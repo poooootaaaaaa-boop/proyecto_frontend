@@ -1,0 +1,127 @@
+.treatments-container {
+  padding: 40px;
+  background-color: #f5f6fa;
+  min-height: 100vh;
+}
+
+.main-title {
+  font-weight: bold !important;
+  margin-bottom: 30px !important;
+}
+
+/* CARDS */
+
+.treatment-cards {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.treatment-card {
+  flex: 1;
+  border-radius: 20px !important;
+  background-color: #f9f9f9 !important;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.medicine-name {
+  font-weight: bold !important;
+}
+
+.medicine-desc {
+  color: gray;
+  font-size: 14px;
+}
+
+.status-chip {
+  background-color: #d4f5d4 !important;
+  color: #2e7d32 !important;
+  font-weight: 500;
+}
+
+/* INFO BOX */
+
+.card-info {
+  display: flex;
+  gap: 20px;
+}
+
+.info-box {
+  background-color: #eeeeee;
+  padding: 15px;
+  border-radius: 12px;
+  flex: 1;
+}
+
+.info-label {
+  font-size: 12px;
+  color: gray;
+}
+
+.info-value {
+  font-weight: bold !important;
+}
+
+.info-sub {
+  font-size: 12px;
+  color: gray;
+}
+
+/* TABLE */
+
+.table-container {
+  padding: 20px;
+  border-radius: 20px !important;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  font-weight: bold;
+  background-color: #eeeeee;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  align-items: center;
+  padding: 15px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.doctor-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.doctor-avatar {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.pdf-btn {
+  background-color: #c5d3f5 !important;
+  color: #2d4bb3 !important;
+  border-radius: 20px !important;
+  text-transform: none !important;
+}
+
+/* LINK */
+
+.history-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #2d4bb3;
+  cursor: pointer;
+  font-weight: 500;
+}

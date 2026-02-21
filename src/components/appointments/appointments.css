@@ -1,0 +1,136 @@
+.appointments-container {
+  padding: 40px;
+  background-color: #f5f6fa;
+  min-height: 100vh;
+}
+
+/* HEADER */
+
+.appointments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-weight: bold !important;
+}
+
+.subtitle {
+  color: gray;
+  font-size: 14px;
+}
+
+.new-btn {
+  background-color: #2d4bb3 !important;
+  color: white !important;
+  border-radius: 25px !important;
+  padding: 10px 20px !important;
+  text-transform: none !important;
+}
+
+/* CONTENT */
+
+.appointments-content {
+  display: flex;
+  gap: 40px;
+}
+
+/* LEFT SIDE */
+
+.appointments-left {
+  flex: 2;
+}
+
+.tabs {
+  margin-bottom: 20px;
+}
+
+/* CARD */
+
+.appointment-card {
+  margin-bottom: 25px;
+  border-left: 6px solid #2d4bb3;
+  border-radius: 15px !important;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.doctor-avatar {
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.doctor-info {
+  flex: 1;
+}
+
+.doctor-name {
+  font-weight: bold !important;
+}
+
+.specialty {
+  color: #2d4bb3;
+  font-size: 14px;
+}
+
+.details {
+  color: gray;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.reagendar-btn {
+  background-color: #dfe6ec !important;
+  color: black !important;
+  text-transform: none !important;
+  border-radius: 10px !important;
+}
+
+.cancelar-btn {
+  background-color: #f5c2c2 !important;
+  color: #d32f2f !important;
+  text-transform: none !important;
+  border-radius: 10px !important;
+}
+
+/* RIGHT SIDE */
+
+.appointments-right {
+  flex: 1;
+}
+
+.calendar {
+  padding: 20px;
+  border-radius: 15px !important;
+  margin-bottom: 20px;
+}
+
+.calendar-title {
+  font-weight: bold !important;
+}
+
+.notes {
+  padding: 20px;
+  border-radius: 15px !important;
+  background-color: #fde8e8 !important;
+}
+
+.notes-title {
+  font-weight: bold !important;
+  margin-bottom: 10px;
+}
+
+.notes-text {
+  color: #d32f2f;
+  font-size: 13px;
+}
