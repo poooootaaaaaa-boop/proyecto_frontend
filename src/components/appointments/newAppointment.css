@@ -1,0 +1,30 @@
+.new-container {
+  padding: 24px;
+}
+
+.calendar-box,
+.hours-box {
+  padding: 16px;
+  border-radius: 16px !important;
+}
+
+.hours-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.hour-chip.free {
+  background: #e3f2fd;
+}
+
+.hour-chip.busy {
+  background: #eee;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hour-chip.selected {
+  background: #1976d2;
+}

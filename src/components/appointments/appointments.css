@@ -1,7 +1,12 @@
+/* =====================================================
+   CONTENEDOR PRINCIPAL (appointments)
+===================================================== */
+
 .appointments-container {
   padding: 40px;
   background-color: #f5f6fa;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 /* HEADER */
@@ -11,6 +16,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .title {
@@ -22,19 +29,31 @@
   font-size: 14px;
 }
 
+/* BOTÓN NUEVA CITA */
+
 .new-btn {
   background-color: #2d4bb3 !important;
   color: white !important;
   border-radius: 25px !important;
   padding: 10px 20px !important;
   text-transform: none !important;
+  transition: all 0.25s ease !important;
 }
 
-/* CONTENT */
+.new-btn:hover {
+  background-color: #1f3a8a !important;
+  transform: translateY(-1px);
+}
 
+/* =====================================================
+   GRID / CONTENT
+===================================================== */
+
+.appointments-grid,
 .appointments-content {
   display: flex;
   gap: 40px;
+  align-items: flex-start;
 }
 
 /* LEFT SIDE */
@@ -47,27 +66,42 @@
   margin-bottom: 20px;
 }
 
-/* CARD */
+/* =====================================================
+   CARD DE CITA
+===================================================== */
 
 .appointment-card {
   margin-bottom: 25px;
   border-left: 6px solid #2d4bb3;
   border-radius: 15px !important;
+  transition: all 0.25s ease;
+}
+
+.appointment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
 }
 
 .card-content {
   display: flex;
   align-items: center;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
-.doctor-avatar {
+/* AVATAR DOCTOR */
+
+.doctor-avatar,
+.card-content .MuiAvatar-root {
   width: 60px !important;
   height: 60px !important;
 }
 
+/* INFO DOCTOR */
+
 .doctor-info {
   flex: 1;
+  min-width: 180px;
 }
 
 .doctor-name {
@@ -84,9 +118,12 @@
   font-size: 13px;
 }
 
+/* ACCIONES */
+
 .actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .reagendar-btn {
@@ -103,10 +140,13 @@
   border-radius: 10px !important;
 }
 
-/* RIGHT SIDE */
+/* =====================================================
+   RIGHT SIDE
+===================================================== */
 
 .appointments-right {
   flex: 1;
+  min-width: 280px;
 }
 
 .calendar {
@@ -118,6 +158,8 @@
 .calendar-title {
   font-weight: bold !important;
 }
+
+/* NOTES */
 
 .notes {
   padding: 20px;
@@ -133,4 +175,91 @@
 .notes-text {
   color: #d32f2f;
   font-size: 13px;
+}
+
+/* =====================================================
+   CONFIRM (lo mantengo pero aislado)
+===================================================== */
+
+.confirm-container {
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.confirm-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px !important;
+  text-align: center;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.confirm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+.avatar {
+  width: 90px !important;
+  height: 90px !important;
+  margin: 10px auto 20px auto !important;
+  border: 4px solid #e3f2fd;
+}
+
+.info {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.confirm-btn {
+  margin-top: 20px !important;
+  background-color: #2d4bb3 !important;
+  border-radius: 25px !important;
+  padding: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+
+.confirm-btn:hover {
+  background-color: #1f3a8a !important;
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+    RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .appointments-grid,
+  .appointments-content {
+    flex-direction: column;
+  }
+
+  .appointments-right {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .appointments-container {
+    padding: 20px;
+  }
+
+  .appointments-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .avatar {
+    width: 72px !important;
+    height: 72px !important;
+  }
 }

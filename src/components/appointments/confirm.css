@@ -1,0 +1,85 @@
+/* CONTENEDOR PRINCIPAL */
+
+.confirm-container {
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* CARD */
+
+.confirm-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px !important;
+  text-align: center;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+/* ✨ hover suave */
+
+.confirm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* TITULO */
+
+.title {
+  font-weight: bold !important;
+  margin-bottom: 20px !important;
+}
+
+/* AVATAR */
+
+.avatar {
+  width: 90px !important;
+  height: 90px !important;
+  margin: 10px auto 20px auto !important;
+  border: 4px solid #e3f2fd;
+}
+
+/* INFO */
+
+.info {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+/* BOTON */
+
+.confirm-btn {
+  margin-top: 20px !important;
+  background-color: #2d4bb3 !important;
+  border-radius: 25px !important;
+  padding: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+
+/* ✨ efecto hover botón */
+
+.confirm-btn:hover {
+  background-color: #1f3a8a !important;
+  transform: translateY(-1px);
+}
+
+/* 📱 responsive */
+
+@media (max-width: 480px) {
+  .confirm-card {
+    max-width: 100%;
+  }
+
+  .avatar {
+    width: 72px !important;
+    height: 72px !important;
+  }
+}
