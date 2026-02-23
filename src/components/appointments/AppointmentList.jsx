@@ -21,7 +21,7 @@ export default function AppointmentList() {
   const navigate = useNavigate();
   const { appointments } = useAppointments();
 
-  // 🔹 puedes filtrar si luego agregas estado
+  // opcional de filtro se agrega aquí, por ahora se muestran todos
   const filteredAppointments = appointments;
 
   return (
