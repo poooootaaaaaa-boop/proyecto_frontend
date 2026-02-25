@@ -1,85 +1,208 @@
-/* CONTENEDOR PRINCIPAL */
-
 .confirm-container {
-  min-height: 100vh;
-  background: #f5f6fa;
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 24px;
-  box-sizing: border-box;
+}
+
+.confirm-wrapper {
+  width: calc(100% + 80px);   /*  compensa 40px + 40px */
+  max-width: 930px;           /* 850 + 80 */
+}
+
+/* HEADER */
+.confirm-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.check-circle {
+  display: inline-flex;
+  background: rgba(16,185,129,0.1);
+  padding: 20px;
+  border-radius: 50%;
+  margin-bottom: 16px;
+}
+
+.success-icon {
+  font-size: 42px;
+  color: #10b981;
+}
+
+.title {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  color: #0f172a;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
 }
 
 /* CARD */
-
 .confirm-card {
-  width: 100%;
-  max-width: 420px;
-  border-radius: 20px !important;
-  text-align: center;
-  padding: 10px;
-  transition: all 0.3s ease;
+  border-radius: 24px !important;
+  border: 1px solid #e2e8f0;
+  box-shadow:
+    0 10px 25px -5px rgba(0,0,0,0.04),
+    0 8px 10px -6px rgba(0,0,0,0.04);
+  overflow: hidden;
 }
 
-/* ✨ hover suave */
-
-.confirm-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+/* DOCTOR */
+.doctor-card {
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+  border-bottom: 1px solid #f1f5f9;
+  background: linear-gradient(
+    90deg,
+    rgba(19,91,236,0.03) 0%,
+    transparent 100%
+  );
 }
 
-/* TITULO */
-
-.title {
-  font-weight: bold !important;
-  margin-bottom: 20px !important;
-}
-
-/* AVATAR */
-
-.avatar {
+.doctor-image {
   width: 90px !important;
   height: 90px !important;
-  margin: 10px auto 20px auto !important;
-  border: 4px solid #e3f2fd;
+  border-radius: 20px !important;
+  border: 4px solid white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-/* INFO */
+.rating-badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  background: white;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 
-.info {
-  color: #555;
+.star-icon {
   font-size: 14px;
+  color: #f59e0b;
+}
+
+/* INFO GRID */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.info-item {
+  padding: 20px;
+  text-align: center;
+  border-right: 1px solid #f1f5f9;
+}
+
+.info-item:last-child {
+  border-right: none;
+}
+
+.info-icon {
+  color: #94a3b8;
   margin-bottom: 6px;
 }
 
-/* BOTON */
+.info-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* INSTRUCTIONS */
+.instructions-section {
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.instructions-title {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  margin-bottom: 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.instructions-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.instruction-card {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.instruction-title {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+.instruction-text {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.amber-icon { color: #f59e0b; }
+.blue-icon { color: #3b82f6; }
+
+.small-primary {
+  color: #135bec;
+}
+
+/* BUTTONS */
+.button-group {
+  margin-top: 30px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+}
 
 .confirm-btn {
-  margin-top: 20px !important;
-  background-color: #2d4bb3 !important;
-  border-radius: 25px !important;
-  padding: 12px !important;
-  text-transform: none !important;
-  font-weight: 600 !important;
-  transition: all 0.25s ease !important;
+  background: #135bec !important;
+  color: white !important;
+  border-radius: 14px !important;
+  padding: 14px !important;
+  font-weight: 800 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
-/* ✨ efecto hover botón */
-
-.confirm-btn:hover {
-  background-color: #1f3a8a !important;
-  transform: translateY(-1px);
+.secondary-btn {
+  border-radius: 14px !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 14px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
 }
 
-/* 📱 responsive */
-
-@media (max-width: 480px) {
-  .confirm-card {
-    max-width: 100%;
-  }
-
-  .avatar {
-    width: 72px !important;
-    height: 72px !important;
-  }
+.legal-text {
+  text-align: center;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 16px;
 }
