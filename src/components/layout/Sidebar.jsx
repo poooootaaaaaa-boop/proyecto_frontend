@@ -67,7 +67,7 @@ export default function Sidebar() {
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
       >
-        ANGELITO CACHONDO
+        Vistas de carlos 
       </Button>
 
 

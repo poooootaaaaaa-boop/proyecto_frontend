@@ -25,34 +25,157 @@ export default function ConfirmAppointment() {
     navigate("/citas");
   };
 
-  return (
-    <Box className="confirm-container">
-      <Grow in timeout={500}>
+return (
+  <Box className="confirm-container">
+    <Grow in timeout={600}>
+      <Box className="confirm-wrapper">
+
+        {/* HEADER */}
+        <Box className="confirm-header">
+          <Box className="check-circle">
+            <span className="material-symbols-outlined success-icon">
+              check_circle
+            </span>
+          </Box>
+
+          <Typography className="title">
+            Confirmación de Reserva
+          </Typography>
+
+          <Typography className="subtitle">
+            Por favor, verifique los detalles antes de finalizar.
+          </Typography>
+        </Box>
+
+        {/* CARD */}
         <Card className="confirm-card">
-          <CardContent>
-            <Typography variant="h5" className="title">
-              Confirmación de Reserva
+
+          {/* DOCTOR */}
+          <Box className="doctor-card">
+            <Box className="doctor-image-wrapper">
+              <Avatar
+                src="https://i.pravatar.cc/150?img=12"
+                className="doctor-image"
+              />
+              <Box className="rating-badge">
+                <span className="material-symbols-outlined star-icon">
+                  star
+                </span>
+                <span>4.9</span>
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography className="doctor-label">
+                Especialista Asignado
+              </Typography>
+              <Typography className="doctor-name">
+                DRA. Elena Vargas
+              </Typography>
+              <Typography className="doctor-specialty">
+                Medicina General
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* INFO GRID */}
+          <Box className="info-grid">
+            <Box className="info-item">
+              <span className="material-symbols-outlined info-icon">
+                calendar_today
+              </span>
+              <Typography className="info-title">Fecha</Typography>
+              <Typography className="info-value">{date}</Typography>
+            </Box>
+
+            <Box className="info-item">
+              <span className="material-symbols-outlined info-icon">
+                schedule
+              </span>
+              <Typography className="info-title">Hora</Typography>
+              <Typography className="info-value">{time}</Typography>
+            </Box>
+
+            <Box className="info-item">
+              <span className="material-symbols-outlined info-icon">
+                location_on
+              </span>
+              <Typography className="info-title">Ubicación</Typography>
+              <Typography className="info-value">
+                Consultorio 402
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* INSTRUCCIONES */}
+          <Box className="instructions-section">
+            <Typography className="instructions-title">
+              <span className="material-symbols-outlined small-primary">
+                priority_high
+              </span>
+              Instrucciones Importantes
             </Typography>
 
-            <Avatar
-              src="https://i.pravatar.cc/150?img=12"
-              className="avatar"
-            />
+            <Box className="instructions-grid">
+              <Box className="instruction-card">
+                <span className="material-symbols-outlined amber-icon">
+                  fastfood
+                </span>
+                <Box>
+                  <Typography className="instruction-title">
+                    Ayuno Requerido
+                  </Typography>
+                  <Typography className="instruction-text">
+                    Mantener ayuno de 8 horas antes de su cita.
+                  </Typography>
+                </Box>
+              </Box>
 
-            <Typography className="info">{date}</Typography>
-            <Typography className="info">{time}</Typography>
+              <Box className="instruction-card">
+                <span className="material-symbols-outlined blue-icon">
+                  description
+                </span>
+                <Box>
+                  <Typography className="instruction-title">
+                    Documentación
+                  </Typography>
+                  <Typography className="instruction-text">
+                    Traer identificación oficial vigente.
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
-            <Button
-              variant="contained"
-              fullWidth
-              className="confirm-btn"
-              onClick={handleConfirm}
-            >
-              Confirmar y Agendar
-            </Button>
-          </CardContent>
         </Card>
-      </Grow>
-    </Box>
-  );
+
+        {/* BOTONES */}
+        <Box className="button-group">
+          <Button
+            className="confirm-btn"
+            onClick={handleConfirm}
+            fullWidth
+          >
+            Confirmar y Agendar
+            <span className="material-symbols-outlined btn-icon">
+              event_available
+            </span>
+          </Button>
+
+          <Button
+            className="secondary-btn"
+            onClick={() => navigate(-1)}
+          >
+            Modificar Selección
+          </Button>
+        </Box>
+
+        <Typography className="legal-text">
+          Al confirmar, se enviará una notificación con los detalles de su cita.
+        </Typography>
+
+      </Box>
+    </Grow>
+  </Box>
+);
 }

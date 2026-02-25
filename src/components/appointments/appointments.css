@@ -233,6 +233,46 @@
   transform: translateY(-1px);
 }
 
+
+/* ===== CARD HISTORIAL ===== */
+.history-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* contenedor header */
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ===== CHIP FINALIZADA ===== */
+.finalizada-chip {
+  background: linear-gradient(45deg, #00c853, #69f0ae) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 8px rgba(0, 200, 83, 0.6);
+  animation: sparkle 2s infinite ease-in-out;
+}
+
+/* ✨ DESTELLO */
+@keyframes sparkle {
+  0% {
+    box-shadow: 0 0 6px rgba(0, 200, 83, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(0, 200, 83, 0.9);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(0, 200, 83, 0.4);
+    transform: scale(1);
+  }
+}
+
 /* 
     RESPONSIVE
  */
