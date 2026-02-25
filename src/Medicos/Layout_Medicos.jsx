@@ -7,15 +7,20 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import EventIcon from "@mui/icons-material/Event";
 import MedicationIcon from "@mui/icons-material/Medication";
+import PersonIcon from '@mui/icons-material/Person';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import "./Layout.css";
 
 import { Link } from "react-router-dom";
 
-export default function Sidebar() {
 
+function Layout_Medicos({ children }) {
   return (
-
-    <div className="sidebar">
-
+     <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="sidebar">
+        
       <Avatar
         sx={{
           width: 70,
@@ -29,7 +34,7 @@ export default function Sidebar() {
         mt={2}
         fontWeight="bold"
       >
-        Sofia Cardenas
+        ANGELITO CACHONDO
       </Typography>
 
       <Typography
@@ -40,71 +45,78 @@ export default function Sidebar() {
         Paciente
       </Typography>
 
-      <Button
+
+
+        <Button
         component={Link}
-        to="/"
+        to="/angelito-cachondo"
         startIcon={<DashboardIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
       >
-        INICIO
+        DASHBOARD
       </Button>
 
-      <Button
+
+        <Button
         component={Link}
-        to="/citas"
-        startIcon={<EventIcon />}
+        to="/angelito-cachondo"
+        startIcon={<PersonIcon />}
+        fullWidth
+        sx={{ color: "white", justifyContent: "flex-start" }}
+      >
+        PACIENTES
+      </Button>
+
+
+        <Button
+        component={Link}
+        to="/angelito-cachondo"
+        startIcon={<DescriptionIcon />}
+        fullWidth
+        sx={{ color: "white", justifyContent: "flex-start" }}
+      >
+        RECETAS MEDICAS
+      </Button>
+
+
+
+        <Button
+        component={Link}
+        to="/angelito-cachondo"
+        startIcon={<CalendarTodayIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
       >
         CITAS
       </Button>
 
-      <Button
+
+
+
+        <Button
         component={Link}
         to="/angelito-cachondo"
-        startIcon={<MedicationIcon />}
+        startIcon={<ContentPasteIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
       >
-        ANGELITO CACHONDO
-      </Button>
-
-      <Button
-        component={Link}
-        to="/Dashboard_medicos"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        Dashboard Medico
+        TRATAMIENTOS
       </Button>
 
 
-        <Button
-        component={Link}
-        to="/lista_paciente"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        Lista de Pacientes
-      </Button>
+      </div>
 
 
 
-        <Button
-        component={Link}
-        to="/tratamientos"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        MEDICAMENTOS
-      </Button>
 
-    </div>
+        <div style={{ flex: 1, padding: "20px", background: "#ffffff" }}>
+            {children}
+        </div>
 
-  );
-
+      </div>
+    
+  )
 }
+
+export default Layout_Medicos
