@@ -8,25 +8,38 @@ import {
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import "dayjs/locale/es";
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import "./newAppointment.css";
+import WeekAppointment from "./WeekAppointment";
 
 dayjs.locale("es");
 
 export default function NewAppointment() {
 
+
+  const [weekSelection, setWeekSelection] = useState(null);
+
   const navigate = useNavigate();
   const today = dayjs();
   const [currentMonth, setCurrentMonth] = useState(today);
-  const [selectedDay, setSelectedDay] = useState(23);
+  const [selectedDay, setSelectedDay] = useState(24);
 
   const startOfMonth = currentMonth.startOf("month");
   const endOfMonth = currentMonth.endOf("month");
   const startDay = startOfMonth.day();
   const daysInMonth = endOfMonth.date();
   const [selectedHour, setSelectedHour] = useState(null);
-
+  const [viewMode, setViewMode] = useState("mes"); // semana | mes
   const days = [];
+
+    useEffect(() => {
+    setSelectedHour(null);
+  }, [viewMode]);
+
+  useEffect(() => {
+    if (viewMode === "mes") setWeekSelection(null);
+  }, [viewMode]);
+
 
   for (let i = 0; i < startDay; i++) days.push(null);
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
@@ -88,12 +101,24 @@ export default function NewAppointment() {
           </Box>
 
           <Box className="apv-view-switch">
-            <Button size="small">Semana</Button>
-            <Button size="small" variant="contained">
-              Mes
-            </Button>
-          </Box>
+  <Button
+    size="small"
+    variant={viewMode === "semana" ? "contained" : "text"}
+    onClick={() => setViewMode("semana")}
+  >
+    Semana
+  </Button>
+
+  <Button
+    size="small"
+    variant={viewMode === "mes" ? "contained" : "text"}
+    onClick={() => setViewMode("mes")}
+  >
+    Mes
+  </Button>
+</Box>
         </Box>
+        {viewMode === "mes" && (
 
         <Box className="apv-calendar-card">
 
@@ -160,77 +185,125 @@ export default function NewAppointment() {
           </Box>
 
         </Box>
+        )}
+
+{viewMode === "semana" && (
+  <WeekAppointment
+    onSelectSlot={(data) => {
+      setWeekSelection(data);
+      setSelectedHour(data.time);
+    }}
+  />
+)}
 
       </Box>
 
       {/* ASISTENTE */}
       <Box className="apv-assistant">
 
-        <Typography className="apv-assistant-title">
-          Asistente de Citas
-        </Typography>
-
-        <Box className="apv-assistant-card">
-
-          <Typography className="apv-assistant-label">
-            Día Seleccionado
-          </Typography>
-
-          <Typography fontWeight={700}>
-            {currentMonth
-              .date(selectedDay)
-              .format("dddd, DD MMMM")}
-          </Typography>
-
-          {selectedHour && (
-  <Typography sx={{ mt: 1 }} fontWeight={600} color="#135bec">
-    Hora: {selectedHour}
+  <Typography className="apv-assistant-title">
+    Asistente de Citas
   </Typography>
-)}
 
-          <Box className="apv-hours-grid">
-  {["09:00 AM","10:30 AM","11:00 AM","03:30 PM"].map((h) => (
-    <Button
-      key={h}
-      size="small"
-      variant={selectedHour === h ? "contained" : "outlined"}
-      onClick={() => setSelectedHour(h)}
-      sx={{
-        fontWeight: 600,
-        borderRadius: "10px"
-      }}
-    >
-      {h}
-    </Button>
-  ))}
-</Box>
+  <Box className="apv-assistant-card">
 
-          <Divider sx={{ my: 3 }} />
+    <Typography className="apv-assistant-label">
+      Día Seleccionado
+    </Typography>
 
-          <Typography fontSize={12} color="text.secondary">
-            Consulta Especialista
-          </Typography>
-          <Typography variant="h5" fontWeight={800}>
-            $85.00
-          </Typography>
+    {/* 📅 FECHA SEGÚN VISTA */}
+    {viewMode === "semana" && weekSelection ? (
+      <Typography fontWeight={700}>
+        {weekSelection.date}
+      </Typography>
+    ) : (
+      <Typography fontWeight={700}>
+        {currentMonth
+          .date(selectedDay)
+          .format("dddd, DD MMMM")}
+      </Typography>
+    )}
 
-        </Box>
+    {/* ⏰ HORA SEGÚN VISTA */}
+    {viewMode === "semana" ? (
+      weekSelection?.time && (
+        <Typography
+          sx={{ mt: 1 }}
+          fontWeight={600}
+          color="#135bec"
+        >
+          Hora: {weekSelection.time}
+        </Typography>
+      )
+    ) : (
+      selectedHour && (
+        <Typography
+          sx={{ mt: 1 }}
+          fontWeight={600}
+          color="#135bec"
+        >
+          Hora: {selectedHour}
+        </Typography>
+      )
+    )}
 
-       <Button
+    {/* 🔥 SOLO EN MODO MES SE VEN LAS HORAS */}
+    {viewMode === "mes" && (
+      <Box className="apv-hours-grid">
+        {["09:00 AM","10:30 AM","11:00 AM","03:30 PM"].map((h) => (
+          <Button
+            key={h}
+            size="small"
+            variant={selectedHour === h ? "contained" : "outlined"}
+            onClick={() => setSelectedHour(h)}
+            sx={{
+              fontWeight: 600,
+              borderRadius: "10px"
+            }}
+          >
+            {h}
+          </Button>
+        ))}
+      </Box>
+    )}
+
+    <Divider sx={{ my: 3 }} />
+
+    <Typography fontSize={12} color="text.secondary">
+      Consulta Especialista
+    </Typography>
+    <Typography variant="h5" fontWeight={800}>
+      $85.00
+    </Typography>
+
+  </Box>
+
+
+<Button
   variant="contained"
   fullWidth
-  disabled={!selectedHour}
-  className="apv-confirm-button"
-  onClick={() =>
-    navigate("/confirmar-cita", {
-      state: {
-        date: currentMonth
-          .date(selectedDay)
-          .format("DD MMMM YYYY"),
-        time: selectedHour,
-      },
-    })
+  disabled={
+    viewMode === "mes"
+      ? !selectedHour
+      : !weekSelection
   }
+  className="apv-confirm-button"
+  onClick={() => {
+    if (viewMode === "mes") {
+      navigate("/confirmar-cita", {
+        state: {
+          date: currentMonth
+            .date(selectedDay)
+            .format("DD MMMM YYYY"),
+          time: selectedHour,
+        },
+      });
+    } else {
+      navigate("/confirmar-cita", {
+        state: weekSelection,
+      });
+    }
+  }}
 >
   Continuar
 </Button>

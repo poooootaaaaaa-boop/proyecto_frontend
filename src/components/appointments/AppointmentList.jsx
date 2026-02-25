@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppointments } from "./AppointmentContext";
 import "./appointments.css";
+import AppointmentHistory from "./AppointmentHistory";
 
 export default function AppointmentList() {
   const [tab, setTab] = useState(0);
@@ -59,74 +60,78 @@ export default function AppointmentList() {
             <Tab label="Historial de Citas" />
           </Tabs>
 
-          {/* LISTADO */}
-          {filteredAppointments.length === 0 && (
-            <Typography sx={{ mt: 3, color: "gray" }}>
-              No tienes citas registradas.
-            </Typography>
-          )}
+      {/* LISTADO */}
+{tab === 0 && (
+  <>
+    {filteredAppointments.length === 0 && (
+      <Typography sx={{ mt: 3, color: "gray" }}>
+        No tienes citas registradas.
+      </Typography>
+    )}
 
-          {filteredAppointments.map((appt, i) => (
-            <Grow in key={i} timeout={400 + i * 120}>
-              <Card className="appointment-card">
-                <CardContent className="card-content">
-                  <Avatar
-                    src={appt.avatar}
-                    className="doctor-avatar"
-                  />
+    {filteredAppointments.map((appt, i) => (
+      <Grow in key={i} timeout={400 + i * 120}>
+        <Card className="appointment-card">
+          <CardContent className="card-content">
+            <Avatar src={appt.avatar} className="doctor-avatar" />
 
-                  <div className="doctor-info">
-                    <Typography className="doctor-name">
-                      {appt.doctor}
-                    </Typography>
+            <div className="doctor-info">
+              <Typography className="doctor-name">
+                {appt.doctor}
+              </Typography>
 
-                    {appt.specialty && (
-                      <Typography className="specialty">
-                        {appt.specialty}
-                      </Typography>
-                    )}
+              {appt.specialty && (
+                <Typography className="specialty">
+                  {appt.specialty}
+                </Typography>
+              )}
 
-                    <Typography className="details">
-                      {appt.date}
-                    </Typography>
+              <Typography className="details">
+                {appt.date}
+              </Typography>
 
-                    <Typography className="details">
-                      {appt.time}
-                    </Typography>
+              <Typography className="details">
+                {appt.time}
+              </Typography>
 
-                    {appt.location && (
-                      <Typography className="details">
-                        {appt.location}
-                      </Typography>
-                    )}
-                  </div>
+              {appt.location && (
+                <Typography className="details">
+                  {appt.location}
+                </Typography>
+              )}
+            </div>
 
-                  {/* acciones opcionales */}
-                  {(appt.onReschedule || appt.onCancel) && (
-                    <div className="actions">
-                      {appt.onReschedule && (
-                        <Button
-                          className="reagendar-btn"
-                          onClick={() => appt.onReschedule(appt)}
-                        >
-                          Reagendar
-                        </Button>
-                      )}
+            {(appt.onReschedule || appt.onCancel) && (
+              <div className="actions">
+                {appt.onReschedule && (
+                  <Button
+                    className="reagendar-btn"
+                    onClick={() => appt.onReschedule(appt)}
+                  >
+                    Reagendar
+                  </Button>
+                )}
 
-                      {appt.onCancel && (
-                        <Button
-                          className="cancelar-btn"
-                          onClick={() => appt.onCancel(appt)}
-                        >
-                          Cancelar
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </Grow>
-          ))}
+                {appt.onCancel && (
+                  <Button
+                    className="cancelar-btn"
+                    onClick={() => appt.onCancel(appt)}
+                  >
+                    Cancelar
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </Grow>
+    ))}
+  </>
+)}
+
+{tab === 1 && (
+  <AppointmentHistory appointments={appointments} />
+)}
         </div>
 
         {/* RIGHT */}

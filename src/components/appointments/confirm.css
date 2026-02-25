@@ -1,12 +1,17 @@
 .confirm-container {
   width: 100%;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Centrado horizontal */
+  align-items: center;     /* Centrado vertical (opcional, pero recomendado) */
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
 .confirm-wrapper {
-  width: calc(100% + 80px);   /*  compensa 40px + 40px */
-  max-width: 930px;           /* 850 + 80 */
+  width: 100%;
+  max-width: 550px; /* Un ancho más estético para que no se vea estirado */
+  margin: 0 auto;   /* Margen automático para asegurar centrado */
 }
 
 /* HEADER */
@@ -41,8 +46,10 @@
 
 /* CARD */
 .confirm-card {
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid #f1f5f9 !important;
   border-radius: 24px !important;
-  border: 1px solid #e2e8f0;
   box-shadow:
     0 10px 25px -5px rgba(0,0,0,0.04),
     0 8px 10px -6px rgba(0,0,0,0.04);
@@ -91,10 +98,12 @@
 }
 
 /* INFO GRID */
+/* Ajuste para que la cuadrícula de información no se vea estirada */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border-bottom: 1px solid #f1f5f9;
+  background: white;
 }
 
 .info-item {
