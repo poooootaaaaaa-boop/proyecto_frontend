@@ -70,6 +70,22 @@ export default function Sidebar() {
         ANGELITO CACHONDO
       </Button>
 
+
+        <Button
+        component={Link}
+        to="/recetas_medicas"
+        startIcon={<MedicationIcon />}
+        fullWidth
+        sx={{ color: "white", justifyContent: "flex-start" }}
+      >
+        recetas medicas
+      </Button>
+
+
+
+
+
+
       <Button
         component={Link}
         to="/Dashboard_medicos"

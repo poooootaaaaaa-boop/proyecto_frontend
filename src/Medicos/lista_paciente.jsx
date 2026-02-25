@@ -22,23 +22,30 @@ function lista_paciente() {
                 <br />
                 <br />
 
-                <div style={{backgroundColor:"white", width:"95%", height:"120px", borderRadius:"70px", justifyContent: "center", display: "flex", alignItems: "center",boxShadow: "0 0 0 6px #E8E8E8", margin: "0 auto",  flexDirection: "column",}}>
-                    <div style={{ position: "relative", marginTop:"18px"}}>
-                     <Form style={{ width: "1120px" }}>
-                        <Form.Group controlId="formGroupEmail">
-                            <Form.Control type="email" placeholder="Nombre del paciente" style={{ paddingRight: "50px", }} />
-                            <SearchIcon onClick={buscarPaciente}  style={{ position: "absolute",right: "15px",top: "50%",transform: "translateY(-50%)",color: "gray",  cursor: "pointer" }} />  
-                        </Form.Group>
-                     </Form>
-                     </div>
+                <div className="container mt-3">
 
-                     <FilterAltIcon style={{ alignSelf: "flex-end", marginRight: "40px", marginTop:"15px",  fontSize: '25px', color:"blue"}}/>
+                    <div className="bg-white p-4" style={{ borderRadius: "20px",border: "1px solid #ddd",boxShadow: "0 2px 6px rgba(0,0,0,0.05)"}}>
 
-                        
-                     
+                        {/* Buscador centrado */}
+                        <div className="row justify-content-center">
+                            <div className="col-12 col-md-10 col-lg-8 position-relative">
+
+                                <Form>
+                                    <Form.Group>
+
+                                        <Form.Control type="text" placeholder="Nombre del paciente" style={{ paddingRight: "50px" }}/>
+                                        <SearchIcon onClick={buscarPaciente} style={{ position: "absolute",right: "20px",top: "50%",transform: "translateY(-50%)",color: "gray",cursor: "pointer"}}/>
+
+                                    </Form.Group>
+                                </Form>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
                 </div>
-                <br />
-                <br />
                 <br />
                 <br />
 
