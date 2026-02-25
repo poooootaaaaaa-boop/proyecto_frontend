@@ -6,7 +6,9 @@ import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-
+import {  CardContent, Typography,Chip} from "@mui/material";
+import ArticleIcon from '@mui/icons-material/Article';
+import "./Tablas.css";
 function Dashboard_medicos() {
   return (
     <div>
@@ -18,32 +20,147 @@ function Dashboard_medicos() {
           </div>
 
 
-          <h5>Bienvenido aqui estamos de nuevo</h5>
+          <h5>Bienvenido aqui estamos de nuevo Angelito cachondo</h5>
           <br />
 
 
-          <div style={{ display: "flex"}}>
-              <Card style={{ width: '18rem', borderRadius: '15px'}}>
-                <Card.Body>
-                  <Card.Subtitle className="mb-2 text-muted" >Citas de Hoy</Card.Subtitle>
-                  <Card.Title style={{ fontSize: '3rem', fontWeight: 'bold' }}>18</Card.Title>
-                </Card.Body>
-              </Card>
-              
-              <Card style={{ width: '18rem', borderRadius: '15px'}}>
-                <Card.Body>
-                  <Card.Subtitle className="mb-2 text-muted">Citas de Hoy</Card.Subtitle>
-                  <Card.Title style={{ fontSize: '3rem', fontWeight: 'bold' }}>18</Card.Title>
-                </Card.Body>
-              </Card>
+          <div className="treatment-cards" style={{width:"60%", display:"flex"}}>
+              <Card className="treatment-card">
+              <CardContent>
+                <div className="card-header">
+                  <div>
+                    <Typography className="medicine-name">
+                      Citas del dia
+                    </Typography>
+                  </div>
+                  <Chip label="En curso" size="small" className="status-chip" />
+                </div>
 
-              <Card style={{ width: '18rem', borderRadius: '15px'}}>
-                <Card.Body>
-                  <Card.Subtitle className="mb-2 text-muted">Citas de Hoy</Card.Subtitle>
-                  <Card.Title style={{ fontSize: '3rem', fontWeight: 'bold' }}>18</Card.Title>
-                </Card.Body>
-              </Card>
+                <div className="card-info">
+
+                  <div className="info-box" style={{textAlign:"center"}}>
+                    <Typography variant="h3">18</Typography>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+              <Card className="treatment-card">
+              <CardContent>
+                <div className="card-header">
+                  <div>
+                    <Typography className="medicine-name">
+                      Citas del dia
+                    </Typography>
+                  </div>
+                  <Chip label="En curso" size="small" className="status-chip" />
+                </div>
+
+                <div className="card-info">
+
+                  <div className="info-box" style={{textAlign:"center"}}>
+                    <Typography variant="h3">18</Typography>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+
+              <Card className="treatment-card">
+              <CardContent>
+                <div className="card-header">
+                  <div>
+                    <Typography className="medicine-name">
+                      Citas del dia
+                    </Typography>
+                  </div>
+                  <Chip label="En curso" size="small" className="status-chip" />
+                </div>
+
+                <div className="card-info">
+
+                  <div className="info-box" style={{textAlign:"center"}}>
+                    <Typography variant="h3">18</Typography>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          
+        
+
           </div>
+
+
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
           <br />
 
@@ -72,10 +189,6 @@ function Dashboard_medicos() {
 
                 </div>
 
-
-
-        
-
               </div>
 
 
@@ -91,8 +204,8 @@ function Dashboard_medicos() {
           <br />
 
           <div style={{display:"flex"}}>
-            <div style={{ width: '650px', marginLeft: '130px', marginTop: '10px'}}>
-              <Table striped bordered hover>
+            <div style={{ width: '750px', marginLeft: '130px', marginTop: '10px'}}>
+              <Table  className="agenda-table">
                 <thead>
                   <tr>
                     <th>Hora</th>
@@ -119,8 +232,35 @@ function Dashboard_medicos() {
               </Table>
             </div>
 
-            <div style={{ marginLeft: '200px' }}>
+
+
+            <div style={{ marginLeft: '100px' }}>
               <h4>Ultimas Recetas</h4>
+
+                <div className="info-box" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <ArticleIcon style={{ backgroundColor: "#6bb3ffef", color: "white", borderRadius: "10%", padding: "8px", fontSize: "35px" }} />
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography className="info-value">
+                      DRA. Elena Vargas
+                    </Typography>
+                    <Typography className="info-sub">
+                      Medicina 10mg -30 días
+                    </Typography>
+                  </div>
+                </div>
+
+                  
+                  <div className="info-box" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <ArticleIcon style={{ backgroundColor: "#6bb3ffef", color: "white", borderRadius: "10%", padding: "8px", fontSize: "35px" }} />
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography className="info-value">
+                        DRA. Juan Pérez
+                      </Typography>
+                      <Typography className="info-sub">
+                        Medicina 5mg -15 días
+                      </Typography>
+                    </div>
+                  </div>
               
             </div>
             

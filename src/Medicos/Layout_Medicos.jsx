@@ -23,9 +23,10 @@ function Layout_Medicos({ children }) {
         
       <Avatar
         sx={{
-          width: 70,
-          height: 70,
-          margin: "0 auto"
+      width: 70,
+      height: 70,
+      margin: "0 auto",
+      border: "3px solid white"
         }}
       />
 
@@ -44,6 +45,8 @@ function Layout_Medicos({ children }) {
       >
         Paciente
       </Typography>
+
+        <div style={{ height: "30px" }}></div>
 
 
 
