@@ -9,6 +9,7 @@ import { AppointmentProvider } from "./components/appointments/AppointmentContex
 import Layout_Medicos from "./Medicos/Layout_Medicos";
 import Dashboard_medicos from "./Medicos/Dashboard_medicos";
 import Lista_paciente from "./Medicos/lista_paciente";
+import Recetas_medicas from "./Medicos/recetas_medicas"
 export default function App() {
 
   return (
@@ -19,6 +20,7 @@ export default function App() {
       <Route path="/" element={<Dashboard />} />
 
       <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
+      <Route path="/recetas_medicas" element={<Recetas_medicas />} />
       <Route path="/lista_paciente" element={<Lista_paciente />} />
       <Route path="/Dashboard_medicos" element={<Dashboard_medicos />} />
       <Route path="/citas" element={<Appointments />} />

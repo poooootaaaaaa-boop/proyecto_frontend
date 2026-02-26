@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 import SearchIcon from '@mui/icons-material/Search';
+import Button from 'react-bootstrap/Button';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import "./Tablas.css";
 
 
 
@@ -15,59 +18,68 @@ function lista_paciente() {
         <div>
             <Layout_Medicos>
                 <br />
-                <h1>Lista de pacientes</h1>
+                <h1 style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}>Lista de pacientes</h1>
                 <br />
                 <br />
 
-                <div style={{backgroundColor:"white", width:"95%", height:"100px", borderRadius:"50px", justifyContent: "center", display: "flex", alignItems: "center",boxShadow: "0 0 0 6px #E8E8E8", margin: "0 auto"}}>
-                    <div style={{ position: "relative"}}>
-                     <Form style={{ width: "1150px" }}>
-                        <Form.Group controlId="formGroupEmail">
-                            <Form.Control type="email" placeholder="Nombre del paciente" style={{ paddingRight: "50px", }} />
-                            <SearchIcon onClick={buscarPaciente}  style={{ position: "absolute",right: "15px",top: "50%",transform: "translateY(-50%)",color: "gray",  cursor: "pointer" }} />
-                            
-                        </Form.Group>
-                     </Form>
-                     </div>
-                        
-                     
+                <div className="container mt-3">
+
+                    <div className="bg-white p-4" style={{ borderRadius: "20px",border: "1px solid #ddd",boxShadow: "0 2px 6px rgba(0,0,0,0.05)"}}>
+
+                        {/* Buscador centrado */}
+                        <div className="row justify-content-center">
+                            <div className="col-12 col-md-10 col-lg-8 position-relative">
+
+                                <Form>
+                                    <Form.Group>
+
+                                        <Form.Control type="text" placeholder="Nombre del paciente" style={{ paddingRight: "50px" }}/>
+                                        <SearchIcon onClick={buscarPaciente} style={{ position: "absolute",right: "20px",top: "50%",transform: "translateY(-50%)",color: "gray",cursor: "pointer"}}/>
+
+                                    </Form.Group>
+                                </Form>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
                 </div>
                 <br />
                 <br />
-                <br />
-                <br />
 
 
-                 <Table style={{borderRadius: "15px", overflow: "hidden", border: "none", width:"1150px", margin: "0 auto" }}>
-                    <thead>
-                    <tr>
-                        <th style={{ backgroundColor: "#F5F5F5",border: "none",padding: "15px",color: "#555"}}>Hora</th>
-                        <th style={{backgroundColor: "#F5F5F5",border: "none",color: "#555"}}>Paciente</th>
-                        <th style={{backgroundColor: "#F5F5F5",border: "none",color: "#555"}}>Ultima cita</th>
-                        <th style={{backgroundColor: "#F5F5F5",border: "none",color: "#555"}}>Acciones</th>
-
-                    </tr>
-                    </thead>
-
-                    <tbody style={{ backgroundColor: "white" }}>
-
+                <div style={{ width: '850px', marginTop: '10px',margin:"0 auto" }}>
+                    <Table  className="agenda-table">
+                        <thead>
                         <tr>
-                        <td style={{ border: "none", padding: "15px" }}>14:30</td>
-                        <td style={{ border: "none" }}>Angelito</td>
-                        <td style={{ border: "none" }}>Consulta Médica</td>
-                        <td style={{ border: "none" }}>En espera</td>
+                            <th>Paciente</th>
+                            <th>Ultima cita</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Angelito Cachondo</td>
+                            <td>25/02/2026</td>
+                            <td><Button variant="outline-primary">Acceso rapido al expediente</Button></td>
                         </tr>
 
                         <tr>
-                        <td style={{ border: "none", padding: "15px" }}>14:30</td>
-                        <td style={{ border: "none" }}>Erick</td>
-                        <td style={{ border: "none" }}>Consulta Médica</td>
-                        <td style={{ border: "none" }}>En espera</td>
+                            <td>Angelito Cachondo</td>
+                            <td>25/02/2026</td>
+                            <td><Button variant="outline-primary">Acceso rapido al expediente</Button></td>
                         </tr>
 
-                    </tbody>
-
-                </Table>
+                        <tr>
+                            <td>Angelito Cachondo</td>
+                            <td>25/02/2026</td>
+                            <td><Button variant="outline-primary">Acceso rapido al expediente</Button></td>
+                        </tr>
+                        </tbody>
+                    </Table>
+                </div>
                 
             </Layout_Medicos>
 
