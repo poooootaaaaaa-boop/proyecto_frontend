@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-
+import FarmaciaRoutes from "./routes/FarmaciaRoutes";
 import Dashboard from "./pages/Dashboard";
 import Appointments from "./pages/Appointments";
 import Treatments from "./pages/Treatments";
@@ -28,7 +28,7 @@ export default function App() {
       <Route path="/confirmar-cita" element={<ConfirmAppointment />} />
 
       <Route path="/tratamientos" element={<Treatments />} />
-
+      <Route path="/farmacia/*" element={<FarmaciaRoutes/>} />
     </Routes>
     </AppointmentProvider>
   );
