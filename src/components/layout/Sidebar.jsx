@@ -73,44 +73,6 @@ export default function Sidebar() {
 
         <Button
         component={Link}
-        to="/recetas_medicas"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        recetas medicas
-      </Button>
-
-
-
-
-
-
-      <Button
-        component={Link}
-        to="/Dashboard_medicos"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        Dashboard Medico
-      </Button>
-
-
-        <Button
-        component={Link}
-        to="/lista_paciente"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        Lista de Pacientes
-      </Button>
-
-
-
-        <Button
-        component={Link}
         to="/tratamientos"
         startIcon={<MedicationIcon />}
         fullWidth

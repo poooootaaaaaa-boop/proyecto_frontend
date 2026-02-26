@@ -52,7 +52,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/Dashboard_medicos"
         startIcon={<DashboardIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
@@ -63,7 +63,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/lista_paciente"
         startIcon={<PersonIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
@@ -74,7 +74,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/recetas_medicas"
         startIcon={<DescriptionIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
