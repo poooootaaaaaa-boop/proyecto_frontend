@@ -78,9 +78,9 @@ function lista_paciente({data=[]}) {
 
                                         <td>{paciente.nombre} {paciente.apellidoP}</td>
 
-                                        <td>{paciente.nacimiento}</td>
+                                        <td>no tiene cita</td>
 
-                                        <td>Acceder</td>
+                                        <td><Button variant="outline-primary">Acceder</Button></td>
 
                                     </tr>
 

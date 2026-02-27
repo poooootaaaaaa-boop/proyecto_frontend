@@ -10,7 +10,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
 
-function Alta_pacientes({data,setData}){
+function Alta_pacientes({ data, setData }){
 
         const[nombre, setNombre]=useState("");
         const[apellidoP, setApellidoP]=useState("");

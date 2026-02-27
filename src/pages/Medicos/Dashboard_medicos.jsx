@@ -24,7 +24,7 @@ function Dashboard_medicos() {
           <br />
 
 
-          <div className="treatment-cards" style={{width:"60%", display:"flex"}}>
+          <div className="treatment-cards" style={{width:"800px", display:"flex"}}>
               <Card className="treatment-card">
               <CardContent>
                 <div className="card-header">
@@ -33,7 +33,7 @@ function Dashboard_medicos() {
                       Citas del dia
                     </Typography>
                   </div>
-                  <Chip label="En curso" size="small" className="status-chip" />
+                
                 </div>
 
                 <div className="card-info">
@@ -53,7 +53,7 @@ function Dashboard_medicos() {
                       Citas del dia
                     </Typography>
                   </div>
-                  <Chip label="En curso" size="small" className="status-chip" />
+      
                 </div>
 
                 <div className="card-info">
@@ -74,7 +74,6 @@ function Dashboard_medicos() {
                       Citas del dia
                     </Typography>
                   </div>
-                  <Chip label="En curso" size="small" className="status-chip" />
                 </div>
 
                 <div className="card-info">

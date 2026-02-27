@@ -6,6 +6,7 @@ import Lista_paciente from "./lista_paciente";
 
 function ClinicaApp() {
   const [data, setData] = useState([]); 
+   const [dataPacientes, setDataPacientes] = useState([]);
 
   return (
     <>
@@ -13,8 +14,8 @@ function ClinicaApp() {
       <Recetas_medicas data={data} /> 
 
 
-      <Alta_pacientes data={data} setData={setData} />
-      <Lista_paciente data={data}/>
+      <Alta_pacientes data={dataPacientes} setData={setDataPacientes} />
+      <Lista_paciente data={dataPacientes}/>
 
     </>
   );
