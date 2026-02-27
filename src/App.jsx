@@ -8,6 +8,7 @@ import NewAppointment from "./components/appointments/NewAppointment";
 import ConfirmAppointment from "./components/appointments/ConfirmAppointment";
 import { AppointmentProvider } from "./components/appointments/AppointmentContext";
 
+
 // Tus rutas y componentes del stash
 import Layout_Medicos from "./pages/Medicos/Layout_Medicos";
 import Dashboard_medicos from "./pages/Medicos/Dashboard_medicos";
@@ -18,6 +19,7 @@ import Layout from "./components/layout/Layout";
 
 export default function App() {
   return (
+
     <AppointmentProvider>
       <Routes>
         <Route path="/" element={<Dashboard />} />
