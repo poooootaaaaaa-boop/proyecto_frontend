@@ -12,7 +12,7 @@ import Lista_paciente from "./Medicos/lista_paciente";
 import Recetas_medicas from "./Medicos/recetas_medicas"
 export default function App() {
 
-  return (
+  return ( 
     <AppointmentProvider>
     <Routes>
 
