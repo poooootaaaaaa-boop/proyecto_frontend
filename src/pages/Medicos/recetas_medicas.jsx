@@ -5,7 +5,6 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from 'react-bootstrap/Button';
 import DownloadIcon from '@mui/icons-material/Download';
-import Alta_pacientes from "./alta_pacientes";
 import { useState } from "react";
 
 

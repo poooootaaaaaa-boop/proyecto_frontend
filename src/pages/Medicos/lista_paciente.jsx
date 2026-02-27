@@ -5,12 +5,15 @@ import Table from 'react-bootstrap/Table';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from 'react-bootstrap/Button';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { Typography} from "@mui/material";
 import "./Tablas.css";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import Datagrid from "./Datagrid";
 
 
 
 
-function lista_paciente() { 
+function lista_paciente({data=[]}) { 
       const buscarPaciente = () => {
     console.log("Buscando paciente")
   }
@@ -19,6 +22,7 @@ function lista_paciente() {
             <Layout_Medicos>
                 <br />
                 <h1 style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}>Lista de pacientes</h1>
+                <Typography className="medicine-name" style={{color:"gray"}}>Consulte y descargue las recetas médicas de sus pacientes.</Typography>
                 <br />
                 <br />
 
@@ -28,29 +32,36 @@ function lista_paciente() {
 
                         {/* Buscador centrado */}
                         <div className="row justify-content-center">
-                            <div className="col-12 col-md-10 col-lg-8 position-relative">
+                            <div className="col-12 col-md-10 col-lg-8 ">
 
-                                <Form>
-                                    <Form.Group>
+                                <div style={{ position:"relative" }}>
 
-                                        <Form.Control type="text" placeholder="Nombre del paciente" style={{ paddingRight: "50px" }}/>
-                                        <SearchIcon onClick={buscarPaciente} style={{ position: "absolute",right: "20px",top: "50%",transform: "translateY(-50%)",color: "gray",cursor: "pointer"}}/>
+                                    <Form>
+                                        <Form.Group>
 
-                                    </Form.Group>
-                                </Form>
+                                            <Form.Control type="text" placeholder="Nombre del paciente" style={{ paddingRight: "50px" }}/>
+                                            <SearchIcon onClick={buscarPaciente} style={{ position: "absolute",right: "20px",top: "50%",transform: "translateY(-50%)",color: "gray",cursor: "pointer"}}/>
+
+                                        </Form.Group>
+                                    </Form>
+                                </div>
+                                <br />
+                                 <div style={{ marginTop: "10px", display:"flex", alignItems:"center"}}>
+                                    <CalendarMonthIcon style={{color: "black", cursor: "pointer",fontSize: "25px"}}/>
+                                    <Typography className="medicine-name" style={{color:"black"}}>Ultima Visita</Typography>
+                                 </div>
 
                             </div>
+                            
                         </div>
-
 
                     </div>
 
                 </div>
                 <br />
                 <br />
-
-
-                <div style={{ width: '850px', marginTop: '10px',margin:"0 auto" }}>
+                
+                <div style={{ width: '1200px', marginTop: '10px',margin:"0 auto" }}>
                     <Table  className="agenda-table">
                         <thead>
                         <tr>
@@ -59,25 +70,23 @@ function lista_paciente() {
                             <th>Acciones</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr>
-                            <td>Angelito Cachondo</td>
-                            <td>25/02/2026</td>
-                            <td><Button variant="outline-primary">Acceso rapido al expediente</Button></td>
-                        </tr>
+                            <tbody>
 
-                        <tr>
-                            <td>Angelito Cachondo</td>
-                            <td>25/02/2026</td>
-                            <td><Button variant="outline-primary">Acceso rapido al expediente</Button></td>
-                        </tr>
+                                {data.map((paciente,index)=> (
 
-                        <tr>
-                            <td>Angelito Cachondo</td>
-                            <td>25/02/2026</td>
-                            <td><Button variant="outline-primary">Acceso rapido al expediente</Button></td>
-                        </tr>
-                        </tbody>
+                                    <tr key={index}>
+
+                                        <td>{paciente.nombre} {paciente.apellidoP}</td>
+
+                                        <td>{paciente.nacimiento}</td>
+
+                                        <td>Acceder</td>
+
+                                    </tr>
+
+                                ))}
+
+                            </tbody>
                     </Table>
                 </div>
                 
