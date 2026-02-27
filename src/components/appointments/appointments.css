@@ -146,11 +146,12 @@
 
 .appointments-right {
   flex: 1;
-  min-width: 280px;
+  min-width: 250px;
+  margin-top: 55px; /* ajusta este valor */
 }
 
 .calendar {
-  padding: 20px;
+  padding: 0px;
   border-radius: 15px !important;
   margin-bottom: 20px;
 }
@@ -271,6 +272,33 @@
     box-shadow: 0 0 6px rgba(0, 200, 83, 0.4);
     transform: scale(1);
   }
+}
+
+
+/* Día completamente bloqueado */
+.apv-day-cell.booked {
+  background-color: #e5e7eb;      /* gris completo */
+  border: 1px solid #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.8;
+  pointer-events: none;           /*  bloquea totalmente interacción */
+}
+
+/* número del día */
+.apv-day-cell.booked .apv-day-number {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+/* quitar puntito azul si estaba */
+.apv-day-cell.booked .apv-dot {
+  display: none;
+}
+
+/* quitar hover */
+.apv-day-cell.booked:hover {
+  background-color: #e5e7eb;
+  transform: none;
 }
 
 /* 
