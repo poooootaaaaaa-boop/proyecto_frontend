@@ -4,6 +4,8 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppointments } from "./AppointmentContext";
 import "./confirm.css";
+import SuccessModal from "./SuccessModal";
+import { useState } from "react";
 
 export default function ConfirmAppointment() {
   const navigate = useNavigate();
@@ -11,24 +13,35 @@ export default function ConfirmAppointment() {
   const { addAppointment } = useAppointments();
 
   const { date, time } = location.state || {};
+  const [openModal, setOpenModal] = useState(false);
 
   const handleConfirm = () => {
-    addAppointment({
-      doctor: "DRA. Elena Vargas",
-      specialty: "Medicina General",
-      date,
-      time,
-      location: "Consultorio 402",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    });
+  addAppointment({
+    id: Date.now(),
+    doctor: "DRA. Elena Vargas",
+    specialty: "Medicina General",
+    date,
+    time,
+    location: "Consultorio 402",
+    avatar: "https://i.pravatar.cc/150?img=12",
+  });
 
-    navigate("/citas");
-  };
+  setOpenModal(true); // 👈 ABRE el modal
+};
 
 return (
   <Box className="confirm-container">
     <Grow in timeout={600}>
       <Box className="confirm-wrapper">
+
+
+        <SuccessModal
+  open={openModal}
+  onClose={() => {
+    setOpenModal(false);
+    navigate("/citas"); // 👈 aquí sí
+  }}
+/>
 
         {/* HEADER */}
         <Box className="confirm-header">
@@ -163,11 +176,12 @@ return (
           </Button>
 
           <Button
-            className="secondary-btn"
-            onClick={() => navigate(-1)}
-          >
-            Modificar Selección
-          </Button>
+  className="secondary-btn"
+  onClick={() => navigate(-1)}
+  fullWidth   // 👈 FALTABA ESTO
+>
+  Modificar Selección
+</Button>
         </Box>
 
         <Typography className="legal-text">
@@ -177,5 +191,7 @@ return (
       </Box>
     </Grow>
   </Box>
+
+  
 );
 }

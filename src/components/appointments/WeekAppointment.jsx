@@ -9,6 +9,7 @@ import "dayjs/locale/es";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./weekAppointment.css";
+import { useAppointments } from "../appointments/AppointmentContext";
 
 dayjs.locale("es");
 
@@ -18,6 +19,7 @@ export default function WeekAppointment({ onSelectSlot }) {
   const navigate = useNavigate();
   const [currentWeek, setCurrentWeek] = useState(dayjs());
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const { appointments } = useAppointments();
 
   // inicio de semana (lunes)
   const startOfWeek = currentWeek.startOf("week").add(1, "day");
@@ -82,31 +84,48 @@ export default function WeekAppointment({ onSelectSlot }) {
               </div>
 
               {HOURS.map((hour) => {
-                const key = `${day.format("YYYY-MM-DD")}-${hour}`;
-                const isSelected = selectedSlot === key;
+  const dateFormatted = day.format("DD MMMM YYYY");
 
-                return (
-                  <div
-                    key={key}
-                    className={`slot ${
-                      isSelected ? "selected" : ""
-                    }`}
-                    onClick={() => {
-  setSelectedSlot(key);
+  const isBooked = appointments.some(
+    (a) => a.date === dateFormatted && a.time === hour
+  );
 
-  const date = day.format("DD MMMM YYYY");
-  const time = hour;
+  const key = `${day.format("YYYY-MM-DD")}-${hour}`;
+  const isSelected = selectedSlot === key;
 
-  onSelectSlot?.({ date, time });
-}}
-                  >
-                    <span className="slot-hour">{hour}</span>
-                    <span className="slot-action">
-                      {isSelected ? "Seleccionado" : "Reservar"}
-                    </span>
-                  </div>
-                );
-              })}
+  return (
+    <div
+      key={key}
+      className={`slot 
+        ${isSelected ? "selected" : ""} 
+        ${isBooked ? "booked" : ""}
+      `}
+      onClick={() => {
+        if (isBooked) return; //  bloquea click
+
+        setSelectedSlot(key);
+
+        onSelectSlot?.({
+          date: dateFormatted,
+          time: hour,
+        });
+      }}
+    >
+      {isBooked ? (
+        <span className="slot-occupied">
+          Ocupado
+        </span>
+      ) : (
+        <>
+          <span className="slot-hour">{hour}</span>
+          <span className="slot-action">
+            {isSelected ? "Seleccionado" : "Reservar"}
+          </span>
+        </>
+      )}
+    </div>
+  );
+})}
             </Box>
           ))}
         </Box>

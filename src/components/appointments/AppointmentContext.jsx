@@ -9,8 +9,29 @@ export function AppointmentProvider({ children }) {
     setAppointments((prev) => [...prev, appt]);
   };
 
+  const updateAppointment = (updatedAppt) => {
+    setAppointments((prev) =>
+      prev.map((appt) =>
+        appt.id === updatedAppt.id ? updatedAppt : appt
+      )
+    );
+  };
+
+  const deleteAppointment = (id) => {
+    setAppointments((prev) =>
+      prev.filter((appt) => appt.id !== id)
+    );
+  };
+
   return (
-    <AppointmentContext.Provider value={{ appointments, addAppointment }}>
+    <AppointmentContext.Provider
+      value={{
+        appointments,
+        addAppointment,
+        updateAppointment,
+        deleteAppointment,
+      }}
+    >
       {children}
     </AppointmentContext.Provider>
   );

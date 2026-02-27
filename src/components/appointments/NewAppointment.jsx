@@ -11,12 +11,13 @@ import "dayjs/locale/es";
 import { useState , useEffect } from "react";
 import "./newAppointment.css";
 import WeekAppointment from "./WeekAppointment";
+import { useAppointments } from "../appointments/AppointmentContext";
 
 dayjs.locale("es");
 
 export default function NewAppointment() {
 
-
+  const { appointments } = useAppointments();
   const [weekSelection, setWeekSelection] = useState(null);
 
   const navigate = useNavigate();
@@ -45,6 +46,16 @@ export default function NewAppointment() {
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
 
   const availableDays = [1,2,6,8,10,14,15,21,22,23,28,30];
+
+  // fechas ocupadas (formato: DD MMMM YYYY)
+const bookedDates = appointments.map(a => a.date);
+
+// horas ocupadas del día seleccionado
+const bookedHoursForSelectedDay = appointments
+  .filter(a =>
+    a.date === currentMonth.date(selectedDay).format("DD MMMM YYYY")
+  )
+  .map(a => a.time);
 
   return (
     <Box className="apv-container">
@@ -144,45 +155,54 @@ export default function NewAppointment() {
             </Button>
           </Box>
 
-          <Box className="apv-week-row">
-            {["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"].map((d) => (
-              <div key={d}>{d}</div>
-            ))}
-          </Box>
+     <Box className="apv-week-row">
+  {["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"].map((d) => (
+    <div key={d}>{d}</div>
+  ))}
+</Box>
 
-          <Box className="apv-calendar-grid">
-            {days.map((day, index) => {
-              const isAvailable = availableDays.includes(day);
-              const isSelected = selectedDay === day;
+<Box className="apv-calendar-grid">
+  {days.map((day, index) => {
 
-              return (
-                <div
-                  key={index}
-                  className={`apv-day-cell
-                    ${!day ? "empty" : ""}
-                    ${isSelected ? "selected" : ""}
-                  `}
-                  onClick={() => {
-  if (!day) return;
-  setSelectedDay(day);
-  setSelectedHour(null); //  resetea la hora al cambiar de día
-}}
-                >
-                  {day && (
-                    <>
-                      <span className="apv-day-number">
-                        {day}
-                      </span>
+    const isAvailable = availableDays.includes(day);
+    const isSelected = selectedDay === day;
 
-                      {isAvailable && (
-                        <span className="apv-dot"></span>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </Box>
+    const formattedDate = day
+      ? currentMonth.date(day).format("DD MMMM YYYY")
+      : null;
+
+    const isBooked =
+      formattedDate && bookedDates.includes(formattedDate);
+
+    return (
+      <div
+        key={index}
+        className={`apv-day-cell
+          ${!day ? "empty" : ""}
+          ${isSelected ? "selected" : ""}
+          ${isBooked ? "booked" : ""}
+        `}
+        onClick={() => {
+          if (!day || isBooked) return; //  aquí se bloquea
+          setSelectedDay(day);
+          setSelectedHour(null);
+        }}
+      >
+        {day && (
+          <>
+            <span className="apv-day-number">
+              {day}
+            </span>
+
+            {isAvailable && !isBooked && (
+              <span className="apv-dot"></span>
+            )}
+          </>
+        )}
+      </div>
+    );
+  })}
+</Box>
 
         </Box>
         )}
@@ -211,7 +231,7 @@ export default function NewAppointment() {
       Día Seleccionado
     </Typography>
 
-    {/* 📅 FECHA SEGÚN VISTA */}
+    {/* FECHA SEGÚN VISTA */}
     {viewMode === "semana" && weekSelection ? (
       <Typography fontWeight={700}>
         {weekSelection.date}
@@ -224,7 +244,7 @@ export default function NewAppointment() {
       </Typography>
     )}
 
-    {/* ⏰ HORA SEGÚN VISTA */}
+    {/* HORA SEGÚN VISTA */}
     {viewMode === "semana" ? (
       weekSelection?.time && (
         <Typography
@@ -247,10 +267,10 @@ export default function NewAppointment() {
       )
     )}
 
-    {/* 🔥 SOLO EN MODO MES SE VEN LAS HORAS */}
+    {/*  SOLO EN MODO MES SE VEN LAS HORAS */}
     {viewMode === "mes" && (
       <Box className="apv-hours-grid">
-        {["09:00 AM","10:30 AM","11:00 AM","03:30 PM"].map((h) => (
+        {["08:00 AM","09:00 AM","10:00 AM","11:00 PM"].map((h) => (
           <Button
             key={h}
             size="small"
