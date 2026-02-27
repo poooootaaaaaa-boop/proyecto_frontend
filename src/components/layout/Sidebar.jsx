@@ -7,6 +7,7 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import EventIcon from "@mui/icons-material/Event";
 import MedicationIcon from "@mui/icons-material/Medication";
+import HistoryIcon from "@mui/icons-material/History";;
 
 import { Link } from "react-router-dom";
 
@@ -20,7 +21,8 @@ export default function Sidebar() {
         sx={{
           width: 70,
           height: 70,
-          margin: "0 auto"
+          margin: "0 auto",
+          border: "3px solid white"
         }}
       />
 
@@ -62,6 +64,16 @@ export default function Sidebar() {
 
       <Button
         component={Link}
+        to="/historial_medico"
+        startIcon={<HistoryIcon />}
+        fullWidth
+        sx={{ color: "white", justifyContent: "flex-start" }}
+      >
+        HISTORIAL MÉDICO
+      </Button>
+
+      <Button
+        component={Link}
         to="/angelito-cachondo"
         startIcon={<MedicationIcon />}
         fullWidth
@@ -69,44 +81,6 @@ export default function Sidebar() {
       >
         Vistas de carlos 
       </Button>
-
-
-        <Button
-        component={Link}
-        to="/recetas_medicas"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        recetas medicas
-      </Button>
-
-
-
-
-
-
-      <Button
-        component={Link}
-        to="/Dashboard_medicos"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        Dashboard Medico
-      </Button>
-
-
-        <Button
-        component={Link}
-        to="/lista_paciente"
-        startIcon={<MedicationIcon />}
-        fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
-      >
-        Lista de Pacientes
-      </Button>
-
 
 
         <Button

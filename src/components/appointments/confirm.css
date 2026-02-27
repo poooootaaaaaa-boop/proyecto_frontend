@@ -215,3 +215,53 @@
   color: #94a3b8;
   margin-top: 16px;
 }
+
+.button-group {
+  margin-top: 30px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 60px; /*  ESTA ES LA CLAVE */
+  box-sizing: border-box;
+}
+
+.confirm-btn,
+.secondary-btn {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+.confirm-btn,
+.secondary-btn {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex; /* en secondary también */
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+
+/* MODAL SUCCESS */
+.modal-success-container {
+  text-align: center;
+  padding: 10px 6px 6px;
+}
+
+.modal-check {
+  margin-bottom: 12px;
+}
+
+.modal-title {
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  color: #0f172a;
+  margin-bottom: 6px !important;
+}
+
+.modal-subtitle {
+  font-size: 13px;
+  color: #64748b;
+}

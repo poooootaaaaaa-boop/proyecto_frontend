@@ -97,3 +97,34 @@
   border-radius: 14px !important;
   font-weight: bold !important;
 }
+
+
+
+
+/* SLOT OCUPADO COMPLETO */
+.slot.booked {
+  background: #f1f5f9;        /* gris suave */
+  border: none;
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+/* texto ocupado */
+.slot-occupied {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+/* quitar hover */
+.slot.booked:hover {
+  background: #f1f5f9;
+  border: none;
+  transform: none;
+}

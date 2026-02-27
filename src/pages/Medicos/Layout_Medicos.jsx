@@ -35,15 +35,7 @@ function Layout_Medicos({ children }) {
         mt={2}
         fontWeight="bold"
       >
-        ANGELITO CACHONDO
-      </Typography>
-
-      <Typography
-        align="center"
-        mb={3}
-        fontSize={14}
-      >
-        Paciente
+        Dr. Juan perez
       </Typography>
 
         <div style={{ height: "30px" }}></div>
@@ -52,7 +44,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/Dashboard_medicos"
         startIcon={<DashboardIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
@@ -63,7 +55,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/lista_paciente"
         startIcon={<PersonIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
@@ -74,7 +66,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/recetas_medicas"
         startIcon={<DescriptionIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}

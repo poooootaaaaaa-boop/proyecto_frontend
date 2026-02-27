@@ -15,7 +15,7 @@ export default function AppointmentHistory({ appointments = [] }) {
     (a) => a.status === "completed" || a.status === "past"
   );
 
-  // fallback si no hay
+  // fallback 
   const fallbackHistory = [
     {
       doctor: "Dra. María López",
