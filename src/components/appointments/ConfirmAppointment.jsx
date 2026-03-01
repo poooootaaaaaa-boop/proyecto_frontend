@@ -36,12 +36,10 @@ return (
 
 
         <SuccessModal
-  open={openModal}
-  onClose={() => {
-    setOpenModal(false);
-    navigate("/citas"); // 👈 aquí sí
-  }}
-/>
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          redirectTo="/citas"
+        />
 
         {/* HEADER */}
         <Box className="confirm-header">
@@ -176,12 +174,12 @@ return (
           </Button>
 
           <Button
-  className="secondary-btn"
-  onClick={() => navigate(-1)}
-  fullWidth   // 👈 FALTABA ESTO
->
-  Modificar Selección
-</Button>
+            className="secondary-btn"
+            onClick={() => navigate(-1)}
+            fullWidth   // 👈 FALTABA ESTO
+          >
+            Modificar Selección
+          </Button>
         </Box>
 
         <Typography className="legal-text">

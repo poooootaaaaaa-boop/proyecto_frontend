@@ -8,19 +8,29 @@ import AlertsCard from "../components/dashboard/AlertsCard";
 import QuickActions from "../components/dashboard/QuickActions";
 
 export default function Dashboard() {
-
   return (
-
     <Layout>
+      <Box
+        sx={{
+          maxWidth: 1200,
+          mx: "auto",
+          px: { xs: 2, md: 3 },
+          py: { xs: 2, md: 3 },
+        }}
+      >
+        {/*  Welcome */}
+        <Box mb={3}>
+          <WelcomeCard />
+        </Box>
 
-      <Box sx={{maxWidth: 1200, mx: "auto",}}>
-
-        {/* Welcome */}
-        <WelcomeCard />
-
-        {/* Cards */}
-        <Grid  container spacing={3} mt={2} sx={{ alignItems: "stretch" }}>
-
+        {/*  Cards principales */}
+        <Grid
+          container
+          spacing={12}
+          sx={{
+            alignItems: "stretch",
+          }}
+        >
           <Grid item xs={12} md={4} sx={{ display: "flex" }}>
             <NextAppointmentCard />
           </Grid>
@@ -32,20 +42,22 @@ export default function Dashboard() {
           <Grid item xs={12} md={4} sx={{ display: "flex" }}>
             <AlertsCard />
           </Grid>
-
         </Grid>
 
-        {/* Quick Actions */}
-        <Typography mt={5} mb={2} fontWeight={700} fontSize={22} color="text.primary" >
-          Acciones Rápidas
-        </Typography>
+        {/*  Quick Actions */}
+        <Box mt={6}>
+          <Typography
+            mb={3}
+            fontWeight={800}
+            fontSize={24}
+            color="text.primary"
+          >
+            Acciones Rápidas
+          </Typography>
 
-        <QuickActions />
-
+          <QuickActions />
+        </Box>
       </Box>
-
     </Layout>
-
   );
-
 }

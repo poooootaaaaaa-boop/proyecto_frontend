@@ -17,6 +17,8 @@
     "@mui/x-date-pickers": "^8.27.2",
     "bootstrap": "^5.3.8",
     "dayjs": "^1.11.19",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",

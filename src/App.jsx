@@ -16,6 +16,7 @@ import Lista_paciente from "./pages/Medicos/lista_paciente";
 import Recetas_medicas from "./pages/Medicos/recetas_medicas";
 import HistorialMedico from "./components/historiapaciente/HistorialMedico";
 import Layout from "./components/layout/Layout";
+import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
 
 export default function App() {
   return (
@@ -35,6 +36,15 @@ export default function App() {
             </Layout>
           }
         />
+        <Route
+          path="/perfil_edit"
+          element={
+            <Layout>
+              <PerfilPremium />
+            </Layout>
+          }
+        />
+
         <Route path="/lista_paciente" element={<Lista_paciente />} />
         <Route path="/Dashboard_medicos" element={<Dashboard_medicos />} />
 
