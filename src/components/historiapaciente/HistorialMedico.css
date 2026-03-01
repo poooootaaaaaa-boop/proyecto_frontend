@@ -395,3 +395,106 @@
   margin-top: 16px;
   padding-top: 28px;
 }
+
+
+/* Ajustes generales para móviles */
+@media (max-width: 1024px) {
+  .historial-wrapper {
+    padding: 40px 20px;
+    max-width: 100%;
+  }
+
+  .historial-header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .main-title {
+    font-size: 24px !important;
+  }
+
+  .btn-primary, .btn-secondary, .btn-download {
+    width: 100%;
+    text-align: center;
+  }
+
+  .custom-card {
+    padding: 20px;
+  }
+
+  .card-tratamiento {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .treatment-top {
+    margin-bottom: 12px;
+  }
+
+  .progress-section {
+    margin-top: 16px;
+  }
+
+  .section-header h6 {
+    font-size: 14px !important;
+  }
+
+  .item-name {
+    font-size: 16px !important;
+  }
+
+  .item-subtitle {
+    font-size: 12px !important;
+  }
+
+  .info-box {
+    padding: 10px;
+  }
+
+  .info-value {
+    font-size: 0.8rem;
+  }
+
+  .progress-labels {
+    font-size: 10px;
+  }
+
+  .custom-progress {
+    height: 8px !important;
+  }
+
+  .table-head-cell {
+    font-size: 8px !important;
+  }
+
+  .bold-text {
+    font-size: 12px !important;
+  }
+
+  .lab-item-row, .diagnosis-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .timeline-container {
+    padding-left: 8px;
+  }
+
+  .timeline-dot-outer {
+    width: 20px;
+    height: 20px;
+    border-width: 3px;
+  }
+
+  .timeline-text-bold {
+    font-size: 11px !important;
+  }
+
+  .timeline-text-sub {
+    font-size: 9px !important;
+  }
+}

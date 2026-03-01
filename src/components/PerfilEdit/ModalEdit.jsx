@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 const ModalEdit = ({
   isOpen,
@@ -34,30 +35,33 @@ const ModalEdit = ({
     onClose();
   };
 
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        {!isSuccess ? (
-          <>
-            <h3>{confirmMessage}</h3>
-            <div className="modal-buttons">
-              <button className="btn-cancel" onClick={handleClose}>
-                Cancelar
-              </button>
-              <button className="btn-confirm" onClick={handleConfirm}>
-                Guardar
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="check-icon">✓</div>
-            <h3>{successMessage}</h3>
-          </>
-        )}
-      </div>
+if (!isOpen) return null;
+
+return createPortal(
+  <div className="modal-overlay">
+    <div className="modal-content">
+      {!isSuccess ? (
+        <>
+          <h3>{confirmMessage}</h3>
+          <div className="modal-buttons">
+            <button className="btn-cancel" onClick={handleClose}>
+              Cancelar
+            </button>
+            <button className="btn-confirm" onClick={handleConfirm}>
+              Guardar
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="check-icon">✓</div>
+          <h3>{successMessage}</h3>
+        </>
+      )}
     </div>
-  );
+  </div>,
+  document.body
+);
 };
 
 export default ModalEdit;

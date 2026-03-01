@@ -1,12 +1,16 @@
 .treatments-container {
-  padding: 40px;
-  background-color: #f5f6fa;
+  padding: 50px;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef2f7 100%);
   min-height: 100vh;
 }
 
+/* TITULO */
+
 .main-title {
-  font-weight: bold !important;
-  margin-bottom: 30px !important;
+  font-weight: 800 !important;
+  margin-bottom: 40px !important;
+  color: #1e293b;
+  letter-spacing: -0.5px;
 }
 
 /* CARDS */
@@ -14,35 +18,45 @@
 .treatment-cards {
   display: flex;
   gap: 30px;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
 }
 
 .treatment-card {
   flex: 1;
-  border-radius: 20px !important;
-  background-color: #f9f9f9 !important;
+  border-radius: 24px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #eef2f7;
+  transition: all 0.3s ease !important;
+}
+
+.treatment-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: start;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .medicine-name {
-  font-weight: bold !important;
+  font-weight: 700 !important;
+  font-size: 18px;
+  color: #0f172a;
 }
 
 .medicine-desc {
-  color: gray;
+  color: #64748b;
   font-size: 14px;
 }
 
 .status-chip {
-  background-color: #d4f5d4 !important;
-  color: #2e7d32 !important;
-  font-weight: 500;
+  background-color: #20e14039 !important;
+  color: #25eb2f !important;
+  font-weight: 600;
 }
 
 /* INFO BOX */
@@ -53,75 +67,189 @@
 }
 
 .info-box {
-  background-color: #eeeeee;
-  padding: 15px;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #f1f5f9, #f8fafc);
+  padding: 18px;
+  border-radius: 16px;
   flex: 1;
+  border: 1px solid #e2e8f0;
 }
 
 .info-label {
-  font-size: 12px;
-  color: gray;
+  font-size: 11px;
+  color: #94a3b8;
+  letter-spacing: 1px;
 }
 
 .info-value {
-  font-weight: bold !important;
+  font-weight: 700 !important;
+  font-size: 14px;
+  color: #0f172a;
 }
 
 .info-sub {
   font-size: 12px;
-  color: gray;
+  color: #64748b;
 }
 
 /* TABLE */
 
 .table-container {
-  padding: 20px;
-  border-radius: 20px !important;
+  padding: 30px;
+  border-radius: 24px !important;
+  background: #ffffff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef2f7;
 }
 
 .table-header {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  font-weight: bold;
-  background-color: #eeeeee;
-  padding: 15px;
-  border-radius: 10px;
+  font-weight: 700;
+  background: #f1f5f9;
+  padding: 18px;
+  border-radius: 14px;
   margin-bottom: 15px;
+  color: #1e293b;
 }
 
 .table-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  padding: 15px 10px;
-  border-bottom: 1px solid #eee;
+  padding: 18px 10px;
+  border-radius: 14px;
+  transition: background 0.2s ease;
+}
+
+.table-row:hover {
+  background: #f8fafc;
 }
 
 .doctor-cell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .doctor-avatar {
-  width: 40px !important;
-  height: 40px !important;
+  width: 42px !important;
+  height: 42px !important;
 }
 
 .pdf-btn {
-  background-color: #c5d3f5 !important;
-  color: #2d4bb3 !important;
-  border-radius: 20px !important;
+  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+  color: white !important;
+  border-radius: 30px !important;
   text-transform: none !important;
+  padding: 8px 20px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.pdf-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
 }
 
 /* LINK */
 
 .history-link {
   text-align: center;
-  margin-top: 20px;
-  color: #2d4bb3;
+  margin-top: 30px;
+  color: #2563eb;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.history-link:hover {
+  opacity: 0.7;
+}
+
+/* ========================= */
+/* 📱 RESPONSIVE */
+/* ========================= */
+
+/* TABLET */
+@media (max-width: 1024px) {
+
+  .treatments-container {
+    padding: 30px;
+  }
+
+  .treatment-cards {
+    flex-direction: column;
+  }
+
+  .card-info {
+    flex-direction: column;
+  }
+
+  .table-header {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 10px;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 15px;
+  }
+
+}
+
+
+/*  MOBILE */
+@media (max-width: 768px) {
+
+  .treatments-container {
+    padding: 20px;
+  }
+
+  .main-title {
+    font-size: 22px !important;
+    text-align: center;
+  }
+
+  .treatment-cards {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .card-info {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .info-box {
+    width: 100%;
+  }
+
+  /* TABLE se convierte en card layout */
+
+  .table-header {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: 1fr;
+    background: #f8fafc;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .table-row div {
+    margin-bottom: 10px;
+  }
+
+  .doctor-cell {
+    flex-direction: row;
+  }
+
+  .pdf-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
 }
