@@ -26,70 +26,143 @@ function lista_paciente({data=[]}) {
                 <br />
                 <br />
 
-                <div className="container mt-3">
 
-                    <div className="bg-white p-4" style={{ borderRadius: "20px",border: "1px solid #ddd",boxShadow: "0 2px 6px rgba(0,0,0,0.05)"}}>
 
-                        {/* Buscador centrado */}
-                        <div className="row justify-content-center">
-                            <div className="col-12 col-md-10 col-lg-8 ">
 
-                                <div style={{ position:"relative" }}>
 
-                                    <Form>
-                                        <Form.Group>
 
-                                            <Form.Control type="text" placeholder="Nombre del paciente" style={{ paddingRight: "50px" }}/>
-                                            <SearchIcon onClick={buscarPaciente} style={{ position: "absolute",right: "20px",top: "50%",transform: "translateY(-50%)",color: "gray",cursor: "pointer"}}/>
 
-                                        </Form.Group>
-                                    </Form>
+
+
+
+                    <div className="container mt-3">
+
+                        <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #e5e7eb",boxShadow:"0 2px 10px rgba(0,0,0,0.05)"}}>
+
+                                <div className="row justify-content-center">
+
+                                    <div className="col-lg-10">
+
+                                        <div style={{position:"relative"}}>
+
+                                            <Form.Control type="text"placeholder="Buscar por nombre, DNI o expediente..."style={{height:"55px",borderRadius:"30px",background:"#f3f4f6",border:"none",paddingLeft:"20px",paddingRight:"60px"}}/>
+
+                                            <SearchIcon onClick={buscarPaciente}style={{position:"absolute",right:"10px",top:"50%",transform:"translateY(-50%)",background:"#1d4ed8",color:"white",padding:"8px",borderRadius:"50%",cursor:"pointer",fontSize:"28px"}}/>
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
-                                <br />
-                                 <div style={{ marginTop: "10px", display:"flex", alignItems:"center"}}>
-                                    <CalendarMonthIcon style={{color: "black", cursor: "pointer",fontSize: "25px"}}/>
-                                    <Typography className="medicine-name" style={{color:"black"}}>Ultima Visita</Typography>
+
+                                <div className="row mt-4 align-items-center">
+
+                                        <div className="col-md-6">
+
+                                            <Typography style={{fontSize:"12px",color:"#9ca3af",fontWeight:"600"}}>ULTIMA VISITA</Typography>
+
+                                                <div style={{display:"flex",alignItems:"center",background:"#f3f4f6",borderRadius:"30px",padding:"10px 15px",width:"250px",marginTop:"5px"}}>
+
+                                                    <CalendarMonthIcon style={{color:"#6b7280",marginRight:"10px"}}/>
+
+                                                    <span style={{color:"#6b7280",fontSize:"14px"}}>Seleccionar fecha</span>
+
+                                                </div>
+
+                                        </div>
+
+
+                            
+
+                                        <div className="col-md-6 text-end">
+
+                                            <Button style={{background:"#1d4ed8",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600"}} as={Link} to="/Medicos/alta_pacientes">+ Nuevo Paciente</Button>
+
+                                        </div>
+
                                  </div>
 
-                            </div>
-                            
+
                         </div>
 
                     </div>
 
-                </div>
                 <br />
                 <br />
                 
-                <div style={{ width: '1200px', marginTop: '10px',margin:"0 auto" }}>
-                    <Table  className="agenda-table">
-                        <thead>
+
+        <div style={{width:"1200px",margin:"0 auto",marginTop:"20px",background:"white",borderRadius:"20px",border:"1px solid #e5e7eb",boxShadow:"0 2px 10px rgba(0,0,0,0.05)",overflow:"hidden"}}>
+
+            <Table borderless hover>
+
+                    <thead style={{background:"#f3f4f6"}}>
+
                         <tr>
-                            <th>Paciente</th>
-                            <th>Ultima cita</th>
-                            <th>Acciones</th>
+
+                            <th style={{padding:"20px",color:"#94a3b8",fontSize:"12px"}}>PACIENTE</th>
+
+                            <th style={{padding:"20px",color:"#94a3b8",fontSize:"12px"}}>ULTIMA CITA</th>
+
+                            <th style={{ padding:"20px",color:"#94a3b8",fontSize:"12px",textAlign:"right"}}>ACCIONES</th>
+
                         </tr>
-                        </thead>
-                            <tbody>
 
-                                {data.map((paciente,index)=> (
+                    </thead>
 
-                                    <tr key={index}>
 
-                                        <td>{paciente.nombre} {paciente.apellidoP}</td>
+                    <tbody>
 
-                                        <td>no tiene cita</td>
+                        {data.map((paciente,index)=> (
 
-                                        <td><Button variant="outline-primary">Acceder</Button></td>
+                            <tr key={index} style={{borderTop:"1px solid #f1f5f9"}}>
 
-                                    </tr>
 
-                                ))}
+                            <td style={{padding:"20px"}}>
 
-                            </tbody>
-                    </Table>
-                </div>
-                
+                                <div style={{display:"flex",alignItems:"center"}}>
+
+
+                                    <div style={{width:"40px",height:"40px",borderRadius:"50%",background:"#dbeafe",display:"flex",alignItems:"center",justifyContent:"center",color:"#1d4ed8",fontWeight:"bold",marginRight:"15px"}}>
+
+                                        {paciente.nombre?.charAt(0)}
+                                        {paciente.apellidoP?.charAt(0)}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div style={{fontWeight:"600"}}>{paciente.nombre} {paciente.apellidoP}</div>
+
+                                        <div style={{fontSize:"12px",color:"#94a3b8" }}> Paciente registrado </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                                <td style={{padding:"20px"}}> <span style={{color:"#475569"}}>Sin cita</span></td>
+
+
+                                <td style={{padding:"20px",textAlign:"right"}}> 
+                                    <Button style={{background:"#e0e7ff",color:"#eaeaea",border:"none",borderRadius:"20px",padding:"8px 18px",fontWeight:"500"}}>
+                                    Ver Expediente
+                                    </Button>
+
+                                </td>
+
+
+                            </tr>
+
+                        ))}
+
+                    </tbody>
+            </Table>
+        </div>
+
+
+
             </Layout_Medicos>
 
             

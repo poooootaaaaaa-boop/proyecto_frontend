@@ -78,7 +78,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/agendar-cita"
         startIcon={<CalendarTodayIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}
@@ -105,7 +105,7 @@ function Layout_Medicos({ children }) {
 
 
 
-        <div style={{ flex: 1, padding: "20px", background: "#ffffff" }}>
+        <div style={{ flex: 1, padding: "20px", background:"#fefcf9" }}>
             {children}
         </div>
 

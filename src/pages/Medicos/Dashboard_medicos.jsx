@@ -4,201 +4,148 @@ import { colors } from "@mui/material";
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
-import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import {  CardContent, Typography,Chip} from "@mui/material";
 import ArticleIcon from '@mui/icons-material/Article';
 import "./Tablas.css";
-function Dashboard_medicos() {
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import HistoryIcon from '@mui/icons-material/History';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PrintIcon from '@mui/icons-material/Print';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+
+function Dashboard_medicos({citas, consultas=[]}) {
+  
   return (
     <div>
       <Layout_Medicos>
 
           <div style={{display:"flex"}}>
-            <h1>Hola Dr.Garcia</h1>
-            <Button variant="primary" style={{ marginLeft: "700px"}}>Nueva Consulta</Button>
+            <h1 className="titulo-dashboard" style={{ marginLeft: '20px' }}>Hola Dr. García</h1>
+            <Button  className="btn-nueva-consulta" style={{ marginLeft: "700px" }}  as={Link}  to="/Medicos/consulta"> + Nueva Consulta</Button>
           </div>
 
 
-          <h5>Bienvenido aqui estamos de nuevo Angelito cachondo</h5>
-          <br />
+          <h5 className="titulo-dashboard" style={{ marginLeft: '20px' }}>Bienvenido aqui estamos de nuevo Angelito</h5>
 
-
-          <div className="treatment-cards" style={{width:"800px", display:"flex"}}>
-              <Card className="treatment-card">
-              <CardContent>
-                <div className="card-header">
-                  <div>
-                    <Typography className="medicine-name">
-                      Citas del dia
-                    </Typography>
-                  </div>
-                
-                </div>
-
-                <div className="card-info">
-
-                  <div className="info-box" style={{textAlign:"center"}}>
-                    <Typography variant="h3">18</Typography>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-              <Card className="treatment-card">
-              <CardContent>
-                <div className="card-header">
-                  <div>
-                    <Typography className="medicine-name">
-                      Citas del dia
-                    </Typography>
-                  </div>
-      
-                </div>
-
-                <div className="card-info">
-
-                  <div className="info-box" style={{textAlign:"center"}}>
-                    <Typography variant="h3">18</Typography>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-
-              <Card className="treatment-card">
-              <CardContent>
-                <div className="card-header">
-                  <div>
-                    <Typography className="medicine-name">
-                      Citas del dia
-                    </Typography>
-                  </div>
-                </div>
-
-                <div className="card-info">
-
-                  <div className="info-box" style={{textAlign:"center"}}>
-                    <Typography variant="h3">18</Typography>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="dashboard-container">
           
-        
-
-          </div>
-
-          <br />
-
-          <h2>Pacientes en espera</h2>
-
-          <div style={{display:"flex"}}>
-              <div>
-                hola
-              </div>
-
-
-
-              <div style={{ marginLeft: '870px', backgroundColor: '#F0F2F5',  borderRadius: '10px', padding: '10px', width: '300px', height: '170px', textAlign: 'center',  alignItems: 'center'}}>
-                <h4>Acceso Rapidos</h4>
-                <br />
-                <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                  <div  style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <PersonAddAlt1Icon style={{ fontSize: '40px', color: 'blue' }} />
-                    <h5>Alta paciente</h5>
-                  </div>
-
-                  <div  style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <AccessTimeIcon style={{ fontSize: '40px', color: 'blue' }} />
-                    <h5>Ver historial</h5>
-                  </div>
-
-                </div>
-
-              </div>
-
-
-
-          </div>
-          <br />
-
-
-
-
-
-          <h2>Citas del dia</h2>
-          <br />
-
-          <div style={{display:"flex"}}>
-            <div style={{ width: '750px', marginLeft: '130px', marginTop: '10px'}}>
-              <Table  className="agenda-table">
-                <thead>
-                  <tr>
-                    <th>Hora</th>
-                    <th>Paciente</th>
-                    <th>Motivo</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>14:30</td>
-                    <td>Angelito</td>
-                    <td>Consulta Medica</td>
-                    <td>En espera</td>
-                  </tr>
-
-                  <tr>
-                    <td>14:30</td>
-                    <td>Erick</td>
-                    <td>Consulta Medica</td>
-                    <td>En espera</td>
-                  </tr>
-                </tbody>
-              </Table>
-            </div>
-
-
-
-            <div style={{ marginLeft: '100px' }}>
-              <h4>Ultimas Recetas</h4>
-
-                <div className="info-box" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                  <ArticleIcon style={{ backgroundColor: "#6bb3ffef", color: "white", borderRadius: "10%", padding: "8px", fontSize: "35px" }} />
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography className="info-value">
-                      DRA. Elena Vargas
-                    </Typography>
-                    <Typography className="info-sub">
-                      Medicina 10mg -30 días
-                    </Typography>
-                  </div>
-                </div>
-
-                  
-                  <div className="info-box" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                    <ArticleIcon style={{ backgroundColor: "#6bb3ffef", color: "white", borderRadius: "10%", padding: "8px", fontSize: "35px" }} />
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <Typography className="info-value">
-                        DRA. Juan Pérez
-                      </Typography>
-                      <Typography className="info-sub">
-                        Medicina 5mg -15 días
-                      </Typography>
+              {/* --- COLUMNA IZQUIERDA (Principal) --- */}
+              <div className="main-section">
+                
+                {/* Fila de Tarjetas */}
+                <div className="stats-row">
+                    <div className="stat-card">
+                        <div className="stat-header">
+                          <div className="icon-box icon-blue"><CalendarMonthIcon /></div>
+                          <span className="trend trend-up"><TrendingUpIcon fontSize="inherit" /> 12%</span>
+                        </div>
+                        <p className="stat-title">Citas del día</p>
+                        <h2 className="stat-number">18</h2>
                     </div>
+
+                    <div className="stat-card">
+                        <div className="stat-header">
+                          <div className="icon-box icon-orange"><AssignmentLateIcon /></div>
+                          <span className="trend trend-up"><TrendingUpIcon fontSize="inherit" /> 5%</span>
+                        </div>
+                        <p className="stat-title">Pacientes en espera</p>
+                        <h2 className="stat-number">5</h2>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-header">
+                          <div className="icon-box icon-green"><TaskAltIcon /></div>
+                          <span className="trend trend-down"><TrendingDownIcon fontSize="inherit" /> 2%</span>
+                        </div>
+                        <p className="stat-title">Consultas completadas</p>
+                        <h2 className="stat-number">12</h2>
+                    </div>
+                </div>
+
+                {/* TABLA DE CITAS */}
+                <h1 className="titulo-dashboard" style={{ marginLeft: '20px' }}>Citas del día</h1>
+
+                <div style={{ display: "flex" }}>
+                    <div style={{ width: '750px', marginLeft: '20px', marginTop: '10px', backgroundColor: 'white', borderRadius: '24px', padding: '10px' }}>
+                      <Table className="agenda-table">
+                          <thead>
+                            <tr>
+                              <th>Hora</th>
+                              <th>Paciente</th>
+                              <th>Motivo</th>
+                              <th>Estado</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {citas.map((item,index)=> ( 
+                              
+                              <tr key={index} style={{borderTop:"1px solid #f1f5f9"}}>
+
+                                <td>{item.fechaCita}</td>
+
+                                <td>{item.nombre} {item.apellidoP}</td>
+
+
+                                <td>{item.motivoCita}</td>
+
+                                <td><span className="estado-badge espera">En espera</span></td>
+
+                              </tr>  
+                              
+                              
+                              ))}
+                          </tbody>
+                      </Table>
                   </div>
-              
-            </div>
-            
+              </div>
 
+              </div>
+
+              {/* --- COLUMNA DERECHA (Sidebar) --- */}
+              <div className="sidebar-section">
+                <h4 className="sidebar-label">ACCESO RÁPIDO</h4>
+
+                  <div className="quick-btns-row">
+
+                      <div className="quick-btn">
+                          <Link to="/Medicos/alta_pacientes">
+                            <PersonAddAlt1Icon className="quick-btn-icon"/>
+                          </Link>
+                        <p>Alta Paciente</p>
+                      </div>
+
+                      <div className="quick-btn">
+                        <HistoryIcon className="quick-btn-icon" />
+                        <p>Ver Historial</p>
+                      </div>
+
+                  </div>
+
+                <h4 className="sidebar-label" style={{ marginTop: '32px' }}>ÚLTIMAS RECETAS</h4>
+                  <div className="prescriptions-list">
+
+                    {consultas.map((pacientes, i) => (
+                      <div key={i} className="prescription-card">
+                        <div className="doc-icon-box"><DescriptionIcon fontSize="small" /></div>
+                        <div className="prescription-content">
+                          <h5>{pacientes.motivo}</h5>
+                          <p>{pacientes.nombre} {pacientes.apellido}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                  </div>
+              </div>
           </div>
-
-
-
-
         
-      </Layout_Medicos>
+        
+        </Layout_Medicos>
     </div>
 
   );

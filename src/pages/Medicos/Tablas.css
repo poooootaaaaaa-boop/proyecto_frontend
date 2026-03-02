@@ -1,3 +1,7 @@
+
+
+
+
 /* CONTENEDOR GENERAL */
 
 .agenda-table {
@@ -93,4 +97,378 @@
   background: #f7f8fc;
   transition: 0.2s;
 
+}
+
+
+
+/*----------------------------------------CALENDARIO DE AGENDA---------------------------------------------------------*/
+.fc {
+background-color: #ffffff;
+border-radius: 8px;
+border: 1px solid #d1d5db;
+}
+
+/* Barra superior */
+.fc-header-toolbar {
+padding: 10px;
+border-bottom: 1px solid #e5e7eb;
+}
+
+/* Título */
+.fc-toolbar-title {
+color: #0f172a;
+font-weight: 700;
+}
+
+/* Botones */
+.fc-button {
+background-color: #1e40af !important;
+border: none !important;
+}
+
+.fc-button:hover {
+background-color: #1e3a8a !important;
+}
+
+/* Encabezado días */
+.fc-col-header-cell {
+background-color: #f1f5f9;
+color: #334155;
+font-weight: 600;
+}
+
+/* Cuadros */
+.fc-daygrid-day {
+background-color: white;
+}
+
+/* Día actual */
+.fc-day-today {
+background-color: #dbeafe !important;
+}
+
+/* Eventos */
+.fc-event {
+background-color: #3b83f64d;
+border-radius: 3px;
+border: none;
+font-size: 12px;
+}
+
+/* Hover */
+.fc-event:hover {
+background-color: #2563eb;
+}
+
+/* Números */
+.fc-daygrid-day-number {
+color: #111827;
+font-weight: 600;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.dashboard-container {
+  display: flex;
+  padding: 30px;
+  gap: 30px;
+  font-family: 'Inter', sans-serif;
+}
+
+.main-section { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+.sidebar-section { width: 320px; flex-shrink: 0; }
+
+/* Estilos de Tarjetas (Simplificados) */
+.stats-row { display: flex; gap: 16px; }
+.stat-card { background: white; padding: 20px; border-radius: 20px; flex: 1; border: 3px solid #e6e0e0af; }
+.stat-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.icon-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.icon-blue { background: #eff6ff; color: #3b82f6; }
+.icon-orange { background: #fff7ed; color: #f97316; }
+.icon-green { background: #f0fdf4; color: #22c55e; }
+.stat-title { color: #64748b; font-size: 14px; margin-bottom: 4px; }
+.stat-number { font-size: 28px; font-weight: 700; margin: 0; }
+
+/* --- ESTILOS DE LA TABLA --- */
+.table-container { background: white; border-radius: 24px; padding: 24px; border: 1px solid #f1f5f9; }
+.table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.table-header h3 { margin: 0; font-size: 18px; color: #1e293b; }
+.view-all-btn { color: #2563eb; background: none; border: none; font-weight: 600; cursor: pointer; }
+
+.appointments-table { width: 100%; border-collapse: collapse; }
+.appointments-table th { text-align: left; color: #94a3b8; font-size: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+.appointments-table td { padding: 16px 0; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+
+.time-cell { font-weight: 700; color: #1e293b; font-size: 14px; line-height: 1.2; }
+.time-cell span { color: #94a3b8; font-weight: 500; font-size: 11px; }
+
+.patient-cell { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #1e293b; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+.avatar-blue { background: #dbeafe; color: #1e40af; }
+.avatar-purple { background: #f3e8ff; color: #6b21a8; }
+.avatar-orange { background: #ffedd5; color: #9a3412; }
+
+.reason-cell { color: #64748b; font-size: 14px; }
+
+/* Badges de Estado */
+.badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-green { background: #dcfce7; color: #15803d; }
+.badge-blue { background: #e0e7ff; color: #4338ca; }
+.badge-gray { background: #f1f5f9; color: #475569; }
+.more-icon { color: #cbd5e1; cursor: pointer; }
+
+/* Sidebar Estilos */
+.sidebar-label { color: #94a3b8; font-size: 12px; margin-bottom: 16px; letter-spacing: 0.5px; }
+.quick-btns-row { display: flex; gap: 12px; }
+.quick-btn { background: white; flex: 1; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; text-align: center; }
+.quick-btn-icon { color: #2563eb; margin-bottom: 8px; }
+.quick-btn p { margin: 0; font-size: 13px; font-weight: 700; }
+
+.prescription-card { background: white; border-radius: 20px; padding: 16px; display: flex; gap: 12px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+.doc-icon-box { background: #eff6ff; color: #3b82f6; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.prescription-content h5 { margin: 0; font-size: 14px; }
+.prescription-content p { margin: 2px 0 6px 0; font-size: 12px; color: #64748b; }
+.print-link { color: #2563eb; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+
+/* Contenedor de la tabla */
+.table-container {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 30px;
+  border: 1px solid #f0f4f8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.table-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.view-all-link {
+  color: #2563eb;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Estructura de la Tabla */
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.appointments-table th {
+  text-align: left;
+  color: #94a3b8;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.appointments-table td {
+  padding: 20px 0;
+  border-bottom: 1px solid #f8fafc;
+  vertical-align: middle;
+}
+
+/* Celda de Hora */
+.time-cell {
+  font-size: 14px;
+  color: #1e293b;
+}
+.time-cell span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* Celda de Paciente con Avatar */
+.patient-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.avatar-blue { background: #e0f2fe; color: #0369a1; }
+.avatar-purple { background: #f3e8ff; color: #7e22ce; }
+
+/* Texto del Motivo */
+.reason-text {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Badges de Estado corregidos */
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-completed { background: #dcfce7; color: #166534; }
+.status-waiting { background: #e0e7ff; color: #3730a3; }
+.status-pending { background: #f1f5f9; color: #475569; }
+
+.action-icon {
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Contenedor blanco redondeado (opcional, para que parezca una tarjeta) */
+.agenda-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif; /* O la fuente que uses */
+}
+
+/* Encabezados */
+.agenda-table th {
+  text-align: left;
+  padding: 15px 20px;
+  color: #94a3b8; /* Gris azulado suave */
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Celdas generales */
+.agenda-table td {
+  padding: 20px;
+  border-bottom: 1px solid #f8fafc;
+  vertical-align: middle;
+}
+
+/* Columna Hora: Negrita y clara */
+.agenda-table td:first-child {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+/* Columna Paciente: Negrita */
+.agenda-table td:nth-child(2) {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Columna Motivo: Texto gris */
+.agenda-table td:nth-child(3) {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Diseño de los Estados (Badges) */
+.estado-badge {
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Colores de los estados basados en tu imagen */
+.espera {
+  background-color: #e0e7ff; /* Azul muy claro */
+  color: #4338ca;
+}
+
+.completado {
+  background-color: #dcfce7; /* Verde claro */
+  color: #15803d;
+}
+
+
+
+.titulo-dashboard {
+  font-family: 'Inter', -apple-system, sans-serif; /* Fuente moderna */
+  font-size: 24px;              /* Tamaño equilibrado */
+  font-weight: 700;             /* Negrita fuerte */
+  color: #1e293b;               /* Azul pizarra oscuro (profesional) */
+  letter-spacing: -0.02em;      /* Letras más juntas para look moderno */
+  margin-bottom: 20px;          /* Espacio con la tabla */
+  margin-top: 10px;
+}
+
+
+.btn-nueva-consulta {
+  background-color: #2563eb !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: white !important;
+  text-align: center;
+}
+
+.btn-nueva-consulta:hover {
+  background-color: #1d4ed8 !important; /* Azul un poco más oscuro al pasar el mouse */
+  transform: translateY(-1px);          /* Pequeño efecto de elevación */
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
 }

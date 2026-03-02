@@ -9,12 +9,14 @@ import { useState } from "react";
 import PersonIcon from '@mui/icons-material/Person';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
+import Mensaje from "./mensaje";
+
 
 function Alta_pacientes({ data, setData }){
 
         const[nombre, setNombre]=useState("");
         const[apellidoP, setApellidoP]=useState("");
-         const[apellidoM, setApellidoM]=useState("");
+        const[apellidoM, setApellidoM]=useState("");
         const[nacimiento, setNacimiento]=useState("");
         const[genero, setGenero]=useState("");
         const[telefono, setTelefono]=useState("");
@@ -27,13 +29,15 @@ function Alta_pacientes({ data, setData }){
         const[tipoSangre, setTipoSangre]=useState("");
         const[alergias, setAlergias]=useState("");
         const[padecimientoHeredofamiliar, setPadecimientoHeredofamiliar]=useState("");
+        const [mostrarMensaje,setMostrarMensaje]=useState(false);
         
 
         const finalizar = () => {
             const altaPaciente = { nombre,apellidoP, apellidoM, nacimiento, genero,telefono,correo,colonia,ciudad,estado,codigoPostal,tipoSangre,alergias,padecimientoHeredofamiliar};
             if (typeof setData === "function") {
             setData(prev => [...prev, altaPaciente]); 
-            } else {
+            setMostrarMensaje(true); 
+            }  else {
             console.error("setData no es una función", setData);
             }
 
@@ -56,9 +60,19 @@ function Alta_pacientes({ data, setData }){
 
 
     return(
-    <div>
+    <div >
         <Layout_Medicos>
-            <div className="container mt-4">
+        
+            {mostrarMensaje ? (
+
+            <Mensaje
+            titulo="¡Paciente Registrado!"
+            descripcion="El paciente fue agregado correctamente."
+            botonPrincipal="Volver"
+            onPrincipal={()=>setMostrarMensaje(false)}
+            />
+
+            ) : (  <div className="container mt-4" >
                 <h1 style={{fontWeight:"600"}}>Alta de pacientes</h1>
                 <Typography style={{fontSize: "17px",color: "gray"}}>Complete la informacion para crear el expediente del paciente</Typography>
 
@@ -192,8 +206,10 @@ function Alta_pacientes({ data, setData }){
                 </div>
 
 
-            </div>
+            </div>)}
+
         </Layout_Medicos>
     </div>
+    
     )
 }export default Alta_pacientes
