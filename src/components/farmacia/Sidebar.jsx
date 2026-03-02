@@ -60,16 +60,7 @@ export default function Sidebar() {
           Inventario
         </Nav.Link>
 
-        <Nav.Link
-          as={NavLink}
-          to="/farmacia/medicamentos"
-          style={({ isActive }) => ({
-            color: "#fff",
-            fontWeight: isActive ? "bold" : "normal",
-          })}
-        >
-          Medicamentos
-        </Nav.Link>
+ 
       </Nav>
 
       <div style={{ position: "absolute", bottom: 20 }}>

@@ -1,0 +1,67 @@
+.home-layout {
+  display: flex;
+  background: #f7f8fa;
+  min-height: 100vh;
+}
+
+.home-content {
+  padding: 30px;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-search {
+  max-width: 260px;
+  border-radius: 20px;
+}
+
+.card-soft {
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.06);
+}
+
+.tabla-home thead {
+  background: #f1f5f9;
+}
+
+.tabla-home th {
+  font-size: 13px;
+  color: #475569;
+}
+
+.paciente {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paciente img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.actions {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.label {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.btn-primary-soft {
+  background: #2563eb;
+  border-radius: 20px;
+  border: none;
+}
+
+.btn-primary-soft:hover {
+  background: #1e40af;
+}

@@ -18,7 +18,7 @@ export default function Distribuidores() {
 
             <Button
               as={NavLink}
-              to="/farmacia/distribuidores/nuevo"
+              to="/farmacia/AgregarDistribuidor"
               variant="primary"
             >
               Agregar
