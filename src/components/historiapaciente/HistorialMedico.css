@@ -46,10 +46,21 @@
 /* Cards */
 .custom-card {
   border-radius: 28px !important;
-  padding: 8px; /* hace que se sientan más grandes */
+  padding: 30px; /* hace que se sientan más grandes */
   border: 1px solid #f1f5f9 !important;
   box-shadow: 0 4px 14px rgba(0,0,0,0.04) !important; /* sombra más suave y elegante */
 }
+
+/* Esto solo afecta a las cards de tratamiento */
+.card-tratamiento {
+  width: 130%;
+  max-width: 900px; /* Aquí controlas el ancho de estas dos específicamente */
+  margin: 0 auto;   /* Las centra si sobran espacio */
+  padding: 10px;    /* Ajuste fino para que no choquen los bordes */
+}
+
+
+
 .treatment-top {
   margin-bottom: 16px;
 }
@@ -248,6 +259,29 @@
   margin-bottom: 32px;
 }
 
+.lab-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.lab-item-row:hover {
+  background: #f5f7fb;
+}
+
+.lab-item-title {
+  font-weight: 600;
+  max-width: 220px; /* controla el corte del nombre */
+}
+
+.lab-item-date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
 .diagnosis-item {
   display: flex;
   justify-content: space-between;
@@ -360,4 +394,107 @@
 .timeline-section {
   margin-top: 16px;
   padding-top: 28px;
+}
+
+
+/* Ajustes generales para móviles */
+@media (max-width: 1024px) {
+  .historial-wrapper {
+    padding: 40px 20px;
+    max-width: 100%;
+  }
+
+  .historial-header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .main-title {
+    font-size: 24px !important;
+  }
+
+  .btn-primary, .btn-secondary, .btn-download {
+    width: 100%;
+    text-align: center;
+  }
+
+  .custom-card {
+    padding: 20px;
+  }
+
+  .card-tratamiento {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .treatment-top {
+    margin-bottom: 12px;
+  }
+
+  .progress-section {
+    margin-top: 16px;
+  }
+
+  .section-header h6 {
+    font-size: 14px !important;
+  }
+
+  .item-name {
+    font-size: 16px !important;
+  }
+
+  .item-subtitle {
+    font-size: 12px !important;
+  }
+
+  .info-box {
+    padding: 10px;
+  }
+
+  .info-value {
+    font-size: 0.8rem;
+  }
+
+  .progress-labels {
+    font-size: 10px;
+  }
+
+  .custom-progress {
+    height: 8px !important;
+  }
+
+  .table-head-cell {
+    font-size: 8px !important;
+  }
+
+  .bold-text {
+    font-size: 12px !important;
+  }
+
+  .lab-item-row, .diagnosis-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .timeline-container {
+    padding-left: 8px;
+  }
+
+  .timeline-dot-outer {
+    width: 20px;
+    height: 20px;
+    border-width: 3px;
+  }
+
+  .timeline-text-bold {
+    font-size: 11px !important;
+  }
+
+  .timeline-text-sub {
+    font-size: 9px !important;
+  }
 }

@@ -1,7 +1,22 @@
-import { Dialog, DialogContent, Typography, Button, Box, Grow } from "@mui/material";
+import { Dialog, DialogContent, Typography, Box, Grow } from "@mui/material";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./confirm.css";
 
-export default function SuccessModal({ open, onClose }) {
+export default function SuccessModal({ open, onClose, redirectTo = "/citas" }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        onClose?.();        // cerrar modal
+        navigate(redirectTo); // redirigir
+      }, 3000); // 5 segundos
+
+      return () => clearTimeout(timer);
+    }
+  }, [open, navigate, onClose, redirectTo]);
+
   return (
     <Dialog
       open={open}
@@ -17,7 +32,6 @@ export default function SuccessModal({ open, onClose }) {
     >
       <Grow in={open} timeout={400}>
         <DialogContent>
-
           <Box className="modal-success-container">
 
             <Box className="check-circle modal-check">
@@ -34,17 +48,7 @@ export default function SuccessModal({ open, onClose }) {
               Tu cita se ha guardado correctamente.
             </Typography>
 
-            <Button
-              className="confirm-btn"
-              fullWidth
-              onClick={onClose}
-              sx={{ mt: 2 }}
-            >
-              Entendido
-            </Button>
-
           </Box>
-
         </DialogContent>
       </Grow>
     </Dialog>

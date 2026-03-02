@@ -1,7 +1,27 @@
 import {Card, CardContent, Typography, Box, Chip, Avatar, Button,Paper } from "@mui/material";
 import "./treatments.css";
+import { jsPDF } from "jspdf";
 
 export default function Treatments() {
+
+  const downloadPDF = () => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+  doc.text("Receta Médica", 20, 20);
+
+  doc.setFontSize(12);
+  doc.text("Paciente: Sofia Cardenas", 20, 40);
+  doc.text("Médico: Dra. Elena Vargas", 20, 50);
+  doc.text("Especialidad: Medicina General", 20, 60);
+
+  doc.text("Medicamento: Metformina 850mg", 20, 80);
+  doc.text("Frecuencia: Cada 12 horas", 20, 90);
+
+  doc.text("Fecha: 12 Mayo 2024", 20, 110);
+
+  doc.save("receta_medica.pdf");
+};
   return (
     <div className="treatments-container">
 
@@ -115,7 +135,7 @@ export default function Treatments() {
                 <p>Medicina General</p>
               </div>
             </div>
-            <Button className="pdf-btn">
+            <Button className="pdf-btn" onClick={downloadPDF}>
               DESCARGAR PDF
             </Button>
           </div>

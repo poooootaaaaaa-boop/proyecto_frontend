@@ -16,6 +16,9 @@ import Lista_paciente from "./pages/Medicos/lista_paciente";
 import Recetas_medicas from "./pages/Medicos/recetas_medicas";
 import HistorialMedico from "./components/historiapaciente/HistorialMedico";
 import Layout from "./components/layout/Layout";
+import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
+import Login from "./pages/Login";
+import Home from "./components/Home/Home";
 
 export default function App() {
   return (
@@ -27,6 +30,8 @@ export default function App() {
         {/* Tus rutas nuevas */}
         <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
         <Route path="/recetas_medicas" element={<Recetas_medicas />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
         <Route
           path="/historial_medico"
           element={
@@ -35,6 +40,15 @@ export default function App() {
             </Layout>
           }
         />
+        <Route
+          path="/perfil_edit"
+          element={
+            <Layout>
+              <PerfilPremium />
+            </Layout>
+          }
+        />
+
         <Route path="/lista_paciente" element={<Lista_paciente />} />
         <Route path="/Dashboard_medicos" element={<Dashboard_medicos />} />
 

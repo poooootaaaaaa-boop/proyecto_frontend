@@ -1,10 +1,12 @@
 import React from 'react';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Box, Typography, Card, CardContent, Grid, Button, Chip,
   LinearProgress, Avatar, Table, TableBody, TableCell,
   TableHead, TableRow, IconButton, Paper, TableContainer
 } from "@mui/material";
-
+import { useState } from "react";
 // Iconos
 import DownloadIcon from "@mui/icons-material/Download";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -15,23 +17,228 @@ import ScheduleIcon from "@mui/icons-material/Schedule";
 import PersonIcon from "@mui/icons-material/Person";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ImageIcon from "@mui/icons-material/Image";
+import PdfModals from "./PdfModals";
 
 import "./HistorialMedico.css";
 
 export default function HistorialMedico() {
+  const [openFullModal, setOpenFullModal] = useState(false);
+const [openConsultaModal, setOpenConsultaModal] = useState(false);
+const [openAlert, setOpenAlert] = useState(false);
+const [openUploadModal, setOpenUploadModal] = useState(false);
+const [pendingFiles, setPendingFiles] = useState([]);
+
+const handleDownloadFullPDF = () => {
+  const doc = new jsPDF();
+
+  // ===== HEADER =====
+  doc.setFillColor(25, 118, 210); // azul médico
+  doc.rect(0, 0, 210, 30, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("HISTORIAL MÉDICO", 20, 18);
+
+  // Logo fake (texto por ahora)
+  doc.setFontSize(10);
+  doc.text("Hospital San Gabriel", 150, 18);
+
+  // Reset color
+  doc.setTextColor(0, 0, 0);
+
+  // ===== INFO PACIENTE =====
+  doc.setFontSize(14);
+  doc.text("Información del Paciente", 20, 45);
+
+  doc.setFontSize(11);
+  doc.text("Nombre: Juan Pérez", 20, 55);
+  doc.text("Edad: 34 años", 20, 62);
+  doc.text("Última actualización: 2024", 20, 69);
+
+  // ===== TRATAMIENTOS =====
+  doc.setFontSize(14);
+  doc.text("Tratamientos Activos", 20, 85);
+
+  autoTable(doc, {
+    startY: 90,
+    head: [["Medicamento", "Dosis", "Frecuencia", "Médico"]],
+    body: [
+      ["Metformina", "850mg", "Cada 12 horas", "Dra. Elena Vargas"],
+      ["Vitamina D3", "2000 UI", "Diariamente", "Dr. Ricardo Soto"],
+    ],
+    theme: "striped",
+    headStyles: { fillColor: [25, 118, 210] },
+  });
+
+  // ===== CONSULTAS =====
+  const finalY = doc.lastAutoTable.finalY + 15;
+
+  doc.setFontSize(14);
+  doc.text("Historial de Consultas", 20, finalY);
+
+  autoTable(doc, {
+    startY: finalY + 5,
+    head: [["Fecha", "Motivo", "Especialista", "ID"]],
+    body: [
+      ["15 Ene 2024", "Chequeo Anual", "Dra. Sofía García", "#C-58421"],
+      ["10 Oct 2023", "Dolor lumbar", "Dr. Ricardo Soto", "#C-58400"],
+    ],
+    theme: "grid",
+    headStyles: { fillColor: [56, 142, 60] },
+  });
+
+  // ===== FOOTER =====
+  const pageHeight = doc.internal.pageSize.height;
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(
+    "Documento generado automáticamente - Sistema Médico",
+    20,
+    pageHeight - 10
+  );
+
+  doc.save("historial_medico_profesional.pdf");
+
+  setOpenFullModal(false);
+  setOpenAlert(true);
+};
+
+const handleDownloadConsultaPDF = () => {
+  const doc = new jsPDF();
+
+  // Header azul
+  doc.setFillColor(25, 118, 210);
+  doc.rect(0, 0, 210, 30, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("REPORTE DE CONSULTA", 20, 18);
+
+  doc.setTextColor(0, 0, 0);
+
+  doc.setFontSize(12);
+  doc.text("Paciente: Juan Pérez", 20, 50);
+  doc.text("Fecha: 15 Ene 2024", 20, 60);
+  doc.text("Motivo: Chequeo Anual", 20, 70);
+  doc.text("Especialidad: Cardiología", 20, 80);
+  doc.text("Doctora: Sofía García", 20, 90);
+
+  doc.setFontSize(11);
+  doc.text(
+    "Observaciones: Paciente estable, continuar tratamiento actual.",
+    20,
+    110,
+    { maxWidth: 170 }
+  );
+
+  doc.save("consulta_medica_profesional.pdf");
+
+  setOpenConsultaModal(false);
+  setOpenAlert(true);
+};
+
+
+const [labFiles, setLabFiles] = useState([
+  {
+    id: 1,
+    name: "Análisis de Sangre Completo",
+    date: "12 May 2024",
+    type: "pdf",
+    url: null,
+  },
+  {
+    id: 2,
+    name: "Resonancia Magnética Lumbar",
+    date: "05 Abr 2024",
+    type: "image",
+    url: null,
+  },
+]);
+
+
+const fileInputRef = React.useRef(null);
+
+const handleUploadClick = () => {
+  fileInputRef.current.click();
+};
+
+
+const handleFileChange = (e) => {
+  const files = Array.from(e.target.files);
+
+  if (files.length === 0) return;
+
+  setPendingFiles(files);      // guardamos temporalmente
+  setOpenUploadModal(true);    // abrimos modal de confirmación
+
+  e.target.value = ""; // reset input para permitir subir el mismo archivo otra vez
+};
+
+const confirmUploadFiles = () => {
+  const newFiles = pendingFiles.map((file, index) => {
+    const isPdf = file.type.includes("pdf");
+
+    return {
+      id: Date.now() + index,
+      name: file.name,
+      date: new Date().toLocaleDateString(),
+      type: isPdf ? "pdf" : "image",
+      url: URL.createObjectURL(file),
+      rawFile: file,
+    };
+  });
+
+  setLabFiles((prev) => [...newFiles, ...prev]);
+  setPendingFiles([]);
+  setOpenUploadModal(false);
+};
+
   return (
     <Box className="historial-wrapper">
+      <PdfModals
+        openFullModal={openFullModal}
+        setOpenFullModal={setOpenFullModal}
+        openConsultaModal={openConsultaModal}
+        setOpenConsultaModal={setOpenConsultaModal}
+        openAlert={openAlert}
+        setOpenAlert={setOpenAlert}
+        handleDownloadFullPDF={handleDownloadFullPDF}
+        handleDownloadConsultaPDF={handleDownloadConsultaPDF}
+         // NUEVO
+        openUploadModal={openUploadModal}
+        setOpenUploadModal={setOpenUploadModal}
+        confirmUploadFiles={confirmUploadFiles}
+      />
       {/* HEADER */}
       <Box className="historial-header-flex">
         <Typography variant="h4" className="main-title">
           Mi Historial Médico
         </Typography>
         <Box display="flex" gap={1.5}>
-          <Button variant="outlined" className="btn-secondary" startIcon={<HistoryIcon />}>
+          <Button
+            variant="outlined"
+            className="btn-secondary"
+            startIcon={<HistoryIcon />}
+            onClick={handleUploadClick}
+          >
             Archivo
           </Button>
-          <Button variant="contained" className="btn-primary" startIcon={<Box component="span" sx={{ fontSize: 20 }}>+</Box>}>
-            Nueva Consulta
+
+          <input
+            type="file"
+            multiple
+            accept=".pdf,image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="contained"
+            className="btn-primary"
+            onClick={() => setOpenFullModal(true)}
+            startIcon={<Box component="span" sx={{ fontSize: 20 }}>+</Box>}
+          >
+            Descargar el historial
           </Button>
         </Box>
       </Box>
@@ -43,11 +250,11 @@ export default function HistorialMedico() {
           <Typography variant="h6">Tratamientos Activos</Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={20}>
           {/* Card Tratamiento 1 */}
-          <Grid item xs={12} md={6}>
-            <Card className="custom-card">
-              <CardContent sx={{ p: '24px !important' }}>
+          <Grid item xs={12} md={12}>
+            <Card className="custom-card card-tratamiento">
+              <CardContent sx={{ p: '40px !important' }}>
                 <Box className="treatment-top">
                   <Box display="flex" gap={2}>
                     <Box className="icon-badge blue">
@@ -88,9 +295,9 @@ export default function HistorialMedico() {
           </Grid>
 
           {/* Card Tratamiento 2 */}
-          <Grid item xs={12} md={6}>
-            <Card className="custom-card">
-              <CardContent sx={{ p: '24px !important' }}>
+          <Grid item xs={12} md={12}>
+            <Card className="custom-card card-tratamiento">
+              <CardContent sx={{ p: '40px !important' }}>
                 <Box className="treatment-top">
                   <Box display="flex" gap={2}>
                     <Box className="icon-badge blue">
@@ -166,7 +373,12 @@ export default function HistorialMedico() {
                     </Box>
                   </TableCell>
                   <TableCell align="right">
-                    <Button variant="contained" className="btn-download" startIcon={<DownloadIcon />}>
+                    <Button
+                      variant="contained"
+                      className="btn-download"
+                      startIcon={<DownloadIcon />}
+                      onClick={() => setOpenConsultaModal(true)}
+                    >
                       PDF
                     </Button>
                   </TableCell>
@@ -179,49 +391,96 @@ export default function HistorialMedico() {
 
 
       {/* RESULTADOS Y DIAGNÓSTICOS */}
-<Grid container spacing={4} sx={{ mt: 2 }}>
+<Grid container spacing={15} sx={{ mt: 2 }}>
   {/* Resultados de Laboratorio */}
-  <Grid item xs={12} lg={8}>
+  <Grid item xs={12} lg={10}>
     <Card className="custom-card lab-results-container">
-      <CardContent sx={{ p: '32px !important' }}>
+      <CardContent sx={{ p: '40px !important' }}>
         <Box className="section-header">
           <ScienceIcon />
           <Typography variant="h6">Resultados de Laboratorio</Typography>
         </Box>
 
-        <Box className="lab-list">
-          {/* Item 1 */}
-          <Box className="lab-item-row">
-            <Box display="flex" alignItems="center" gap={2}>
-              <Box className="file-icon-box pdf">
-                <PictureAsPdfIcon />
-              </Box>
-              <Box>
-                <Typography className="lab-item-title">Análisis de Sangre Completo</Typography>
-                <Typography className="lab-item-date">12 May 2024 • Bioquímica</Typography>
-              </Box>
-            </Box>
-            <IconButton className="action-btn-blue">
-              <DownloadIcon />
-            </IconButton>
-          </Box>
+<Box
+  className="lab-list"
+  sx={{
+    maxHeight: 240,        //  altura fija
+    overflowY: "auto",     //  scroll vertical
+    overflowX: "hidden",
+    pr: 1,
 
-          {/* Item 2 */}
-          <Box className="lab-item-row">
-            <Box display="flex" alignItems="center" gap={2}>
-              <Box className="file-icon-box image">
-                <ImageIcon />
-              </Box>
-              <Box>
-                <Typography className="lab-item-title">Resonancia Magnética Lumbar</Typography>
-                <Typography className="lab-item-date">05 Abr 2024 • Imagenología</Typography>
-              </Box>
-            </Box>
-            <IconButton className="action-btn-blue">
-              <VisibilityIcon />
-            </IconButton>
-          </Box>
+    "&::-webkit-scrollbar": {
+      width: 6,
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "#c1c1c1",
+      borderRadius: 3,
+    },
+  }}
+>
+  {labFiles.map((file) => (
+    <Box
+      key={file.id}
+      className="lab-item-row"
+      sx={{
+        minHeight: 72,            //  filas iguales
+        flexShrink: 0,
+      }}
+    >
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={2}
+        sx={{ minWidth: 0 }}       //  CLAVE para ellipsis
+      >
+        <Box
+          className={`file-icon-box ${
+            file.type === "pdf" ? "pdf" : "image"
+          }`}
+        >
+          {file.type === "pdf" ? (
+            <PictureAsPdfIcon />
+          ) : (
+            <ImageIcon />
+          )}
         </Box>
+
+        {/*  contenedor del texto */}
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            className="lab-item-title"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {file.name}
+          </Typography>
+
+          <Typography
+            className="lab-item-date"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {file.date} • Archivo subido
+          </Typography>
+        </Box>
+      </Box>
+
+      <IconButton
+        className="action-btn-blue"
+        onClick={() => window.open(file.url, "_blank")}
+        sx={{ flexShrink: 0 }} // 🔹 evita que se deforme
+      >
+        {file.type === "pdf" ? <DownloadIcon /> : <VisibilityIcon />}
+      </IconButton>
+    </Box>
+  ))}
+</Box>
       </CardContent>
     </Card>
   </Grid>
@@ -229,7 +488,7 @@ export default function HistorialMedico() {
   {/* Diagnósticos y Línea de Tiempo */}
   <Grid item xs={12} lg={4}>
     <Card className="custom-card">
-      <CardContent sx={{ p: '32px !important' }}>
+      <CardContent sx={{ p: '40px !important' }}>
         <Box className="section-header">
           <HistoryIcon />
           <Typography variant="h6">Diagnósticos</Typography>
