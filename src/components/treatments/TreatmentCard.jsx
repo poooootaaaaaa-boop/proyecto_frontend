@@ -1,6 +1,8 @@
 import {Card, CardContent, Typography, Box, Chip, Avatar, Button,Paper } from "@mui/material";
 import "./treatments.css";
 import { jsPDF } from "jspdf";
+import { useState } from "react";
+import MedicationDetailModal from "./MedicationDetailModal";
 import { useNavigate } from "react-router-dom";
 
 export default function Treatments() {
@@ -24,13 +26,35 @@ export default function Treatments() {
 
   doc.save("receta_medica.pdf");
 };
+
+const [openModal, setOpenModal] = useState(false);
+const [selectedMedication, setSelectedMedication] = useState(null);
+
+const exampleMedication = {
+  nombre: "Metformina",
+  dosis: "850mg - Tableta Oral",
+  presentacion: "Caja con 30 tabletas",
+  precio: "150 MXN",
+  via: "Oral",
+  duracion: "30 días",
+  descripcion: "Se utiliza para controlar los niveles de azúcar en sangre en pacientes con diabetes tipo 2.",
+  hora_inicio: "08:00 AM",
+  hora_fin: "08:00 PM",
+  total_tabletas: "60 tabletas",
+  doctor: "Dra. Elena Vargas",
+  especialidad: "Medicina General"
+};
   return (
     <div className="treatments-container">
 
       <Typography variant="h4" className="main-title">
         Mis Tratamientos y Recetas
       </Typography>
-
+      <MedicationDetailModal
+       open={openModal}
+       onClose={() => setOpenModal(false)}
+       medicamento={selectedMedication}
+      />
       {/* CARDS SUPERIORES */}
       <div className="treatment-cards">
 
@@ -70,6 +94,9 @@ export default function Treatments() {
                 </Typography>
               </div>
             </div>
+            <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => {   setSelectedMedication(exampleMedication); setOpenModal(true); }}>
+                  Ver Detalle
+                </Button>
           </CardContent>
         </Card>
 
@@ -85,7 +112,7 @@ export default function Treatments() {
                 </Typography>
               </div>
               <Chip label="En curso" size="small" className="status-chip" />
-            </div>
+           </div>
 
             <div className="card-info">
               <div className="info-box">

@@ -18,6 +18,7 @@ import HistorialMedico from "./components/historiapaciente/HistorialMedico";
 import Layout from "./components/layout/Layout";
 import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./components/Home/Home";
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
     <AppointmentProvider>
       <Routes>
         <Route path="/Dashboard_paciente" element={<Dashboard />} />
+        <Route path="/recuperar" element={<ForgotPassword />} />
 
         {/* Tus rutas nuevas */}
         <Route path="/angelito-cachondo" element={<Layout_Medicos />} />

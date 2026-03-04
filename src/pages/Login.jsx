@@ -122,9 +122,13 @@ export default function Login() {
               Iniciar sesión
             </button>
 
-            <a href="#" className="forgot">
-              ¿Olvidaste tu contraseña?
-            </a>
+          <p
+            className="forgot"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/recuperar")}
+            >
+            ¿Olvidaste tu contraseña?
+          </p>
           </form>
 
           {/*  Usuarios demo visibles */}
