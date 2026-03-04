@@ -1,9 +1,11 @@
 import {Card, CardContent, Typography, Box, Chip, Avatar, Button,Paper } from "@mui/material";
 import "./treatments.css";
 import { jsPDF } from "jspdf";
+import { useNavigate } from "react-router-dom";
 
 export default function Treatments() {
 
+  const navigate = useNavigate();
   const downloadPDF = () => {
   const doc = new jsPDF();
 
@@ -143,8 +145,12 @@ export default function Treatments() {
 
       </Paper>
 
-      <Typography className="history-link">
-        Ver Historial Completo
+      <Typography
+        className="history-link"
+        onClick={() => navigate("/historial_medico")}
+        sx={{ cursor: "pointer" }}
+      >
+      Ver Historial Completo
       </Typography>
 
     </div>

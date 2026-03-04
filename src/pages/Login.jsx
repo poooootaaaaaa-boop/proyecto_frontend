@@ -26,7 +26,7 @@ export default function Login() {
     {
       email: "paciente@demo.com",
       password: "123456",
-      route: "/",
+      route: "/dashboard_paciente",
       role: "paciente",
     },
   ];

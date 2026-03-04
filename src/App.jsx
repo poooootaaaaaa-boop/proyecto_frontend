@@ -25,13 +25,13 @@ export default function App() {
 
     <AppointmentProvider>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/Dashboard_paciente" element={<Dashboard />} />
 
         {/* Tus rutas nuevas */}
         <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
         <Route path="/recetas_medicas" element={<Recetas_medicas />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route
           path="/historial_medico"
           element={

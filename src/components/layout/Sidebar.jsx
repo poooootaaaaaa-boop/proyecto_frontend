@@ -60,7 +60,7 @@ export default function Sidebar() {
 
         <Button
           component={Link}
-          to="/"
+          to="/Dashboard_paciente"
           startIcon={<DashboardIcon />}
           fullWidth
           sx={buttonStyle}

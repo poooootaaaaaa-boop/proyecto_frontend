@@ -29,7 +29,35 @@ const handleCancelClick = (appt) => {
     setSelectedAppointment(appt);
     setOpenCancel(true);
   };
-
+const fakeAppointments = [
+  {
+    id: "fake1",
+    doctor: "Dra. Mariana López",
+    specialty: "Cardiología",
+    date: dayjs().add(1, "day").format("DD MMMM YYYY"),
+    time: "10:30 AM",
+    location: "Clínica Central - Consultorio 204",
+    avatar: "https://randomuser.me/api/portraits/women/45.jpg",
+  },
+  {
+    id: "fake2",
+    doctor: "Dr. Carlos Méndez",
+    specialty: "Dermatología",
+    date: dayjs().add(2, "day").format("DD MMMM YYYY"),
+    time: "04:00 PM",
+    location: "Hospital San Rafael",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    id: "fake3",
+    doctor: "Dra. Ana Torres",
+    specialty: "Pediatría",
+    date: dayjs().add(5, "day").format("DD MMMM YYYY"),
+    time: "09:15 AM",
+    location: "Centro Médico Norte",
+    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+  },
+];
 
   // filtro del día seleccionado (si hay)
  const filteredAppointments = selectedDate
@@ -46,7 +74,7 @@ const sortedAppointments = [...filteredAppointments].sort((a, b) => {
   const diffA = dateA.diff(today, "day");
   const diffB = dateB.diff(today, "day");
 
-  // Futuras primero (más cercanas primero)
+  //Futuras primero (más cercanas primero)
   if (diffA >= 0 && diffB >= 0) {
     return diffA - diffB;
   }
