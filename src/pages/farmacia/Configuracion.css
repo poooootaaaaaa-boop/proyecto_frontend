@@ -1,0 +1,151 @@
+/* ===== LAYOUT BASE ===== */
+
+.farmacia-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.farmacia-content {
+  flex: 1;
+  padding: 50px;
+  background: linear-gradient(135deg, #f4f7ff 0%, #eef2f9 100%);
+}
+
+/* ===== WRAPPER ===== */
+
+.config-wrapper {
+  max-width: 1400px;
+}
+
+/* ===== HEADER ===== */
+
+.config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.config-header h4 {
+  font-weight: 700;
+  color: #1e2a38;
+  margin: 0;
+}
+
+.config-search {
+  max-width: 260px;
+  border-radius: 25px;
+  padding: 10px 18px;
+  border: 1px solid #e3e8f0;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* ===== TABS ===== */
+
+.config-tabs {
+  display: flex;
+  gap: 35px;
+  margin-bottom: 35px;
+}
+
+.tab {
+  cursor: pointer;
+  font-weight: 500;
+  padding-bottom: 8px;
+  color: #8a94a6;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: #1e3c72;
+}
+
+.tab.active {
+  font-weight: 700;
+  color: #1e3c72;
+  border-bottom: 3px solid #1e3c72;
+}
+
+/* ===== CARDS ===== */
+
+.farm-card {
+  padding: 30px;
+  border-radius: 20px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(25, 42, 70, 0.08);
+  transition: all 0.25s ease;
+}
+
+.farm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(25, 42, 70, 0.12);
+}
+
+.card-title {
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #1f2d3d;
+}
+
+/* ===== TABLE ===== */
+
+.farm-table thead {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: #9aa4b2;
+}
+
+.farm-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.farm-table tbody tr:hover {
+  background: #f4f8ff;
+}
+
+.farm-table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.action-dots {
+  cursor: pointer;
+  font-size: 18px;
+  color: #7b8794;
+}
+
+.action-dots:hover {
+  color: #1e3c72;
+}
+
+/* ===== BADGES MÁS SUAVES ===== */
+
+.badge.bg-success {
+  background: #e6f4ea !important;
+  color: #1e7e34 !important;
+  font-weight: 600;
+}
+
+.badge.bg-secondary {
+  background: #f1f3f5 !important;
+  color: #6c757d !important;
+  font-weight: 600;
+}
+
+/* ===== SWITCHES MEJORADOS ===== */
+
+.switch-group .form-check {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+  font-size: 14px;
+}
+
+.switch-group .form-check-input {
+  cursor: pointer;
+  transform: scale(1.1);
+}

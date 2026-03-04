@@ -1,21 +1,12 @@
-import {
-  Container,
-  Row,
-  Col,
-  Table,
-  Badge,
-  Card,
-  Button,
-  Form,
-  Modal,
-} from "react-bootstrap";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./homeFarmacia.css";
-import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function HomeFarmacia() {
+  const navigate = useNavigate();
+
   // 🔹 Datos dinámicos
   const [recetas, setRecetas] = useState([
     { id: 1, paciente: "Juan Pérez", hora: "10:30", estado: "Urgente" },
@@ -27,7 +18,6 @@ export default function HomeFarmacia() {
   const [showModal, setShowModal] = useState(false);
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
 
-  // 🔹 Abrir modal con datos
   const openModal = (receta) => {
     setRecetaSeleccionada({ ...receta });
     setShowModal(true);
@@ -38,7 +28,6 @@ export default function HomeFarmacia() {
     setRecetaSeleccionada(null);
   };
 
-  // 🔹 Cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRecetaSeleccionada({
@@ -47,7 +36,6 @@ export default function HomeFarmacia() {
     });
   };
 
-  // 🔹 Guardar cambios
   const handleSave = () => {
     setRecetas((prev) =>
       prev.map((r) =>
@@ -61,171 +49,173 @@ export default function HomeFarmacia() {
     <div className="home-layout">
       <Sidebar />
 
-      <Container fluid className="home-content">
+      <div className="home-content-modern">
         <Topbar />
 
-        {/* Header */}
-        <div className="home-header">
+        {/* HEADER */}
+        <div className="home-header-modern">
           <div>
-            <h4>Buen día Dr. Alejandro</h4>
-            <small className="text-muted">Jueves, 24 de octubre</small>
+            <h2 className="main-title">Panel de Farmacia</h2>
+            <p className="subtitle">Jueves, 24 de octubre</p>
           </div>
 
-          <Form.Control
+          <input
             type="search"
-            placeholder="Buscar"
-            className="home-search"
+            placeholder="Buscar receta..."
+            className="modern-search"
           />
         </div>
 
-        <Row className="mt-4">
-          {/* Próximas recetas */}
-          <Col md={8}>
-            <Card className="card-soft">
-              <Card.Body>
-                <h5 className="mb-3">Próximas recetas</h5>
+        <div className="home-grid">
+          {/* RECETAS */}
+          <div className="card-modern">
+            <div className="card-header-modern">
+              <h5>Próximas recetas</h5>
+            </div>
 
-                <Table hover responsive className="tabla-home">
-                  <thead>
-                    <tr>
-                      <th>Paciente</th>
-                      <th>Hora</th>
-                      <th>Estado</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recetas.map((receta) => (
-                      <tr key={receta.id}>
-                        <td className="paciente">
-                          <img src="https://i.pravatar.cc/40" alt="avatar" />
-                          {receta.paciente}
-                        </td>
-                        <td>{receta.hora}</td>
-                        <td>
-                          <Badge
-                            bg={
-                              receta.estado === "Urgente"
-                                ? "danger"
-                                : "secondary"
-                            }
-                          >
-                            {receta.estado}
-                          </Badge>
-                        </td>
-                        <td
-                          className="actions"
-                          onClick={() => openModal(receta)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          ⋮
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
-          </Col>
+            <div className="table-modern">
+              <div className="table-header-modern">
+                <span>Paciente</span>
+                <span>Hora</span>
+                <span>Estado</span>
+                <span></span>
+              </div>
 
-          {/* Accesos rápidos */}
-          <Col md={4}>
-            <h6 className="mb-3">Accesos rápidos</h6>
+              {recetas.map((receta) => (
+                <div className="table-row-modern" key={receta.id}>
+                  <div className="paciente-cell">
+                    <img
+                      src="https://i.pravatar.cc/40"
+                      alt="avatar"
+                    />
+                    {receta.paciente}
+                  </div>
 
-            <Card className="card-soft mb-3">
-              <Card.Body>
-                <Button
-                  as={NavLink}
-                  to="/farmacia/AgregarMedicamento"
-                  variant="primary"
-                >
-                  Agregar medicamento
-                </Button>
-              </Card.Body>
-            </Card>
+                  <div>{receta.hora}</div>
 
-            <Card className="card-soft mb-3">
-              <Card.Body>
-                <Button
-                  as={NavLink}
-                  to="/farmacia/Distribuidores"
-                  variant="primary"
-                >
-                  Distribuidores
-                </Button>
-              </Card.Body>
-            </Card>
+                  <div>
+                    <span
+                      className={`status-badge ${
+                        receta.estado === "Urgente"
+                          ? "urgent"
+                          : "normal"
+                      }`}
+                    >
+                      {receta.estado}
+                    </span>
+                  </div>
 
-            <Card className="card-soft mb-3">
-              <Card.Body>
-                <small className="label">Recetas por validar</small>
-                <h3>{recetas.length}</h3>
-              </Card.Body>
-            </Card>
+                  <div
+                    className="row-action"
+                    onClick={() => openModal(receta)}
+                  >
+                    ⋮
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-            <Card className="card-soft">
-              <Card.Body>
-                <small className="label">Alerta de stock</small>
-                <h3>5</h3>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+          {/* ACCESOS RAPIDOS */}
+          <div className="quick-actions">
+            <div className="card-modern">
+              <button
+                className="btn-primary-modern"
+                onClick={() =>
+                  navigate("/farmacia/AgregarMedicamento")
+                }
+              >
+                Agregar medicamento
+              </button>
+            </div>
 
-        {/* MODAL */}
-        <Modal show={showModal} onHide={closeModal} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Editar receta</Modal.Title>
-          </Modal.Header>
+            <div className="card-modern">
+              <button
+                className="btn-primary-modern"
+                onClick={() =>
+                  navigate("/farmacia/Distribuidores")
+                }
+              >
+                Distribuidores
+              </button>
+            </div>
 
-          {recetaSeleccionada && (
-            <Modal.Body>
-              <Form>
-                <Form.Group className="mb-3">
-                  <Form.Label>Paciente</Form.Label>
-                  <Form.Control
+            <div className="card-modern stats-card">
+              <small>Recetas por validar</small>
+              <h3>{recetas.length}</h3>
+            </div>
+
+            <div className="card-modern stats-card">
+              <small>Alerta de stock</small>
+              <h3>5</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL MODERNO */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-modern">
+            <div className="modal-header-modern">
+              <h4>Editar receta</h4>
+              <button onClick={closeModal}>✕</button>
+            </div>
+
+            {recetaSeleccionada && (
+              <div className="modal-body-modern">
+                <div className="form-group-modern">
+                  <label>Paciente</label>
+                  <input
                     type="text"
                     name="paciente"
                     value={recetaSeleccionada.paciente}
                     onChange={handleChange}
                   />
-                </Form.Group>
+                </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Hora</Form.Label>
-                  <Form.Control
+                <div className="form-group-modern">
+                  <label>Hora</label>
+                  <input
                     type="time"
                     name="hora"
                     value={recetaSeleccionada.hora}
                     onChange={handleChange}
                   />
-                </Form.Group>
+                </div>
 
-                <Form.Group>
-                  <Form.Label>Estado</Form.Label>
-                  <Form.Select
+                <div className="form-group-modern">
+                  <label>Estado</label>
+                  <select
                     name="estado"
                     value={recetaSeleccionada.estado}
                     onChange={handleChange}
                   >
                     <option value="Urgente">Urgente</option>
                     <option value="Normal">Normal</option>
-                  </Form.Select>
-                </Form.Group>
-              </Form>
-            </Modal.Body>
-          )}
+                  </select>
+                </div>
+              </div>
+            )}
 
-          <Modal.Footer>
-            <Button variant="secondary" onClick={closeModal}>
-              Cancelar
-            </Button>
-            <Button variant="primary" onClick={handleSave}>
-              Guardar cambios
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </Container>
+            <div className="modal-footer-modern">
+              <button
+                className="btn-secondary-modern"
+                onClick={closeModal}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="btn-primary-modern"
+                onClick={handleSave}
+              >
+                Guardar cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

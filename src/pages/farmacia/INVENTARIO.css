@@ -1,0 +1,177 @@
+.home-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.home-content-modern {
+  flex: 1;
+  padding: 50px 60px;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef2f7 100%);
+}
+
+.page-wrapper {
+  width: 100%;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.subtitle {
+  color: #64748b;
+  margin-top: -5px;
+}
+
+.primary-btn {
+  background: #2563eb !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 10px 20px !important;
+}
+
+.secondary-btn {
+background: #2563eb !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 10px 20px !important;}
+
+.inventory-actions {
+  margin-bottom: 30px;
+}
+
+/* CARDS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.stat-card-modern {
+  background: white;
+  padding: 35px;
+  border-radius: 24px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
+}
+
+.stat-card-modern h3 {
+  font-size: 36px;
+  margin: 18px 0;
+  font-weight: 800;
+}
+
+.stat-badge {
+  margin-top: auto;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stat-badge.success {
+  background: rgba(34,197,94,0.15);
+  color: #16a34a;
+}
+
+.stat-badge.warning {
+  background: rgba(234,179,8,0.15);
+  color: #ca8a04;
+}
+
+.stat-badge.danger {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+/* TABLE */
+.card-modern {
+  background: white;
+  padding: 35px;
+  border-radius: 24px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.05);
+}
+
+.table-header-modern,
+.table-row-modern {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 60px;
+  align-items: center;
+}
+
+.table-header-modern {
+  background: #f1f5f9;
+  padding: 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.table-row-modern {
+  padding: 18px;
+  border-radius: 14px;
+  transition: 0.2s;
+}
+
+.table-row-modern:hover {
+  background: #f8fafc;
+}
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.in-stock {
+  background: rgba(34,197,94,0.1);
+  color: #16a34a;
+}
+
+.low-stock {
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+}
+
+.muted {
+  color: #64748b;
+}
+
+.success-text {
+  color: #16a34a;
+}
+
+.danger-text {
+  color: #ef4444;
+}
+
+.row-action {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .inventory-header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .table-header-modern {
+    display: none;
+  }
+
+  .table-row-modern {
+    grid-template-columns: 1fr;
+    background: #f8fafc;
+    margin-bottom: 12px;
+  }
+}
