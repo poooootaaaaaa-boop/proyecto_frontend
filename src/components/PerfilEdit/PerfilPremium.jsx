@@ -1,14 +1,90 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./PerfilPremium.css";
 import ModalEdit from "./ModalEdit";
 
 const PerfilPremium = () => {
   const [activeTab, setActiveTab] = useState("datos");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  useEffect(() => {
+  const datosGuardados = localStorage.getItem("perfilPremium");
+  if (datosGuardados) {
+    setPerfil(JSON.parse(datosGuardados));
+  }
+}, []);
 
-  const handleSave = () => {
-    setIsModalOpen(true);
+const [showPassword, setShowPassword] = useState({
+  actual: false,
+  nueva: false,
+  confirmar: false,
+});
+
+const handleSave = () => {
+  // Validar que las contraseñas coincidan
+  if (perfil.seguridad.nueva !== perfil.seguridad.confirmar) {
+    alert("Las contraseñas no coinciden");
+    return;
+  }
+
+  // Actualizar contraseña actual con la nueva
+  const perfilActualizado = {
+    ...perfil,
+    seguridad: {
+      actual: perfil.seguridad.nueva || perfil.seguridad.actual,
+      nueva: "",
+      confirmar: "",
+    },
   };
+
+  setPerfil(perfilActualizado);
+  localStorage.setItem("perfilPremium", JSON.stringify(perfilActualizado));
+
+  setIsModalOpen(true);
+};
+
+ const handleChange = (e) => {
+  setPerfil({
+    ...perfil,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handleCheckbox = (e) => {
+  setPerfil({
+    ...perfil,
+    notificaciones: {
+      ...perfil.notificaciones,
+      [e.target.name]: e.target.checked,
+    },
+  });
+};
+
+const handleSeguridad = (e) => {
+  setPerfil({
+    ...perfil,
+    seguridad: {
+      ...perfil.seguridad,
+      [e.target.name]: e.target.value,
+    },
+  });
+};
+  const [perfil, setPerfil] = useState({
+  nombre: "Sofía Cárdenas",
+  fechaNacimiento: "",
+  telefono: "",
+  correo: "sofia.cardenas@example.com",
+  direccion: "",
+  notificaciones: {
+    whatsapp: true,
+    laboratorio: true,
+    boletin: false,
+    promociones: false,
+  },
+  seguridad: {
+    actual: "",
+    nueva: "",
+    confirmar: "",
+  },
+});
 
   return (
     <div className="perfil-container">
@@ -68,27 +144,27 @@ const PerfilPremium = () => {
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Nombre Completo</label>
-                    <input type="text" defaultValue="Sofía Cárdenas" />
+                    <input type="text" name="nombre"  value={perfil.nombre}  onChange={handleChange}/>
                   </div>
 
                   <div className="form-group">
                     <label>Fecha de Nacimiento</label>
-                    <input type="text" placeholder="DD/MM/AAAA" />
+                    <input type="text" name="fechaNacimiento" value={perfil.fechaNacimiento} onChange={handleChange} placeholder="DD/MM/AAAA" />
                   </div>
 
                   <div className="form-group">
                     <label>Teléfono</label>
-                    <input type="text" placeholder="+52 55 1234 5678" />
+                    <input type="text" name="telefono" value={perfil.telefono} onChange={handleChange} placeholder="+52 55 1234 5678" />
                   </div>
 
                   <div className="form-group">
                     <label>Correo</label>
-                    <input type="email" defaultValue="sofia.cardenas@example.com" />
+                    <input type="email" name="correo" value={perfil.correo} onChange={handleChange} />
                   </div>
 
                   <div className="form-group full">
                     <label>Dirección</label>
-                    <input type="text" placeholder="Calle Ejemplo 123, CDMX" />
+                    <input type="text" name="direccion" value={perfil.direccion} onChange={handleChange} placeholder="Calle Ejemplo 123, CDMX" />
                   </div>
                 </div>
               </>
@@ -102,50 +178,109 @@ const PerfilPremium = () => {
 
                 <div className="preferences-box">
                   <label>
-                    <input type="checkbox" defaultChecked />
+                    <input type="checkbox" name="whatsapp" checked={perfil.notificaciones.whatsapp} onChange={handleCheckbox}/>
                     Recordatorios por WhatsApp
                   </label>
 
                   <label>
-                    <input type="checkbox" defaultChecked />
+                    <input type="checkbox" name="laboratorio" checked={perfil.notificaciones.laboratorio} onChange={handleCheckbox}/>
                     Resultados de Laboratorio
                   </label>
 
                   <label>
-                    <input type="checkbox" />
+                    <input type="checkbox" name="boletin" checked={perfil.notificaciones.boletin} onChange={handleCheckbox}/>
                     Boletín Mensual
                   </label>
 
                   <label>
-                    <input type="checkbox" />
+                    <input type="checkbox" name="promociones" checked={perfil.notificaciones.promociones} onChange={handleCheckbox}/>
                     Promociones Exclusivas Premium
                   </label>
                 </div>
               </>
             )}
 
-            {activeTab === "seguridad" && (
-              <>
-                <div className="section-title">
-                  <h3>Seguridad de la Cuenta</h3>
-                </div>
+          {activeTab === "seguridad" && (
+  <>
+    {/* CONTRASEÑA ACTUAL */}
+    <div className="form-group small">
+      <label>Contraseña Actual</label>
 
-                <div className="form-group small">
-                  <label>Contraseña Actual</label>
-                  <input type="password" defaultValue="••••••••••••" />
-                </div>
+      <div className="password-wrapper">
+        <input
+         type={showPassword.actual ? "text" : "password"}
+         name="actual"
+         value={perfil.seguridad.actual}
+         disabled  
+        />
 
-                <div className="form-group small">
-                  <label>Nueva Contraseña</label>
-                  <input type="password" placeholder="Nueva contraseña" />
-                </div>
+        <span
+          className="material-symbols-outlined eye-icon"
+          onClick={() =>
+            setShowPassword((prev) => ({
+              ...prev,
+              actual: !prev.actual,
+            }))
+          }
+        >
+          {showPassword.actual ? "visibility_off" : "visibility"}
+        </span>
+      </div>
+    </div>
 
-                <div className="form-group small">
-                  <label>Confirmar Nueva Contraseña</label>
-                  <input type="password" placeholder="Confirmar contraseña" />
-                </div>
-              </>
-            )}
+    {/* NUEVA CONTRASEÑA */}
+    <div className="form-group small">
+      <label>Nueva Contraseña</label>
+
+      <div className="password-wrapper">
+        <input
+          type={showPassword.nueva ? "text" : "password"}
+          name="nueva"
+          value={perfil.seguridad.nueva}
+          onChange={handleSeguridad}
+        />
+
+        <span
+          className="material-symbols-outlined eye-icon"
+          onClick={() =>
+            setShowPassword((prev) => ({
+              ...prev,
+              nueva: !prev.nueva,
+            }))
+          }
+        >
+          {showPassword.nueva ? "visibility_off" : "visibility"}
+        </span>
+      </div>
+    </div>
+
+    {/* CONFIRMAR CONTRASEÑA */}
+    <div className="form-group small">
+      <label>Confirmar Nueva Contraseña</label>
+
+      <div className="password-wrapper">
+        <input
+          type={showPassword.confirmar ? "text" : "password"}
+          name="confirmar"
+          value={perfil.seguridad.confirmar}
+          onChange={handleSeguridad}
+        />
+
+        <span
+          className="material-symbols-outlined eye-icon"
+          onClick={() =>
+            setShowPassword((prev) => ({
+              ...prev,
+              confirmar: !prev.confirmar,
+            }))
+          }
+        >
+          {showPassword.confirmar ? "visibility_off" : "visibility"}
+        </span>
+      </div>
+    </div>
+  </>
+)}
 
             <button className="update-btn" onClick={handleSave}>Guardar Cambios</button>
           </div>

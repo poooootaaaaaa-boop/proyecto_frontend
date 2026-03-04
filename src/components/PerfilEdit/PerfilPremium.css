@@ -299,6 +299,31 @@
   opacity: 1 !important;
 }
 
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #64748b;
+  transition: 0.2s;
+}
+
+.eye-icon:hover {
+  color: #2563eb;
+}
+
 /* Animaciones */
 @keyframes modalPop {
   from {

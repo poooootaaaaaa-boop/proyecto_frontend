@@ -1,5 +1,6 @@
 // LandingPage.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 const HERO_IMAGES = [
@@ -12,6 +13,7 @@ const HERO_IMAGES = [
 
 export default function Home() {
   const [index, setIndex] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -25,13 +27,14 @@ export default function Home() {
       {/* NAVBAR */}
       <header className="navbar">
         <div className="logo">+ MediSmart AI</div>
-        <nav className="nav-links">
-          <a>Características</a>
-          <a>Especialidades</a>
-          <a>Planes</a>
-        </nav>
+    
         <div className="nav-actions">
-          <button className="btn-primary">Comenzar</button>
+          <button 
+            className="btn-primary"
+            onClick={() => navigate("/login")}
+          >
+           Comenzar
+          </button>
           <button className="btn-outline">Ingresar</button>
         </div>
       </header>
