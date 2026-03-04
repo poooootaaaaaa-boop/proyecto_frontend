@@ -5,77 +5,85 @@ import {
   Table,
   Badge,
   Button,
-  Nav,Form,Col
+  Nav,
+  Form,
+  Col,
+  Modal,
 } from "react-bootstrap";
-import { Modal } from "react-bootstrap";
 import { useState } from "react";
-
+import "./RecetasRecibidas.css";
 
 export default function RecetasRecibidas() {
-   const [showModal, setShowModal] = useState(false);
-  
+  const [showModal, setShowModal] = useState(false);
+
   const [formData, setFormData] = useState({
     paciente: "",
     hora: "",
     estado: "Normal",
   });
-  const openModal = () => {
-    setShowModal(true);
-  };
-  
-  const closeModal = () => {
-    setShowModal(false);
-  };
-  
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
+
   return (
-    <div style={{ display: "flex" }}>
+    <div className="home-layout">
       <Sidebar />
 
-      <div style={{ flex: 1, background: "#f7f7f7", minHeight: "100vh" }}>
+      <div className="home-content-modern">
         <Topbar />
 
-        <div style={{ padding: "30px" }}>
-          {/* ===== HEADER ===== */}
-          <h4 className="mb-3">Recetas Recibidas</h4>
+        <div className="page-wrapper">
+          <h4 className="page-title">Recetas Recibidas</h4>
 
-          {/* ===== TABS ===== */}
-          <Nav variant="tabs" defaultActiveKey="activas" className="mb-4">
-            <Nav.Item>
-              <Nav.Link eventKey="activas">Recetas activas</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="historial">Historial</Nav.Link>
-            </Nav.Item>
-          </Nav>
+          {/* ===== CARDS RESUMEN ARRIBA ===== */}
+          <div className="stats-grid">
+            <Card className="stat-card">
+              <small>Pendientes hoy</small>
+              <h2>12</h2>
+            </Card>
+
+            <Card className="stat-card">
+              <small>Validadas hoy</small>
+              <h2>12</h2>
+            </Card>
+
+            <Card className="stat-card">
+              <small>Surtidas hoy</small>
+              <h2>2</h2>
+            </Card>
+          </div>
 
           {/* ===== ACCIONES ===== */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div className="d-flex gap-3 text-primary">
-              <span style={{ cursor:  "pointer" }}> Ver receta</span>
+          <div className="table-actions">
+            <div className="left-actions">
+              <span className="link-action">Ver receta</span>
             </div>
 
-            <Button variant="primary">Validar receta</Button>
+            <Button className="primary-btn">
+              Validar receta
+            </Button>
           </div>
 
           {/* ===== TABLA ===== */}
-          <Card className="p-4 rounded-4 border-0 mb-4">
-            <h6 className="mb-3">Recetas Pendientes</h6>
+          <Card className="table-card">
+            <h6 className="table-title">Recetas Pendientes</h6>
 
-            <Table responsive borderless>
+            <Table responsive borderless className="modern-table">
               <thead>
-                <tr className="text-muted">
+                <tr>
                   <th>Fecha</th>
                   <th>Paciente</th>
                   <th>Doctor</th>
-                  <th>ID </th>
+                  <th>ID</th>
                   <th>Estado</th>
-                  <th>Acciones</th>
+                  <th></th>
                 </tr>
               </thead>
 
@@ -84,133 +92,116 @@ export default function RecetasRecibidas() {
                   <td>10:30</td>
                   <td>Juan Pérez</td>
                   <td>Juan Pérez</td>
-                  <td>10:30</td>
+                  <td>#1023</td>
                   <td>
-                    <Badge bg="warning" text="dark">
+                    <Badge className="badge-warning">
                       Pendiente
                     </Badge>
                   </td>
-             <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
-                </tr>
-
-                <tr>
-                  <td>10:30</td>
-                  <td>Juan Pérez</td>
-                  <td>Juan Pérez</td>
-                  <td>10:30</td>
-                  <td>
-                    <Badge bg="info">Validando</Badge>
+                  <td
+                    className="actions"
+                    onClick={openModal}
+                  >
+                    ⋮
                   </td>
-                <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
                 </tr>
 
                 <tr>
-                  <td>10:30</td>
-                  <td>Juan Pérez</td>
-                  <td>Juan Pérez</td>
-                  <td>10:30</td>
+                  <td>11:15</td>
+                  <td>María López</td>
+                  <td>Dr. Gómez</td>
+                  <td>#1024</td>
                   <td>
-                    <Badge bg="success">Listo para surtir</Badge>
-                  </td>
-                <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
-                </tr>
-
-                <tr>
-                  <td>10:30</td>
-                  <td>Juan Pérez</td>
-                  <td>Juan Pérez</td>
-                  <td>10:30</td>
-                  <td>
-                    <Badge bg="warning" text="dark">
-                      Pendiente
+                    <Badge className="badge-info">
+                      Validando
                     </Badge>
                   </td>
-              <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
+                  <td
+                    className="actions"
+                    onClick={openModal}
+                  >
+                    ⋮
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>12:00</td>
+                  <td>Carlos Ruiz</td>
+                  <td>Dra. Torres</td>
+                  <td>#1025</td>
+                  <td>
+                    <Badge className="badge-success">
+                      Listo para surtir
+                    </Badge>
+                  </td>
+                  <td
+                    className="actions"
+                    onClick={openModal}
+                  >
+                    ⋮
+                  </td>
                 </tr>
               </tbody>
             </Table>
           </Card>
-
-          {/* ===== RESUMEN ===== */}
-          <div className="d-flex gap-3">
-            <Card className="p-3 rounded-4 border-0 flex-fill">
-              <small className="text-muted">Pendientes hoy</small>
-              <h3>12</h3>
-            </Card>
-
-            <Card className="p-3 rounded-4 border-0 flex-fill">
-              <small className="text-muted">Validadas hoy</small>
-              <h3>12</h3>
-            </Card>
-
-            <Card className="p-3 rounded-4 border-0 flex-fill">
-              <small className="text-muted">Surtidas hoy</small>
-              <h3>2</h3>
-            </Card>
-          </div>
         </div>
       </div>
-          <Modal show={showModal} onHide={closeModal} centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Editar receta</Modal.Title>
-  </Modal.Header>
 
-  <Modal.Body>
-    <Form>
-      <Form.Group className="mb-3">
-        <Form.Label>Fecha</Form.Label>
-       <Col md={12}>
-                    <Form.Control type="date" />
-                  </Col>
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Paciente</Form.Label>
-        <Form.Control
-          type="text"
-          name="paciente"
-          value={formData.paciente}
-          onChange={handleChange}
-        />
-      </Form.Group>
+      {/* ===== MODAL (NO SE TOCA LÓGICA) ===== */}
+      <Modal show={showModal} onHide={closeModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Editar receta</Modal.Title>
+        </Modal.Header>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Doctor</Form.Label>
-       <Col md={12}>
-                    <Form.Control type="text" />
-                  </Col>
-      </Form.Group>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Fecha</Form.Label>
+              <Col md={12}>
+                <Form.Control type="date" />
+              </Col>
+            </Form.Group>
 
-      <Form.Group>
-        <Form.Label>Estado</Form.Label>
-        <Form.Select
-          name="estado"
-          value={formData.estado}
-          onChange={handleChange}
-        >
-          <option value="Urgente">Pendiente</option>
-          <option value="Normal">Listo</option>
-        </Form.Select>
-      </Form.Group>
-    </Form>
-  </Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Paciente</Form.Label>
+              <Form.Control
+                type="text"
+                name="paciente"
+                value={formData.paciente}
+                onChange={handleChange}
+              />
+            </Form.Group>
 
-  <Modal.Footer>
-    <Button variant="secondary" onClick={closeModal}>
-      Cancelar
-    </Button>
-    <Button variant="primary" onClick={closeModal}>
-      Guardar
-    </Button>
-  </Modal.Footer>
-</Modal>
+            <Form.Group className="mb-3">
+              <Form.Label>Doctor</Form.Label>
+              <Col md={12}>
+                <Form.Control type="text" />
+              </Col>
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Estado</Form.Label>
+              <Form.Select
+                name="estado"
+                value={formData.estado}
+                onChange={handleChange}
+              >
+                <option value="Urgente">Pendiente</option>
+                <option value="Normal">Listo</option>
+              </Form.Select>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeModal}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={closeModal}>
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

@@ -1,212 +1,241 @@
-import { Card, Table, Badge,Button, Form, Col } from "react-bootstrap";
+import {
+ 
+  Button,
+  Form,
+  Col,
+  Modal,
+} from "react-bootstrap";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import { NavLink } from "react-router-dom";
-import { Modal } from "react-bootstrap";
 import { useState } from "react";
-
+import "./Inventario.css";
 
 export default function Inventario() {
-   const [showModal, setShowModal] = useState(false);
-    
-    const [formData, setFormData] = useState({
-      paciente: "",
-      hora: "",
-      estado: "Normal",
+  const [showModal, setShowModal] = useState(false);
+
+  const [formData, setFormData] = useState({
+    paciente: "",
+    hora: "",
+    estado: "Normal",
+  });
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
-    const openModal = () => {
-      setShowModal(true);
-    };
-    
-    const closeModal = () => {
-      setShowModal(false);
-    };
-    
-    const handleChange = (e) => {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
-    };
+  };
+
   return (
-    <div style={{ display: "flex" }}>
+    <div className="home-layout">
       <Sidebar />
 
-      <div style={{ flex: 1, background: "#f7f7f7", minHeight: "100vh" }}>
+      <div className="home-content-modern">
         <Topbar />
 
-        <div style={{ padding: "30px" }}>
-          <h4 className="mb-4">Inventario</h4>
-      <div
-            className="d-flex justify-content-between align-items-center mb-4"
-          >
-            <h4>Medicamentos</h4>
+        <div className="page-wrapper">
+          <div className="inventory-header">
+            <div>
+              <h2 className="main-title">Inventario</h2>
+              <p className="subtitle">Gestión de medicamentos</p>
+            </div>
 
             <Button
               as={NavLink}
               to="/farmacia/AgregarMedicamento"
-              variant="primary"
+              className="primary-btn"
             >
               Agregar medicamento
             </Button>
           </div>
-         
-          {/* ====== CARDS ====== */}
-          <div className="d-flex gap-3 mb-4">
-            <Card className="p-3 flex-fill rounded-4 border-0">
-              <h6>Total Items</h6>
-              <h2>1,240</h2>
-              <small className="text-success">2.4% from last month</small>
-            </Card>
 
-            <Card className="p-3 flex-fill rounded-4 border-0">
-              <div className="d-flex justify-content-between">
-                <h6>Low Stock</h6>
-                <Badge bg="success">+12%</Badge>
-              </div>
-              <h2>12</h2>
-              <small className="text-danger">6 pendientes para la tarde</small>
-            </Card>
+          {/* ===== CARDS RESUMEN ===== */}
+          <div className="stats-grid">
+            <div className="stat-card-modern">
+              <small>Total Items</small>
+              <h3>1,240</h3>
+              <span className="stat-badge success">
+                +2.4% último mes
+              </span>
+            </div>
 
-            <Card className="p-3 flex-fill rounded-4 border-0">
-              <h6>Expired</h6>
-              <h2>2</h2>
-              <small className="text-danger">6 pendientes para la tarde</small>
-            </Card>
+            <div className="stat-card-modern">
+              <small>Low Stock</small>
+              <h3>12</h3>
+              <span className="stat-badge warning">
+                6 pendientes
+              </span>
+            </div>
+
+            <div className="stat-card-modern">
+              <small>Expired</small>
+              <h3>2</h3>
+              <span className="stat-badge danger">
+                Revisión urgente
+              </span>
+            </div>
           </div>
-          <br />
-              <Button
+
+          <div className="inventory-actions">
+            <Button
               as={NavLink}
               to="/farmacia/Distribuidores"
-              variant="primary"
-            >
-              ver distribuidores
+    className="primary-btn"            >
+              Ver distribuidores
             </Button>
+          </div>
 
-          {/* ====== TABLE ====== */}
-          <Card className="p-4 rounded-4 border-0">
-            <br />
-            <Table responsive borderless>
-              <thead>
-                <tr className="text-muted">
-                  <th>MEDICATION NAME & CATEGORY</th>
-                  <th>TOTAL STOCK</th>
-                  <th>LOTES Y CADUCIDAD</th>
-                  <th>STATUS</th>
-                  <th>ACCIONES</th>
-                </tr>
-              </thead>
+          {/* ===== TABLA MODERNA ===== */}
+          <div className="card-modern">
+            <h5 className="section-title">
+              Lista de Medicamentos
+            </h5>
 
-              <tbody>
-                <tr>
-                  <td><strong>Amoxicilin 500 mg</strong></td>
-                  <td>
-                    400 units <br />
-                    <small className="text-success">optimal level</small>
-                  </td>
-                  <td>oct 2025</td>
-                  <td><Badge bg="success">in stock</Badge></td>
-              <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
-                       </tr>
+            <div className="table-modern">
+              <div className="table-header-modern">
+                <span>Medicamento</span>
+                <span>Total Stock</span>
+                <span>Lote / Caducidad</span>
+                <span>Status</span>
+                <span></span>
+              </div>
 
-                <tr>
-                  <td><strong>Amoxicilin 500 mg</strong></td>
-                  <td>
-                    200 units <br />
-                    <small className="text-danger">optimal level</small>
-                  </td>
-                  <td>oct 2025</td>
-                  <td><Badge bg="danger">in stock</Badge></td>
-              <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
-                       </tr>
+              <div className="table-row-modern">
+                <div>
+                  <strong>Amoxicilina 500mg</strong>
+                  <br />
+                  <small className="muted">
+                    Antibiótico
+                  </small>
+                </div>
 
-                <tr>
-                  <td><strong>Amoxicilin 500 mg</strong></td>
-                  <td>
-                    200 units <br />
-                    <small className="text-danger">optimal level</small>
-                  </td>
-                  <td>oct 2025</td>
-                  <td><Badge bg="danger">in stock</Badge></td>
-              <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
-                       </tr>
+                <div>
+                  400 unidades
+                  <br />
+                  <small className="success-text">
+                    Nivel óptimo
+                  </small>
+                </div>
 
-                <tr>
-                  <td><strong>Amoxicilin 500 mg</strong></td>
-                  <td>
-                    200 units <br />
-                    <small className="text-success">optimal level</small>
-                  </td>
-                  <td>oct 2025</td>
-                  <td><Badge bg="success">in stock</Badge></td>
-              <td className="actions" onClick={openModal} style={{ cursor: "pointer" }}>
-  ⋮
-</td>       
-                       </tr>
-              </tbody>
-            </Table>
-          </Card>
+                <div>Oct 2025</div>
+
+                <div>
+                  <span className="status-badge in-stock">
+                    In Stock
+                  </span>
+                </div>
+
+                <div
+                  className="row-action"
+                  onClick={openModal}
+                >
+                  ⋮
+                </div>
+              </div>
+
+              <div className="table-row-modern">
+                <div>
+                  <strong>Ibuprofeno 600mg</strong>
+                  <br />
+                  <small className="muted">
+                    Analgésico
+                  </small>
+                </div>
+
+                <div>
+                  120 unidades
+                  <br />
+                  <small className="danger-text">
+                    Bajo stock
+                  </small>
+                </div>
+
+                <div>Nov 2025</div>
+
+                <div>
+                  <span className="status-badge low-stock">
+                    Low Stock
+                  </span>
+                </div>
+
+                <div
+                  className="row-action"
+                  onClick={openModal}
+                >
+                  ⋮
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-                <Modal show={showModal} onHide={closeModal} centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Editar Medicamento</Modal.Title>
-  </Modal.Header>
 
-  <Modal.Body>
-    <Form>
-      <Form.Group className="mb-3">
-        <Form.Label>Nombre y categoria</Form.Label>
-       <Col md={12}>
-                    <Form.Control type="text" />
-                  </Col>
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Paciente</Form.Label>
-        <Form.Control
-          type="text"
-          name="paciente"
-          value={formData.paciente}
-          onChange={handleChange}
-        />
-      </Form.Group>
+      {/* ===== MODAL (LÓGICA INTACTA) ===== */}
+      <Modal show={showModal} onHide={closeModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Editar Medicamento
+          </Modal.Title>
+        </Modal.Header>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Doctor</Form.Label>
-       <Col md={12}>
-                    <Form.Control type="text" />
-                  </Col>
-      </Form.Group>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Nombre y categoría
+              </Form.Label>
+              <Col md={12}>
+                <Form.Control type="text" />
+              </Col>
+            </Form.Group>
 
-      <Form.Group>
-        <Form.Label>Estado</Form.Label>
-        <Form.Select
-          name="estado"
-          value={formData.estado}
-          onChange={handleChange}
-        >
-          <option value="Urgente">Pendiente</option>
-          <option value="Normal">Listo</option>
-        </Form.Select>
-      </Form.Group>
-    </Form>
-  </Modal.Body>
+            <Form.Group className="mb-3">
+              <Form.Label>Stock</Form.Label>
+              <Form.Control
+                type="text"
+                name="paciente"
+                value={formData.paciente}
+                onChange={handleChange}
+              />
+            </Form.Group>
 
-  <Modal.Footer>
-    <Button variant="secondary" onClick={closeModal}>
-      Cancelar
-    </Button>
-    <Button variant="primary" onClick={closeModal}>
-      Guardar
-    </Button>
-  </Modal.Footer>
-</Modal>
+            <Form.Group>
+              <Form.Label>Estado</Form.Label>
+              <Form.Select
+                name="estado"
+                value={formData.estado}
+                onChange={handleChange}
+              >
+                <option value="Urgente">
+                  Low Stock
+                </option>
+                <option value="Normal">
+                  In Stock
+                </option>
+              </Form.Select>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={closeModal}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={closeModal}
+          >
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
