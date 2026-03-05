@@ -9,8 +9,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  //  Usuarios demo
-  const users = [
+  // Usuarios demo
+  const demoUsers = [
     {
       email: "farmacia@demo.com",
       password: "123456",
@@ -31,25 +31,41 @@ export default function Login() {
     },
   ];
 
-  const handleLogin = () => {
-    const foundUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
+const handleLogin = () => {
 
-    if (foundUser) {
-      setError("");
+  const savedUsers =
+    JSON.parse(localStorage.getItem("registeredUsers")) || [];
 
-      // Guardar en localStorage
-      localStorage.setItem("user", JSON.stringify(foundUser));
+  const allUsers = [...demoUsers, ...savedUsers];
 
+  const foundUser = allUsers.find(
+    (u) => u.email === email && u.password === password
+  );
+
+  if (foundUser) {
+    setError("");
+
+    localStorage.setItem("user", JSON.stringify(foundUser));
+
+    // decidir ruta según rol
+    if (foundUser.route) {
       navigate(foundUser.route);
-    } else {
-      setError("Credenciales incorrectas");
+    } else if (foundUser.role === "medico") {
+      navigate("/Medicos/Dashboard_medicos");
+    } else if (foundUser.role === "clinica") {
+      navigate("/Farmacia/dashboard");
+    } else if (foundUser.role === "paciente") {
+      navigate("/dashboard_paciente");
     }
-  };
+
+  } else {
+    setError("Credenciales incorrectas");
+  }
+};
 
   return (
     <div className="login-container">
+
       {/* LADO IZQUIERDO */}
       <div className="login-left">
         <img
@@ -94,6 +110,7 @@ export default function Login() {
               handleLogin();
             }}
           >
+
             <div className="input-group">
               <label>Correo Electrónico</label>
               <input
@@ -115,29 +132,33 @@ export default function Login() {
             </div>
 
             {error && (
-              <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
+              <p style={{ color: "red", marginBottom: "10px" }}>
+                {error}
+              </p>
             )}
 
             <button type="submit" className="login-btn">
               Iniciar sesión
             </button>
 
-          <p
-            className="forgot"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/recuperar")}
+            <p
+              className="forgot"
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/recuperar")}
             >
-            ¿Olvidaste tu contraseña?
-          </p>
+              ¿Olvidaste tu contraseña?
+            </p>
+
           </form>
 
-          {/*  Usuarios demo visibles */}
+          {/* Usuarios demo */}
           <div style={{ marginTop: "20px", fontSize: "12px", opacity: 0.7 }}>
             <p><strong>Usuarios demo:</strong></p>
             <p>farmacia@demo.com / 123456</p>
             <p>medico@demo.com / 123456</p>
             <p>paciente@demo.com / 123456</p>
           </div>
+
         </div>
       </div>
     </div>

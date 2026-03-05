@@ -35,7 +35,7 @@ export default function Home() {
           >
            Comenzar
           </button>
-          <button className="btn-outline">Ingresar</button>
+          <button className="btn-outline" onClick={() => navigate("/seleccionar_perfil")}>Ingresar</button>
         </div>
       </header>
 
