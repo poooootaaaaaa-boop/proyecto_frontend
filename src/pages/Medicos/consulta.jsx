@@ -10,14 +10,14 @@ import Mensaje from "./mensaje";
 
 function Consulta({data,setData}){
     const[nombre, setNombre]=useState("");
-    const[apellido, setApellido]=useState("");
+    const[apellidoP, setApellidoP]=useState("");
     const[motivo, setMotivo]=useState("");
     const[sintomas, setSintomas]=useState("");
     const[examen, setExamen]=useState("");
     const [mostrarMensaje,setMostrarMensaje]=useState(false);
 
       const guardar = () => {
-    const nuevoPaciente = { nombre, apellido, motivo, sintomas, examen };
+    const nuevoPaciente = { nombre, apellidoP, motivo, sintomas, examen };
     if (typeof setData === "function") {
       setData(prev => [...prev, nuevoPaciente]);
       setMostrarMensaje(true);  
@@ -26,7 +26,7 @@ function Consulta({data,setData}){
     }
 
     setNombre("");
-    setApellido("");
+    setApellidoP("");
     setMotivo("");
     setSintomas("");
     setExamen("");
@@ -70,7 +70,7 @@ function Consulta({data,setData}){
 
                                         <Form.Label className="text-primary fw-bold">Apellido del paciente</Form.Label>
 
-                                        <Form.Control value={apellido} onChange={(e)=>setApellido(e.target.value)}/>
+                                        <Form.Control value={apellidoP} onChange={(e)=>setApellidoP(e.target.value)}/>
                                         </Col>
                                     </Row>
 
