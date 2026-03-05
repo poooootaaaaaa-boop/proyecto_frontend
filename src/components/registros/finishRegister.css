@@ -1,0 +1,111 @@
+.finish-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", sans-serif;
+  background: white;
+}
+
+/* progress bar */
+
+.finish-progress {
+  height: 4px;
+  background: #e5e7eb;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 100%;
+  background: #0047cc;
+}
+
+/* header */
+
+.finish-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 40px;
+}
+
+.header-icon {
+  color: #0047cc !important;
+  font-size: 32px !important;
+}
+
+.header-title {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+/* main */
+
+.finish-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+}
+
+.finish-text {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.finish-title {
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+}
+
+.finish-subtitle {
+  color: #6b7280;
+}
+
+/* form */
+
+.finish-form {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* password info */
+
+.password-info {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: -10px;
+}
+
+/* terms */
+
+.terms-text {
+  font-size: 14px;
+}
+
+.terms-description {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.terms-link {
+  color: #0047cc;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+/* button */
+
+.finish-button {
+  background: #0047cc !important;
+  padding: 12px !important;
+  font-size: 15px !important;
+  margin-top: 10px !important;
+}
+
+.finish-button:hover {
+  background: #003bb5 !important;
+}

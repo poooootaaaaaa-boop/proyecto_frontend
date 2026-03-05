@@ -1,0 +1,95 @@
+.doctor-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 6px !important;
+  background-color: #f3f4f6 !important;
+}
+
+.progress-bar .MuiLinearProgress-bar {
+  background-color: #003bb5 !important;
+}
+
+/* Header */
+.doctor-header {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon {
+  color: #003bb5 !important;
+}
+
+.header-title {
+  font-weight: 700 !important;
+}
+
+/* Main */
+.doctor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.doctor-text {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.doctor-title {
+  font-weight: 700 !important;
+  margin-bottom: 10px !important;
+}
+
+.doctor-subtitle {
+  color: #6b7280;
+}
+
+/* Form */
+.doctor-form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.doctor-input .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.doctor-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #003bb5 !important;
+}
+
+.doctor-input .MuiInputLabel-root.Mui-focused {
+  color: #003bb5 !important;
+}
+
+/* Button */
+.doctor-button-container {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+}
+
+.doctor-button {
+  background-color: #003bb5 !important;
+  padding: 8px 40px !important;
+  font-weight: 500 !important;
+}
+
+.doctor-button:hover {
+  background-color: #002a85 !important;
+}
