@@ -8,28 +8,37 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Mensaje from "./mensaje";
 
-function Consulta({data,setData}){
-    const[nombre, setNombre]=useState("");
-    const[apellidoP, setApellidoP]=useState("");
+function Consulta({data,setData, dataPacientes}){
+    const [pacienteId, setPacienteId] = useState("");
     const[motivo, setMotivo]=useState("");
     const[sintomas, setSintomas]=useState("");
     const[examen, setExamen]=useState("");
     const [mostrarMensaje,setMostrarMensaje]=useState(false);
+    const [notas, setNotas] = useState("");
 
       const guardar = () => {
-    const nuevoPaciente = { nombre, apellidoP, motivo, sintomas, examen };
+    // find patient info so we can include name in the stored record
+    const selected = dataPacientes.find(p => String(p.id) === String(pacienteId));
+    const nuevoPaciente = {
+      id: Date.now(),
+      pacienteId,
+      motivo,
+      sintomas,
+      examen,
+      notas,
+      nombre: selected?.nombre || "",
+      apellido: selected?.apellidoP || ""
+    };
     if (typeof setData === "function") {
       setData(prev => [...prev, nuevoPaciente]);
       setMostrarMensaje(true);  
     } else {
       console.error("setData no es una función", setData);
     }
-
-    setNombre("");
-    setApellidoP("");
     setMotivo("");
     setSintomas("");
     setExamen("");
+    setNotas("");
   };
 
 
@@ -59,25 +68,33 @@ function Consulta({data,setData}){
                                         <br />
                                         <Col md={6}>
                                         <Form.Label className="text-primary fw-bold">Nombre del paciente</Form.Label>
+                                        <Form.Select 
+                                                value={pacienteId}
+                                                onChange={(e)=>setPacienteId(e.target.value)}
+                                                >
 
-                                        <Form.Control value={nombre} onChange={(e) => setNombre(e.target.value)} />
+                                                <option value="">Seleccionar paciente</option>
+
+                                                {dataPacientes.map((paciente)=>(
+                                                <option key={paciente.id} value={paciente.id}>
+                                                    {paciente.nombre} {paciente.apellidoP}
+                                                </option>
+                                                ))}
+
+                                                </Form.Select>
                                         </Col>
 
+                                            {/* INPUT DE NOTAS */}
+                                            <Col md={6}>
+                                                <Form.Label className="fw-bold" style={{color:"#7c3aed"}}>
+                                                    📝 Notas del médico
+                                                </Form.Label>
 
-                                        <br />
-
-                                        <Col md={6}> 
-
-                                        <Form.Label className="text-primary fw-bold">Apellido del paciente</Form.Label>
-
-                                        <Form.Control value={apellidoP} onChange={(e)=>setApellidoP(e.target.value)}/>
-                                        </Col>
+                                                <Form.Control as="textarea"rows={8} placeholder="Escriba aquí observaciones adicionales, recomendaciones o notas importantes..." style={{background:"#faf5ff",border:"1px solid #e9d5ff",resize:"none"}}  value={notas} onChange={(e)=>setNotas(e.target.value)}/>
+                                            </Col>
                                     </Row>
 
-
-                                        <br />
-
-                                        <Col md={4}>
+                                        <Col md={6}>
 
                                             <Form.Label className="text-primary fw-bold">Motivo de la consulta</Form.Label>
 
