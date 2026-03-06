@@ -31,11 +31,11 @@ export default function Home() {
         <div className="nav-actions">
           <button 
             className="btn-primary"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/seleccionar_perfil")}
           >
            Comenzar
           </button>
-          <button className="btn-outline">Ingresar</button>
+          <button className="btn-outline" onClick={() => navigate("/login")}>Ingresar</button>
         </div>
       </header>
 

@@ -7,6 +7,7 @@ import Treatments from "./pages/Treatments";
 import NewAppointment from "./components/appointments/NewAppointment";
 import ConfirmAppointment from "./components/appointments/ConfirmAppointment";
 import { AppointmentProvider } from "./components/appointments/AppointmentContext";
+import SelectProfile from "./components/registros/SelectProfile";
 
 
 // Tus rutas y componentes del stash
@@ -20,7 +21,7 @@ import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./components/Home/Home";
-import "bootstrap-icons/font/bootstrap-icons.css";
+
 
 export default function App() {
   return (
@@ -29,6 +30,10 @@ export default function App() {
       <Routes>
         <Route path="/Dashboard_paciente" element={<Dashboard />} />
         <Route path="/recuperar" element={<ForgotPassword />} />
+        <Route path="/seleccionar_perfil" element={<SelectProfile />} />
+        <Route path="/registro/doctor" element={<DoctorInfo />} />
+        <Route path="/registro/clinic" element={<ClinicInfo />} />
+        <Route path="/registro/finish" element={<FinishRegister />} />
 
         {/* Tus rutas nuevas */}
         <Route path="/angelito-cachondo" element={<Layout_Medicos />} />

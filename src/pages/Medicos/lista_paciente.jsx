@@ -12,11 +12,15 @@ import Datagrid from "./Datagrid";
 
 
 
-
 function lista_paciente({data=[]}) { 
-      const buscarPaciente = () => {
+      
+    
+    const buscarPaciente = () => {
     console.log("Buscando paciente")
   }
+
+
+  // navigation handled via Link component in the table rows
     return (
         <div>
             <Layout_Medicos>
@@ -146,9 +150,14 @@ function lista_paciente({data=[]}) {
 
 
                                 <td style={{padding:"20px",textAlign:"right"}}> 
-                                    <Button style={{background:"#e0e7ff",color:"#eaeaea",border:"none",borderRadius:"20px",padding:"8px 18px",fontWeight:"500"}}>
+                                <Button
+                                    style={{background:"#e0e7ff",color:"#eaeaea",border:"none",borderRadius:"20px",padding:"8px 18px",fontWeight:"500"}}
+                                    as={Link}
+                                    to="/Medicos/historial"
+                                    state={{ paciente }}
+                                >
                                     Ver Expediente
-                                    </Button>
+                                </Button>
 
                                 </td>
 

@@ -33,13 +33,14 @@ function Alta_pacientes({ data, setData }){
         
 
         const finalizar = () => {
-            const altaPaciente = { nombre,apellidoP, apellidoM, nacimiento, genero,telefono,correo,colonia,ciudad,estado,codigoPostal,tipoSangre,alergias,padecimientoHeredofamiliar};
+            const altaPaciente = { id: Date.now(),nombre,apellidoP, apellidoM, nacimiento, genero,telefono,correo,colonia,ciudad,estado,codigoPostal,tipoSangre,alergias,padecimientoHeredofamiliar};
             if (typeof setData === "function") {
             setData(prev => [...prev, altaPaciente]); 
             setMostrarMensaje(true); 
             }  else {
             console.error("setData no es una función", setData);
             }
+            console.log("Paciente registrado:", altaPaciente);
 
             setNombre("");
             setApellidoP("");

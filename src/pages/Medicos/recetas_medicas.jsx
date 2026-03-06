@@ -8,12 +8,20 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useState } from "react";
 
 
-function recetas_medicas({ data = [] }){
+function recetas_medicas({ data = [], dataPacientes=[]}){
+    const [busqueda, setBusqueda] = useState("");
+    const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
 
-          const buscarPaciente = () => {
-    console.log("Buscando paciente")
+const handleBusqueda = (e) => {
+    const valor = e.target.value;
+    setBusqueda(valor);
 
-  }
+    const resultado = data.filter((p) =>
+        p.nombre.toLowerCase().includes(valor.toLowerCase())
+    );
+
+    setPacientesFiltrados(resultado);
+};
     return(
     <Layout_Medicos>
 
@@ -50,18 +58,10 @@ function recetas_medicas({ data = [] }){
                             <Form>
                                 <Form.Group>
 
-                                    <Form.Control type="text"placeholder="🔍 Buscar por nombre del paciente..." style={{borderRadius:"30px",padding:"12px 20px",border:"none",background:"#e5e7eb",fontSize:"15px"}}/>
+                                    <Form.Control type="text"placeholder="🔍 Buscar por nombre del paciente..." style={{borderRadius:"30px",padding:"12px 20px",border:"none",background:"#e5e7eb",fontSize:"15px"}} value={busqueda} onChange={handleBusqueda}/>
 
                                 </Form.Group>
                             </Form>
-
-                        </div>
-
-
-                        {/* Botón */}
-                        <div className="col-md-3 text-end">
-
-                            <Button onClick={buscarPaciente}style={{ background:"#1d4ed8",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600",boxShadow:"0 5px 12px rgba(29,78,216,0.3)"}}>🔍 Buscar</Button>
 
                         </div>
 
@@ -76,7 +76,7 @@ function recetas_medicas({ data = [] }){
 
         <div className="container mt-4">
             <div className="row g-4">
-                {data.map((paciente, index) => (
+                {(busqueda ? pacientesFiltrados : data).map((paciente, index) => (
                     <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={index}>
                         <Card  style={{ borderRadius: "20px", border: "1px solid #e5e7eb",boxShadow: "0 4px 10px rgba(0,0,0,0.05)",padding: "10px"}}>
                             <CardContent>

@@ -10,3 +10,74 @@ body {
   border-radius: 12px;
   height: 120px;
 }
+
+
+/* =========================
+   GLOBAL RESPONSIVE SYSTEM
+========================= */
+
+*{
+box-sizing:border-box;
+}
+
+/* Tablets */
+
+@media (max-width: 1024px){
+
+.container{
+padding:20px;
+}
+
+h1{
+font-size:28px;
+}
+
+h2{
+font-size:22px;
+}
+
+}
+
+/* Mobile */
+
+@media (max-width: 768px){
+
+.container{
+padding:15px;
+}
+
+h1{
+font-size:24px;
+}
+
+h2{
+font-size:20px;
+}
+
+button{
+font-size:14px;
+}
+
+}
+
+/* Mobile pequeño */
+
+@media (max-width: 480px){
+
+.container{
+padding:10px;
+}
+
+h1{
+font-size:20px;
+}
+
+h2{
+font-size:18px;
+}
+
+button{
+font-size:13px;
+}
+
+}
