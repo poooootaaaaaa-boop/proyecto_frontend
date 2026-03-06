@@ -21,6 +21,9 @@ import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./components/Home/Home";
+import DoctorInfo from "./components/registros/DoctorInfo";
+import ClinicInfo from "./components/registros/ClinicInfo";
+import FinishRegister from "./components/registros/FinishRegister";
 
 
 export default function App() {
@@ -31,10 +34,9 @@ export default function App() {
         <Route path="/Dashboard_paciente" element={<Dashboard />} />
         <Route path="/recuperar" element={<ForgotPassword />} />
         <Route path="/seleccionar_perfil" element={<SelectProfile />} />
-
-
-
-
+        <Route path="/registro/doctor" element={<DoctorInfo />} />
+        <Route path="/registro/clinic" element={<ClinicInfo />} />
+        <Route path="/registro/finish" element={<FinishRegister />} />
 
         {/* Tus rutas nuevas */}
         <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
