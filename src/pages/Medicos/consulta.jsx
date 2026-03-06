@@ -61,65 +61,93 @@ function Consulta({data,setData, dataPacientes}){
                              <div className="container mt-4" >
                                  <h3 style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}>Formulario Clinico</h3>
                                  <Typography style={{fontSize: "17px",color: "gray"}}>Registra el Proceso de la Consulta Actual</Typography>
-                                <div className="bg-white p-4 mb-4" style={{borderRadius:"10px", border: "1px solid #f1f5f9",boxShadow:"none"}}>
+                                <div className="bg-white p-4 mb-4" style={{borderRadius:"20px",border:"1px solid #ddd",boxShadow:"0 2px 6px rgba(0,0,0,0.05)"}}>
 
-                                    <Row className="mt-3">
-                                        
-                                        <br />
-                                        <Col md={6}>
-                                        <Form.Label className="text-primary fw-bold">Nombre del paciente</Form.Label>
-                                        <Form.Select 
-                                                value={pacienteId}
-                                                onChange={(e)=>setPacienteId(e.target.value)}
-                                                >
-
-                                                <option value="">Seleccionar paciente</option>
-
-                                                {dataPacientes.map((paciente)=>(
-                                                <option key={paciente.id} value={paciente.id}>
-                                                    {paciente.nombre} {paciente.apellidoP}
-                                                </option>
-                                                ))}
-
-                                                </Form.Select>
-                                        </Col>
-
-                                            {/* INPUT DE NOTAS */}
+                                        <Row className="mt-3">
+                                            
+                                            <br />
                                             <Col md={6}>
-                                                <Form.Label className="fw-bold" style={{color:"#7c3aed"}}>
+                                            <Form.Label className="text-dark fw-bold">Nombre del paciente</Form.Label>
+                                            <Form.Select 
+                                                    value={pacienteId}
+                                                    onChange={(e)=>setPacienteId(e.target.value)}
+                                                    >
+
+                                                    <option value="">Seleccionar paciente</option>
+
+                                                    {dataPacientes.map((paciente)=>(
+                                                    <option key={paciente.id} value={paciente.id}>
+                                                        {paciente.nombre} {paciente.apellidoP}
+                                                    </option>
+                                                    ))}
+
+                                                    </Form.Select>
+                                            </Col>
+
+                                            <Col md={6}>
+                                                <Form.Label className="text-dark fw-bold">Motivo de la consulta</Form.Label>
+
+                                                <Form.Control value={motivo} onChange={(e)=>setMotivo(e.target.value)}/>
+                                            </Col>
+
+                                        </Row>
+                                </div>
+
+                                <div className="bg-white p-4 mb-4" style={{borderRadius:"20px",border:"1px solid #ddd",boxShadow:"0 2px 6px rgba(0,0,0,0.05)"}}>
+
+                                    <Row>
+                                        
+                                         <Col md={8}>
+
+                                            <Row className="mt-3">
+                                                <Col md={12}> 
+
+                                                    <Form.Label className="text-dark fw-bold"> Sintomas</Form.Label>
+
+                                                    <Form.Control as="textarea"rows={4} value={sintomas} onChange={(e)=>setSintomas(e.target.value)}/>
+                                                
+                                                </Col>
+                                            </Row>
+
+
+                                            <Row className="mt-3">
+
+                                                 <Col md={12}>
+
+                                                    <Form.Label className="text-dark fw-bold"> Examen físico</Form.Label>
+
+                                                    <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)}/>  
+                                                 
+                                                 
+                                                 </Col>
+
+                                            </Row>
+                                               
+                                         
+                                         </Col>
+
+                                           {/* LADO DERECHO */}
+
+                                        {/* INPUT DE NOTAS */}
+                                         <Col md={4}>
+                                            <Form.Label className="fw-bold" style={{color:"#7c3aed"}}>
                                                     📝 Notas del médico
                                                 </Form.Label>
 
-                                                <Form.Control as="textarea"rows={8} placeholder="Escriba aquí observaciones adicionales, recomendaciones o notas importantes..." style={{background:"#faf5ff",border:"1px solid #e9d5ff",resize:"none"}}  value={notas} onChange={(e)=>setNotas(e.target.value)}/>
-                                            </Col>
-                                    </Row>
-
-                                        <Col md={6}>
-
-                                            <Form.Label className="text-primary fw-bold">Motivo de la consulta</Form.Label>
-
-                                            <Form.Control value={motivo} onChange={(e)=>setMotivo(e.target.value)}/>
+                                             <Form.Control as="textarea"rows={8} placeholder="Escriba aquí observaciones adicionales, recomendaciones o notas importantes..." style={{background:"#faf5ff",border:"1px solid #e9d5ff",resize:"none"}}  value={notas} onChange={(e)=>setNotas(e.target.value)}/>
                                         </Col>
 
-                                        <br/>
-
-                                        <Form.Label className="text-primary fw-bold"> Sintomas</Form.Label>
-
-                                        <Form.Control as="textarea"rows={4} value={sintomas} onChange={(e)=>setSintomas(e.target.value)}/>
-
-                                        <br/>
-
-                                        <Form.Label className="text-primary fw-bold"> Examen físico</Form.Label>
-
-                                        <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)}/>
 
 
-                                        <br /><br /><br /><br />
+
+                                    </Row>
+
+
 
                                 </div>
 
 
-
+                                <br />
 
                             </div>
 

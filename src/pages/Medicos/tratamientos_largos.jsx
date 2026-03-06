@@ -220,15 +220,15 @@ return (
 
     <Modal.Footer>
 
-      <Button variant="success" onClick={finalizarTratamiento}>
-      Finalizar tratamiento
+      <Button onClick={finalizarTratamiento}variant="success" style={{background:"#16a34a",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600"}}>
+        Finalizar tratamiento
       </Button>
 
-      <Button variant="danger" onClick={cancelarTratamiento}>
-      Cancelar tratamiento
+      <Button variant="danger" onClick={cancelarTratamiento}style={{background:"#dc2626",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600"}}>
+        Cancelar tratamiento
       </Button>
 
-      <Button variant="secondary"onClick={()=>setShowModal(false)}>
+      <Button variant="secondary"onClick={()=>setShowModal(false)} style={{background:"#6b7280",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600", color:"#fff"}}>
       Cerrar
       </Button>
 

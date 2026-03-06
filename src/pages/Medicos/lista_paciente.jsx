@@ -62,7 +62,6 @@ function lista_paciente({data=[]}) {
 
                                             <Form.Control type="text"placeholder="Buscar por nombre, DNI o expediente..."style={{height:"55px",borderRadius:"30px",background:"#f3f4f6",border:"none",paddingLeft:"20px",paddingRight:"60px"}} value={busqueda} onChange={handleBusqueda}/>
 
-                                            <SearchIcon style={{position:"absolute",right:"10px",top:"50%",transform:"translateY(-50%)",background:"#1d4ed8",color:"white",padding:"8px",borderRadius:"50%",cursor:"pointer",fontSize:"28px"}}/>
 
                                         </div>
 

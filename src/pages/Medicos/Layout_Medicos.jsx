@@ -11,12 +11,32 @@ import PersonIcon from '@mui/icons-material/Person';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import LogoutModal from "../../components/farmacia/LogoutModal";
 import "./Layout.css";
+import { Nav, Offcanvas } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
+
 
 import { Link } from "react-router-dom";
 
 
 function Layout_Medicos({ children }) {
+    const [openLogout, setOpenLogout] = useState(false);
+    const [show, setShow] = useState(false);
+
+const linkStyle = ({ isActive }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  color: "#fff",
+  padding: "10px 15px",
+  borderRadius: "10px",
+  textDecoration: "none",
+  background: isActive ? "rgba(255,255,255,0.15)" : "transparent",
+  fontWeight: isActive ? "600" : "400",
+  transition: "0.2s",
+});
   return (
      <div style={{ display: "flex", minHeight: "100vh" }}>
       <div className="sidebar">
@@ -98,6 +118,44 @@ function Layout_Medicos({ children }) {
       >
         TRATAMIENTOS
       </Button>
+
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+
+
+
+    <div style={{ marginTop: "auto" }}>
+      <hr style={{ borderColor: "rgba(255,255,255,0.3)" }} />
+
+      <Nav.Link
+        onClick={() => setOpenLogout(true)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          color: "#ffdddd",
+          padding: "10px 15px",
+          borderRadius: "10px",
+          cursor: "pointer",
+        }}
+      >
+        <i className="bi bi-box-arrow-right"></i>
+        Cerrar sesión
+      </Nav.Link>
+    </div>
+
+      <LogoutModal
+            open={openLogout}
+            handleClose={() => setOpenLogout(false)}
+          />
 
 
       </div>
