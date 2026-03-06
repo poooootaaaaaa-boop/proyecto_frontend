@@ -136,6 +136,9 @@ const exampleMedication = {
                 </Typography>
               </div>
             </div>
+            <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => {   setSelectedMedication(exampleMedication); setOpenModal(true); }}>
+                  Ver Detalle
+                </Button>
           </CardContent>
         </Card>
 
