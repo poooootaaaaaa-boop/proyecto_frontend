@@ -31,9 +31,10 @@ export default function App() {
         <Route path="/Dashboard_paciente" element={<Dashboard />} />
         <Route path="/recuperar" element={<ForgotPassword />} />
         <Route path="/seleccionar_perfil" element={<SelectProfile />} />
-        <Route path="/registro/doctor" element={<DoctorInfo />} />
-        <Route path="/registro/clinic" element={<ClinicInfo />} />
-        <Route path="/registro/finish" element={<FinishRegister />} />
+
+
+
+
 
         {/* Tus rutas nuevas */}
         <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
