@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
-
+import { useLocation } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import EventIcon from "@mui/icons-material/Event";
 import MedicationIcon from "@mui/icons-material/Medication";
@@ -26,6 +26,7 @@ export default function Sidebar() {
 
   const [openLogout, setOpenLogout] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
+  const location = useLocation();
 
   const isMobile = useMediaQuery("(max-width:900px)");
 
@@ -64,21 +65,57 @@ export default function Sidebar() {
 
       <Box sx={{ flexGrow: 1 }}>
 
-        <Button component={Link} to="/Dashboard_paciente" startIcon={<DashboardIcon />} fullWidth sx={buttonStyle}>
-          INICIO
-        </Button>
+        <Button
+  component={Link}
+  to="/Dashboard_paciente"
+  startIcon={<DashboardIcon />}
+  fullWidth
+  sx={{
+    ...buttonStyle,
+    ...(location.pathname === "/Dashboard_paciente" && activeStyle)
+  }}
+>
+  INICIO
+</Button>
 
-        <Button component={Link} to="/citas" startIcon={<EventIcon />} fullWidth sx={buttonStyle}>
-          CITAS
-        </Button>
+        <Button
+  component={Link}
+  to="/citas"
+  startIcon={<EventIcon />}
+  fullWidth
+  sx={{
+    ...buttonStyle,
+    ...(location.pathname === "/citas" && activeStyle)
+  }}
+>
+  CITAS
+</Button>
 
-        <Button component={Link} to="/historial_medico" startIcon={<HistoryIcon />} fullWidth sx={buttonStyle}>
-          HISTORIAL MÉDICO
-        </Button>
+        <Button
+  component={Link}
+  to="/historial_medico"
+  startIcon={<HistoryIcon />}
+  fullWidth
+  sx={{
+    ...buttonStyle,
+    ...(location.pathname === "/historial_medico" && activeStyle)
+  }}
+>
+  HISTORIAL MÉDICO
+</Button>
 
-        <Button component={Link} to="/tratamientos" startIcon={<MedicationIcon />} fullWidth sx={buttonStyle}>
-          MEDICAMENTOS
-        </Button>
+        <Button
+  component={Link}
+  to="/tratamientos"
+  startIcon={<MedicationIcon />}
+  fullWidth
+  sx={{
+    ...buttonStyle,
+    ...(location.pathname === "/tratamientos" && activeStyle)
+  }}
+>
+  MEDICAMENTOS
+</Button>
 
       </Box>
 
@@ -86,9 +123,18 @@ export default function Sidebar() {
 
       <Box>
 
-        <Button component={Link} to="/perfil_edit" startIcon={<SettingsIcon />} fullWidth sx={buttonStyle}>
-          CONFIGURACIONES
-        </Button>
+       <Button
+  component={Link}
+  to="/perfil_edit"
+  startIcon={<SettingsIcon />}
+  fullWidth
+  sx={{
+    ...buttonStyle,
+    ...(location.pathname === "/perfil_edit" && activeStyle)
+  }}
+>
+  CONFIGURACIONES
+</Button>
 
         <Button startIcon={<LogoutIcon />} fullWidth sx={buttonStyle} onClick={() => setOpenLogout(true)}>
           CERRAR SESIÓN
@@ -152,4 +198,10 @@ const buttonStyle = {
   "&:hover": {
     backgroundColor: "rgba(255,255,255,0.15)"
   }
+};
+
+const activeStyle = {
+  backgroundColor: "rgba(255,255,255,0.15)",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+  fontWeight: "bold"
 };
