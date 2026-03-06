@@ -91,7 +91,7 @@ function Layout_Medicos({ children }) {
 
         <Button
         component={Link}
-        to="/angelito-cachondo"
+        to="/Medicos/tratamientos_largos"
         startIcon={<ContentPasteIcon />}
         fullWidth
         sx={{ color: "white", justifyContent: "flex-start" }}

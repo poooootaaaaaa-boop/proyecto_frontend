@@ -6,11 +6,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import Button from 'react-bootstrap/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useState } from "react";
-
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function recetas_medicas({ data = [], dataPacientes=[]}){
     const [busqueda, setBusqueda] = useState("");
     const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
+    const [openFullModal, setOpenFullModal] = useState(false);
 
 const handleBusqueda = (e) => {
     const valor = e.target.value;
@@ -22,6 +24,189 @@ const handleBusqueda = (e) => {
 
     setPacientesFiltrados(resultado);
 };
+
+
+const handleDownloadFullPDF = () => {
+  const doc = new jsPDF();
+
+  // ===== HEADER =====
+  doc.setFillColor(25, 118, 210); // azul médico
+  doc.rect(0, 0, 210, 30, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.text("HISTORIAL MÉDICO", 20, 18);
+
+  // Logo fake (texto por ahora)
+  doc.setFontSize(10);
+  doc.text("Hospital San Gabriel", 150, 18);
+
+  // Reset color
+  doc.setTextColor(0, 0, 0);
+
+  // ===== INFO PACIENTE =====
+  doc.setFontSize(14);
+  doc.text("Información del Paciente", 20, 45);
+
+  doc.setFontSize(11);
+  doc.text("Nombre: Juan Pérez", 20, 55);
+  doc.text("Edad: 34 años", 20, 62);
+  doc.text("Última actualización: 2024", 20, 69);
+
+  // ===== TRATAMIENTOS =====
+  doc.setFontSize(14);
+  doc.text("Tratamientos Activos", 20, 85);
+
+  autoTable(doc, {
+    startY: 90,
+    head: [["Medicamento", "Dosis", "Frecuencia", "Médico"]],
+    body: [
+      ["Metformina", "850mg", "Cada 12 horas", "Dra. Elena Vargas"],
+      ["Vitamina D3", "2000 UI", "Diariamente", "Dr. Ricardo Soto"],
+    ],
+    theme: "striped",
+    headStyles: { fillColor: [25, 118, 210] },
+  });
+
+  // ===== CONSULTAS =====
+  const finalY = doc.lastAutoTable.finalY + 15;
+
+  doc.setFontSize(14);
+  doc.text("Historial de Consultas", 20, finalY);
+
+  autoTable(doc, {
+    startY: finalY + 5,
+    head: [["Fecha", "Motivo", "Especialista", "ID"]],
+    body: [
+      ["15 Ene 2024", "Chequeo Anual", "Dra. Sofía García", "#C-58421"],
+      ["10 Oct 2023", "Dolor lumbar", "Dr. Ricardo Soto", "#C-58400"],
+    ],
+    theme: "grid",
+    headStyles: { fillColor: [56, 142, 60] },
+  });
+
+  // ===== FOOTER =====
+  const pageHeight = doc.internal.pageSize.height;
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(
+    "Documento generado automáticamente - Sistema Médico",
+    20,
+    pageHeight - 10
+  );
+
+  doc.save("historial_medico_profesional.pdf");
+
+  setOpenFullModal(false);
+  setOpenAlert(true);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return(
     <Layout_Medicos>
 
@@ -99,7 +284,7 @@ const handleBusqueda = (e) => {
                         {/* Botón */}
                         <div style={{ marginTop: "15px", textAlign: "center" }}>
 
-                            <Button style={{background: "#1d4ed8",border: "none",borderRadius: "25px",padding: "8px 20px",fontWeight: "600"}}>
+                            <Button style={{background: "#1d4ed8",border: "none",borderRadius: "25px",padding: "8px 20px",fontWeight: "600"}} onClick={() => handleDownloadFullPDF(true)}>
                                 <DownloadIcon /> Descargar PDF
                             </Button>
 

@@ -9,6 +9,7 @@ import { Typography} from "@mui/material";
 import "./Tablas.css";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Datagrid from "./Datagrid";
+import { useState } from "react";
 
 
 
@@ -18,6 +19,24 @@ function lista_paciente({data=[]}) {
     const buscarPaciente = () => {
     console.log("Buscando paciente")
   }
+
+    const [busqueda, setBusqueda] = useState("");
+    const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
+
+
+
+
+
+  const handleBusqueda = (e) => {
+    const valor = e.target.value;
+    setBusqueda(valor);
+
+    const resultado = data.filter((p) =>
+        p.nombre.toLowerCase().includes(valor.toLowerCase())
+    );
+
+    setPacientesFiltrados(resultado);
+};
 
 
   // navigation handled via Link component in the table rows
@@ -31,14 +50,6 @@ function lista_paciente({data=[]}) {
                 <br />
 
 
-
-
-
-
-
-
-
-
                     <div className="container mt-3">
 
                         <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #e5e7eb",boxShadow:"0 2px 10px rgba(0,0,0,0.05)"}}>
@@ -49,9 +60,9 @@ function lista_paciente({data=[]}) {
 
                                         <div style={{position:"relative"}}>
 
-                                            <Form.Control type="text"placeholder="Buscar por nombre, DNI o expediente..."style={{height:"55px",borderRadius:"30px",background:"#f3f4f6",border:"none",paddingLeft:"20px",paddingRight:"60px"}}/>
+                                            <Form.Control type="text"placeholder="Buscar por nombre, DNI o expediente..."style={{height:"55px",borderRadius:"30px",background:"#f3f4f6",border:"none",paddingLeft:"20px",paddingRight:"60px"}} value={busqueda} onChange={handleBusqueda}/>
 
-                                            <SearchIcon onClick={buscarPaciente}style={{position:"absolute",right:"10px",top:"50%",transform:"translateY(-50%)",background:"#1d4ed8",color:"white",padding:"8px",borderRadius:"50%",cursor:"pointer",fontSize:"28px"}}/>
+                                            <SearchIcon style={{position:"absolute",right:"10px",top:"50%",transform:"translateY(-50%)",background:"#1d4ed8",color:"white",padding:"8px",borderRadius:"50%",cursor:"pointer",fontSize:"28px"}}/>
 
                                         </div>
 
@@ -59,26 +70,9 @@ function lista_paciente({data=[]}) {
 
                                 </div>
 
-                                <div className="row mt-4 align-items-center">
+                                <div  className="row mt-4 align-items-center">
 
-                                        <div className="col-md-6">
-
-                                            <Typography style={{fontSize:"12px",color:"#9ca3af",fontWeight:"600"}}>ULTIMA VISITA</Typography>
-
-                                                <div style={{display:"flex",alignItems:"center",background:"#f3f4f6",borderRadius:"30px",padding:"10px 15px",width:"250px",marginTop:"5px"}}>
-
-                                                    <CalendarMonthIcon style={{color:"#6b7280",marginRight:"10px"}}/>
-
-                                                    <span style={{color:"#6b7280",fontSize:"14px"}}>Seleccionar fecha</span>
-
-                                                </div>
-
-                                        </div>
-
-
-                            
-
-                                        <div className="col-md-6 text-end">
+                                        <div className="col-12 text-end">
 
                                             <Button style={{background:"#1d4ed8",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600"}} as={Link} to="/Medicos/alta_pacientes">+ Nuevo Paciente</Button>
 
@@ -116,7 +110,7 @@ function lista_paciente({data=[]}) {
 
                     <tbody>
 
-                        {data.map((paciente,index)=> (
+                        {(busqueda ? pacientesFiltrados : data).map((paciente, index) => (
 
                             <tr key={index} style={{borderTop:"1px solid #f1f5f9"}}>
 
