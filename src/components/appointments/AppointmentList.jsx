@@ -233,7 +233,7 @@ const handleConfirmCancel = () => {
           },
         }}
       >
-        <CardContent className="card-content">
+        <CardContent className="card-content-citas">
           <Avatar src={appt.avatar} className="doctor-avatar" />
 
           <div className="doctor-info">
@@ -302,10 +302,23 @@ const handleConfirmCancel = () => {
 
         {/* RIGHT */}
         <div className="appointments-right">
-          <Paper className="calendar">
-            <DateCalendar
+          <Paper className="calendar"  sx={{
+    width: "100%",
+    overflow: "hidden",
+  }}>
+<DateCalendar
   value={selectedDate}
   onChange={(newValue) => setSelectedDate(newValue)}
+  sx={{
+    width: "100%",
+    "& .MuiPickersCalendarHeader-root": {
+      paddingLeft: 1,
+      paddingRight: 1,
+    },
+    "& .MuiDayCalendar-weekContainer": {
+      justifyContent: "space-between",
+    },
+  }}
 />
 {selectedDate && (
   <Button

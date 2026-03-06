@@ -3,8 +3,13 @@ import {
   Avatar,
   Typography,
   Box,
-  Divider
+  Divider,
+  Drawer,
+  IconButton,
+  useMediaQuery
 } from "@mui/material";
+
+import MenuIcon from "@mui/icons-material/Menu";
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import EventIcon from "@mui/icons-material/Event";
@@ -20,13 +25,15 @@ import LogoutModal from "./LogoutModal";
 export default function Sidebar() {
 
   const [openLogout, setOpenLogout] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
 
-  return (
+  const isMobile = useMediaQuery("(max-width:900px)");
+
+  const sidebarContent = (
 
     <Box
       sx={{
         width: 250,
-        
         background: "linear-gradient(180deg, #1e3a8a 0%, #1e3a8a 100%)",
         color: "white",
         display: "flex",
@@ -55,46 +62,21 @@ export default function Sidebar() {
 
       <Divider sx={{ my: 3, backgroundColor: "rgba(255,255,255,0.3)" }} />
 
-      {/* Menú principal */}
       <Box sx={{ flexGrow: 1 }}>
 
-        <Button
-          component={Link}
-          to="/Dashboard_paciente"
-          startIcon={<DashboardIcon />}
-          fullWidth
-          sx={buttonStyle}
-        >
+        <Button component={Link} to="/Dashboard_paciente" startIcon={<DashboardIcon />} fullWidth sx={buttonStyle}>
           INICIO
         </Button>
 
-        <Button
-          component={Link}
-          to="/citas"
-          startIcon={<EventIcon />}
-          fullWidth
-          sx={buttonStyle}
-        >
+        <Button component={Link} to="/citas" startIcon={<EventIcon />} fullWidth sx={buttonStyle}>
           CITAS
         </Button>
 
-        <Button
-          component={Link}
-          to="/historial_medico"
-          startIcon={<HistoryIcon />}
-          fullWidth
-          sx={buttonStyle}
-        >
+        <Button component={Link} to="/historial_medico" startIcon={<HistoryIcon />} fullWidth sx={buttonStyle}>
           HISTORIAL MÉDICO
         </Button>
 
-        <Button
-          component={Link}
-          to="/tratamientos"
-          startIcon={<MedicationIcon />}
-          fullWidth
-          sx={buttonStyle}
-        >
+        <Button component={Link} to="/tratamientos" startIcon={<MedicationIcon />} fullWidth sx={buttonStyle}>
           MEDICAMENTOS
         </Button>
 
@@ -102,25 +84,13 @@ export default function Sidebar() {
 
       <Divider sx={{ my: 2, backgroundColor: "rgba(255,255,255,0.3)" }} />
 
-      {/* Parte inferior */}
       <Box>
 
-        <Button
-          component={Link}
-          to="/perfil_edit"
-          startIcon={<SettingsIcon />}
-          fullWidth
-          sx={buttonStyle}
-        >
+        <Button component={Link} to="/perfil_edit" startIcon={<SettingsIcon />} fullWidth sx={buttonStyle}>
           CONFIGURACIONES
         </Button>
 
-        <Button
-          startIcon={<LogoutIcon />}
-          fullWidth
-          sx={buttonStyle}
-          onClick={() => setOpenLogout(true)}
-        >
+        <Button startIcon={<LogoutIcon />} fullWidth sx={buttonStyle} onClick={() => setOpenLogout(true)}>
           CERRAR SESIÓN
         </Button>
 
@@ -132,6 +102,43 @@ export default function Sidebar() {
       />
 
     </Box>
+  );
+
+  return (
+    <>
+
+      {/* BOTON HAMBURGUESA SOLO MOVIL */}
+      {isMobile && (
+        <IconButton
+          onClick={() => setOpenMenu(true)}
+          sx={{
+            position: "fixed",
+            top: 15,
+            left: 15,
+            zIndex: 2000,
+            background: "#1e3a8a",
+            color: "white",
+            "&:hover": {
+              background: "#1e40af"
+            }
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+      )}
+
+      {/* DESKTOP */}
+      {!isMobile && sidebarContent}
+
+      {/* MOVIL */}
+      <Drawer
+        open={openMenu}
+        onClose={() => setOpenMenu(false)}
+      >
+        {sidebarContent}
+      </Drawer>
+
+    </>
   );
 }
 

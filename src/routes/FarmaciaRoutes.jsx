@@ -8,6 +8,7 @@ import AgregarMedicamento from "../pages/farmacia/AgregarMedicamento";
 import Distribuidores from "../pages/farmacia/Distribuidores";
 import AgregarDistribuidor from "../pages/farmacia/AgregarDistribuidor";
 import Configuracion from "../pages/farmacia/Configuracion";
+import Doctors from "../pages/farmacia/Doctors";
 
 export default function FarmaciaRoutes(){
     return(
@@ -21,6 +22,7 @@ export default function FarmaciaRoutes(){
             <Route path="Distribuidores" element={<Distribuidores/>}/>
             <Route path="AgregarDistribuidor" element={<AgregarDistribuidor/>}/>
             <Route path="configuracion" element={<Configuracion/>}/>
+            <Route path="doctores" element={<Doctors/>}/>
         </Routes>
     );
 }

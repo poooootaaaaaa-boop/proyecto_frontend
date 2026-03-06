@@ -21,9 +21,7 @@ import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./components/Home/Home";
-import DoctorInfo from "./components/registros/DoctorInfo";
-import ClinicInfo from "./components/registros/ClinicInfo";
-import FinishRegister from "./components/registros/FinishRegister";
+
 
 export default function App() {
   return (

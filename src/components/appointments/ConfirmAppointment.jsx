@@ -174,7 +174,7 @@ return (
           </Button>
 
           <Button
-            className="secondary-btn"
+            className="secondary-btn-citas"
             onClick={() => navigate(-1)}
             fullWidth   // 👈 FALTABA ESTO
           >

@@ -2,27 +2,82 @@ import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./dashboardFarmacia.css";
 import Chart from "react-apexcharts";
+import { useState } from "react";
 
 export default function DashboardFarmacia() {
-  // 🔹 Top productos (Bar moderna)
+
+  const [recetas, setRecetas] = useState([
+    {
+      id: 1,
+      paciente: "Juan Pérez",
+      medicamento: "Amoxicilina 500 mg",
+      hora: "10:30",
+      prioridad: "Urgente",
+    },
+    {
+      id: 2,
+      paciente: "Ana López",
+      medicamento: "Paracetamol 750 mg",
+      hora: "11:15",
+      prioridad: "Normal",
+    },
+  ]);
+
+  const [modalEditar, setModalEditar] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+
+  // abrir editar
+  const abrirEditar = (receta) => {
+    setRecetaSeleccionada({ ...receta });
+    setModalEditar(true);
+  };
+
+  // abrir eliminar
+  const abrirEliminar = (receta) => {
+    setRecetaSeleccionada(receta);
+    setModalEliminar(true);
+  };
+
+  const cerrarModales = () => {
+    setModalEditar(false);
+    setModalEliminar(false);
+    setRecetaSeleccionada(null);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setRecetaSeleccionada({
+      ...recetaSeleccionada,
+      [name]: value,
+    });
+  };
+
+  const guardarCambios = () => {
+    setRecetas((prev) =>
+      prev.map((r) =>
+        r.id === recetaSeleccionada.id ? recetaSeleccionada : r
+      )
+    );
+
+    cerrarModales();
+  };
+
+  const eliminarReceta = () => {
+    setRecetas((prev) =>
+      prev.filter((r) => r.id !== recetaSeleccionada.id)
+    );
+
+    cerrarModales();
+  };
+
+  // 🔹 CHARTS
   const topProductos = {
-    series: [
-      {
-        name: "Solicitudes",
-        data: [45, 38, 30, 22, 18],
-      },
-    ],
+    series: [{ name: "Solicitudes", data: [45, 38, 30, 22, 18] }],
     options: {
-      chart: {
-        type: "bar",
-        toolbar: { show: false },
-      },
-      plotOptions: {
-        bar: {
-          borderRadius: 8,
-          columnWidth: "45%",
-        },
-      },
+      chart: { type: "bar", toolbar: { show: false } },
+      plotOptions: { bar: { borderRadius: 8, columnWidth: "45%" } },
       dataLabels: { enabled: false },
       colors: ["#2563eb"],
       xaxis: {
@@ -33,25 +88,14 @@ export default function DashboardFarmacia() {
           "Vitamina C",
           "Aspirina",
         ],
-        labels: { style: { colors: "#64748b" } },
-      },
-      yaxis: {
-        labels: { style: { colors: "#64748b" } },
-      },
-      grid: {
-        borderColor: "#e2e8f0",
-        strokeDashArray: 4,
       },
     },
   };
 
-  // 🔹 Top distribuidores (Donut moderna)
   const topDistribuidores = {
     series: [40, 30, 20, 10],
     options: {
-      chart: {
-        type: "donut",
-      },
+      chart: { type: "donut" },
       labels: [
         "Distribuidor A",
         "Distribuidor B",
@@ -59,16 +103,6 @@ export default function DashboardFarmacia() {
         "Distribuidor D",
       ],
       colors: ["#2563eb", "#1e40af", "#60a5fa", "#93c5fd"],
-      legend: {
-        position: "bottom",
-      },
-      plotOptions: {
-        pie: {
-          donut: {
-            size: "65%",
-          },
-        },
-      },
     },
   };
 
@@ -81,34 +115,30 @@ export default function DashboardFarmacia() {
 
         <h2 className="main-title">Dashboard de Farmacia</h2>
 
-        {/* 🔹 CARDS */}
+        {/* CARDS */}
         <div className="stats-grid">
           <div className="stat-card-modern">
             <small>Recetas del día</small>
-            <h3>14</h3>
-            <span className="stat-badge primary">Hoy</span>
+            <h3>{recetas.length}</h3>
           </div>
 
           <div className="stat-card-modern">
             <small>Recetas pendientes</small>
-            <h3>6</h3>
-            <span className="stat-badge warning">Pendientes</span>
+            <h3>{recetas.length}</h3>
           </div>
 
           <div className="stat-card-modern">
             <small>Productos por caducar</small>
             <h3>4</h3>
-            <span className="stat-badge danger">Atención</span>
           </div>
 
           <div className="stat-card-modern">
             <small>Total de productos</small>
             <h3>248</h3>
-            <span className="stat-badge success">Inventario</span>
           </div>
         </div>
 
-        {/* 🔹 TABLA MODERNA */}
+        {/* TABLA */}
         <div className="card-modern table-card">
           <h5 className="section-title">Recetas Pendientes</h5>
 
@@ -118,32 +148,46 @@ export default function DashboardFarmacia() {
               <span>Medicamento</span>
               <span>Hora</span>
               <span>Prioridad</span>
-              <span></span>
+              <span>Acciones</span>
             </div>
 
-            <div className="table-row-modern">
-              <div>Juan Pérez</div>
-              <div>Amoxicilina 500 mg</div>
-              <div>10:30</div>
-              <div>
-                <span className="status-badge urgent">Urgente</span>
-              </div>
-              <div className="row-action">⋮</div>
-            </div>
+            {recetas.map((receta) => (
+              <div className="table-row-modern" key={receta.id}>
+                <div>{receta.paciente}</div>
+                <div>{receta.medicamento}</div>
+                <div>{receta.hora}</div>
 
-            <div className="table-row-modern">
-              <div>Ana López</div>
-              <div>Paracetamol 750 mg</div>
-              <div>11:15</div>
-              <div>
-                <span className="status-badge normal">Normal</span>
+                <div>
+                  <span
+                    className={`status-badge ${
+                      receta.prioridad === "Urgente"
+                        ? "urgent"
+                        : "normal"
+                    }`}
+                  >
+                    {receta.prioridad}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <i
+                    className="bi bi-pencil-square"
+                    style={{ cursor: "pointer", color: "#2563eb" }}
+                    onClick={() => abrirEditar(receta)}
+                  />
+
+                  <i
+                    className="bi bi-trash"
+                    style={{ cursor: "pointer", color: "#dc2626" }}
+                    onClick={() => abrirEliminar(receta)}
+                  />
+                </div>
               </div>
-              <div className="row-action">⋮</div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* 🔹 GRÁFICAS MODERNAS */}
+        {/* CHARTS */}
         <div className="charts-grid">
           <div className="card-modern">
             <h5 className="section-title">Top Productos</h5>
@@ -166,6 +210,71 @@ export default function DashboardFarmacia() {
           </div>
         </div>
       </div>
+
+      {/* MODAL EDITAR */}
+      {modalEditar && (
+        <div className="modal-overlay">
+          <div className="modal-modern">
+            <h4>Editar Receta</h4>
+
+            <input
+              name="paciente"
+              value={recetaSeleccionada.paciente}
+              onChange={handleChange}
+            />
+
+            <input
+              name="medicamento"
+              value={recetaSeleccionada.medicamento}
+              onChange={handleChange}
+            />
+
+            <input
+              type="time"
+              name="hora"
+              value={recetaSeleccionada.hora}
+              onChange={handleChange}
+            />
+
+            <select
+              name="prioridad"
+              value={recetaSeleccionada.prioridad}
+              onChange={handleChange}
+            >
+              <option>Urgente</option>
+              <option>Normal</option>
+            </select>
+
+            <div className="modal-footer-modern">
+              <button onClick={cerrarModales}>Cancelar</button>
+              <button onClick={guardarCambios}>Guardar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ELIMINAR */}
+      {modalEliminar && (
+        <div className="modal-overlay">
+          <div className="modal-modern">
+            <h4>¿Eliminar receta?</h4>
+            <p>
+              ¿Estás seguro de que deseas eliminar la receta de{" "}
+              <strong>{recetaSeleccionada?.paciente}</strong>?
+            </p>
+
+            <div className="modal-footer-modern">
+              <button onClick={cerrarModales}>Cancelar</button>
+          <button
+  className="btn-danger"
+  onClick={eliminarReceta}
+>
+  Eliminar
+</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

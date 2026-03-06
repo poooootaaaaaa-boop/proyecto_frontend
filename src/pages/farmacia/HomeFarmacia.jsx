@@ -7,17 +7,17 @@ import { useNavigate } from "react-router-dom";
 export default function HomeFarmacia() {
   const navigate = useNavigate();
 
-  // 🔹 Datos dinámicos
   const [recetas, setRecetas] = useState([
     { id: 1, paciente: "Juan Pérez", hora: "10:30", estado: "Urgente" },
     { id: 2, paciente: "María López", hora: "11:00", estado: "Normal" },
     { id: 3, paciente: "Carlos Ruiz", hora: "12:15", estado: "Normal" },
   ]);
 
-  // 🔹 Modal
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
 
+  // 🔹 abrir editar
   const openModal = (receta) => {
     setRecetaSeleccionada({ ...receta });
     setShowModal(true);
@@ -28,21 +28,41 @@ export default function HomeFarmacia() {
     setRecetaSeleccionada(null);
   };
 
+  // 🔹 abrir eliminar
+  const openDeleteModal = (receta) => {
+    setRecetaSeleccionada(receta);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setRecetaSeleccionada(null);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setRecetaSeleccionada({
       ...recetaSeleccionada,
       [name]: value,
     });
   };
 
+  // 🔹 guardar edición
   const handleSave = () => {
     setRecetas((prev) =>
       prev.map((r) =>
         r.id === recetaSeleccionada.id ? recetaSeleccionada : r
       )
     );
+
     closeModal();
+  };
+
+  //  eliminar receta
+  const eliminarReceta = () => {
+    setRecetas(recetas.filter((r) => r.id !== recetaSeleccionada.id));
+    closeDeleteModal();
   };
 
   return (
@@ -78,16 +98,13 @@ export default function HomeFarmacia() {
                 <span>Paciente</span>
                 <span>Hora</span>
                 <span>Estado</span>
-                <span></span>
+                <span>Acciones</span>
               </div>
 
               {recetas.map((receta) => (
                 <div className="table-row-modern" key={receta.id}>
                   <div className="paciente-cell">
-                    <img
-                      src="https://i.pravatar.cc/40"
-                      alt="avatar"
-                    />
+                    <img src="https://i.pravatar.cc/40" alt="avatar" />
                     {receta.paciente}
                   </div>
 
@@ -105,11 +122,33 @@ export default function HomeFarmacia() {
                     </span>
                   </div>
 
-                  <div
-                    className="row-action"
-                    onClick={() => openModal(receta)}
-                  >
-                    ⋮
+                  {/* ICONOS */}
+                  <div style={{ display: "flex", gap: "12px" }}>
+                    <button
+                      onClick={() => openModal(receta)}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        color: "#2563eb",
+                      }}
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+
+                    <button
+                      onClick={() => openDeleteModal(receta)}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        color: "#dc2626",
+                      }}
+                    >
+                      <i className="bi bi-trash"></i>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -153,64 +192,72 @@ export default function HomeFarmacia() {
         </div>
       </div>
 
-      {/* MODAL MODERNO */}
+      {/* MODAL EDITAR */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-modern">
-            <div className="modal-header-modern">
-              <h4>Editar receta</h4>
-              <button onClick={closeModal}>✕</button>
-            </div>
+            <h4>Editar receta</h4>
 
             {recetaSeleccionada && (
-              <div className="modal-body-modern">
-                <div className="form-group-modern">
-                  <label>Paciente</label>
-                  <input
-                    type="text"
-                    name="paciente"
-                    value={recetaSeleccionada.paciente}
-                    onChange={handleChange}
-                  />
-                </div>
+              <>
+                <input
+                  type="text"
+                  name="paciente"
+                  value={recetaSeleccionada.paciente}
+                  onChange={handleChange}
+                  placeholder="Paciente"
+                />
 
-                <div className="form-group-modern">
-                  <label>Hora</label>
-                  <input
-                    type="time"
-                    name="hora"
-                    value={recetaSeleccionada.hora}
-                    onChange={handleChange}
-                  />
-                </div>
+                <input
+                  type="time"
+                  name="hora"
+                  value={recetaSeleccionada.hora}
+                  onChange={handleChange}
+                />
 
-                <div className="form-group-modern">
-                  <label>Estado</label>
-                  <select
-                    name="estado"
-                    value={recetaSeleccionada.estado}
-                    onChange={handleChange}
-                  >
-                    <option value="Urgente">Urgente</option>
-                    <option value="Normal">Normal</option>
-                  </select>
-                </div>
-              </div>
+                <select
+                  name="estado"
+                  value={recetaSeleccionada.estado}
+                  onChange={handleChange}
+                >
+                  <option value="Urgente">Urgente</option>
+                  <option value="Normal">Normal</option>
+                </select>
+              </>
             )}
 
             <div className="modal-footer-modern">
-              <button
-                className="btn-secondary-modern"
-                onClick={closeModal}
-              >
+              <button onClick={closeModal}>Cancelar</button>
+
+              <button onClick={handleSave}>
+                Guardar cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ELIMINAR */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-modern">
+            <h4>Eliminar receta</h4>
+
+            <p>
+              ¿Estás seguro que deseas eliminar la receta de{" "}
+              <strong>{recetaSeleccionada?.paciente}</strong>?
+            </p>
+
+            <div className="modal-footer-modern">
+              <button onClick={closeDeleteModal}>
                 Cancelar
               </button>
 
               <button
-                className="btn-primary-modern"
-                onClick={handleSave}
+                className="btn-danger"
+                onClick={eliminarReceta}
               >
-                Guardar cambios
+                Eliminar
               </button>
             </div>
           </div>

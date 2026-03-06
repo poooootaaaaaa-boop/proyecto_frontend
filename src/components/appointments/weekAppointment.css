@@ -128,3 +128,84 @@
   border: none;
   transform: none;
 }
+
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+/* TABLET */
+@media (max-width: 1024px) {
+
+  .week-grid {
+    grid-template-columns: 90px repeat(5, 1fr);
+  }
+
+  .hour-cell {
+    font-size: 11px;
+    height: 70px;
+  }
+
+  .slot {
+    height: 70px;
+  }
+
+  .day-header {
+    font-size: 10px;
+  }
+
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+  .week-card {
+    overflow-x: auto;
+  }
+
+  .week-grid {
+    min-width: 650px;
+  }
+
+  .hour-cell {
+    height: 65px;
+  }
+
+  .slot {
+    height: 65px;
+    margin: 4px;
+  }
+
+  .slot-hour {
+    font-size: 11px;
+  }
+
+  .slot-action {
+    font-size: 9px;
+  }
+
+}
+
+/* SMALL MOBILE */
+@media (max-width: 480px) {
+
+  .week-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .hour-cell {
+    font-size: 10px;
+  }
+
+  .slot-hour {
+    font-size: 10px;
+  }
+
+  .slot-action {
+    font-size: 8px;
+  }
+
+}
