@@ -6,10 +6,12 @@ import EventIcon from "@mui/icons-material/Event";
 import WarningIcon from "@mui/icons-material/Warning";
 import EditIcon from "@mui/icons-material/Edit";
 import { useState } from "react";
+import Modal from "react-bootstrap/Modal";
 
 function tratamientos_largos() {
 
 const [editando, setEditando] = useState(null);
+const [showModal, setShowModal] = useState(false);
 
 const [item, setItem] = useState([
   {nombre:"Erick Sanches", progreso:70, cita:"05/02/2025"},
@@ -21,6 +23,26 @@ const cambiarProgreso = (index, valor) => {
   const nuevoItem = [...item];
   nuevoItem[index].progreso = valor;
   setItem(nuevoItem);
+};
+
+
+const finalizarTratamiento = () => {
+
+  const nuevoItem = [...item];
+  nuevoItem[editando].progreso = 100;
+
+  setItem(nuevoItem);
+  setShowModal(false);
+  setEditando(null);
+};
+
+const cancelarTratamiento = () => {
+
+  const nuevoItem = item.filter((_, index) => index !== editando);
+
+  setItem(nuevoItem);
+  setShowModal(false);
+  setEditando(null);
 };
 
 return (
@@ -151,7 +173,7 @@ return (
         {/* EDITAR */}
         <div className="col-md-2">
 
-          <EditIcon style={{cursor:"pointer",color:"#374151"}}onClick={()=>setEditando(i)}/>
+          <EditIcon style={{cursor:"pointer",color:"#374151"}} onClick={()=>{ setEditando(i); setShowModal(true);}}/>
 
         </div>
 
@@ -162,6 +184,58 @@ return (
   </div>
 
 </div>
+
+
+  <Modal show={showModal} onHide={()=>setShowModal(false)} centered>
+
+      <Modal.Header closeButton>
+        <Modal.Title>Editar Tratamiento</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+
+      {editando !== null && (
+
+     <>
+
+          <Typography style={{fontWeight:"600", marginBottom:"10px"}}>
+          Paciente: {item[editando].nombre}
+          </Typography>
+
+          <Typography style={{fontSize:"14px", marginBottom:"10px"}}>
+          Progreso del tratamiento
+          </Typography>
+
+        <input type="range"min="0"max="100"value={item[editando].progreso}onChange={(e)=>cambiarProgreso(editando, e.target.value)}style={{width:"100%"}}/>
+
+        <Typography style={{marginTop:"10px", color:"#6b7280"}}>
+          {item[editando].progreso}% completado
+        </Typography>
+
+     </>
+
+    )}
+
+    </Modal.Body>
+
+    <Modal.Footer>
+
+      <Button variant="success" onClick={finalizarTratamiento}>
+      Finalizar tratamiento
+      </Button>
+
+      <Button variant="danger" onClick={cancelarTratamiento}>
+      Cancelar tratamiento
+      </Button>
+
+      <Button variant="secondary"onClick={()=>setShowModal(false)}>
+      Cerrar
+      </Button>
+
+    </Modal.Footer>
+
+  </Modal>
+
 
 </Layout_Medicos>
 );
