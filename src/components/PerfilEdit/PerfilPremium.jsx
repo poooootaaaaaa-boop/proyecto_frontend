@@ -149,7 +149,7 @@ const handleSeguridad = (e) => {
 
                   <div className="form-group">
                     <label>Fecha de Nacimiento</label>
-                    <input type="text" name="fechaNacimiento" value={perfil.fechaNacimiento} onChange={handleChange} placeholder="DD/MM/AAAA" />
+                    <input type="date" name="fechaNacimiento" value={perfil.fechaNacimiento} onChange={handleChange} placeholder="DD/MM/AAAA" />
                   </div>
 
                   <div className="form-group">

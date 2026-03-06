@@ -51,7 +51,7 @@ export default function AppointmentHistory({ appointments = [] }) {
       {dataToShow.map((appt, i) => (
         <Grow in key={i} timeout={400 + i * 120}>
           <Card className="appointment-card history-card">
-            <CardContent className="card-content">
+            <CardContent className="card-content-citas">
               <Avatar src={appt.avatar} className="doctor-avatar" />
 
               <div className="doctor-info">
