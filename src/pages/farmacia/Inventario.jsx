@@ -1,5 +1,4 @@
 import {
- 
   Button,
   Form,
   Col,
@@ -12,22 +11,70 @@ import { useState } from "react";
 import "./Inventario.css";
 
 export default function Inventario() {
-  const [showModal, setShowModal] = useState(false);
 
-  const [formData, setFormData] = useState({
-    paciente: "",
-    hora: "",
-    estado: "Normal",
-  });
+  const [medicamentos, setMedicamentos] = useState(
+    JSON.parse(localStorage.getItem("medicamentos")) || []
+  );
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const [modalEditar, setModalEditar] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [medSeleccionado, setMedSeleccionado] = useState(null);
+
+  const abrirEditar = (med) => {
+    setMedSeleccionado({ ...med });
+    setModalEditar(true);
+  };
+
+  const abrirEliminar = (med) => {
+    setMedSeleccionado(med);
+    setModalEliminar(true);
+  };
+
+  const cerrarModales = () => {
+    setModalEditar(false);
+    setModalEliminar(false);
+    setMedSeleccionado(null);
+  };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+
+    setMedSeleccionado({
+      ...medSeleccionado,
+      [name]: value,
     });
+  };
+
+  const guardarCambios = () => {
+
+    const nuevos = medicamentos.map((m) =>
+      m.nombre === medSeleccionado.nombre
+        ? medSeleccionado
+        : m
+    );
+
+    setMedicamentos(nuevos);
+    localStorage.setItem(
+      "medicamentos",
+      JSON.stringify(nuevos)
+    );
+
+    cerrarModales();
+  };
+
+  const eliminarMedicamento = () => {
+
+    const nuevos = medicamentos.filter(
+      (m) => m.nombre !== medSeleccionado.nombre
+    );
+
+    setMedicamentos(nuevos);
+    localStorage.setItem(
+      "medicamentos",
+      JSON.stringify(nuevos)
+    );
+
+    cerrarModales();
   };
 
   return (
@@ -38,10 +85,13 @@ export default function Inventario() {
         <Topbar />
 
         <div className="page-wrapper">
+
           <div className="inventory-header">
             <div>
               <h2 className="main-title">Inventario</h2>
-              <p className="subtitle">Gestión de medicamentos</p>
+              <p className="subtitle">
+                Gestión de medicamentos
+              </p>
             </div>
 
             <Button
@@ -53,11 +103,12 @@ export default function Inventario() {
             </Button>
           </div>
 
-          {/* ===== CARDS RESUMEN ===== */}
+          {/* CARDS */}
           <div className="stats-grid">
+
             <div className="stat-card-modern">
               <small>Total Items</small>
-              <h3>1,240</h3>
+              <h3>{medicamentos.length}</h3>
               <span className="stat-badge success">
                 +2.4% último mes
               </span>
@@ -78,104 +129,115 @@ export default function Inventario() {
                 Revisión urgente
               </span>
             </div>
+
           </div>
 
           <div className="inventory-actions">
             <Button
               as={NavLink}
               to="/farmacia/Distribuidores"
-    className="primary-btn"            >
+              className="primary-btn"
+            >
               Ver distribuidores
             </Button>
           </div>
 
-          {/* ===== TABLA MODERNA ===== */}
+          {/* TABLA */}
           <div className="card-modern">
+
             <h5 className="section-title">
               Lista de Medicamentos
             </h5>
 
             <div className="table-modern">
+
               <div className="table-header-modern">
                 <span>Medicamento</span>
                 <span>Total Stock</span>
                 <span>Lote / Caducidad</span>
                 <span>Status</span>
-                <span></span>
+                <span>Acciones</span>
               </div>
 
-              <div className="table-row-modern">
-                <div>
-                  <strong>Amoxicilina 500mg</strong>
-                  <br />
-                  <small className="muted">
-                    Antibiótico
-                  </small>
-                </div>
-
-                <div>
-                  400 unidades
-                  <br />
-                  <small className="success-text">
-                    Nivel óptimo
-                  </small>
-                </div>
-
-                <div>Oct 2025</div>
-
-                <div>
-                  <span className="status-badge in-stock">
-                    In Stock
-                  </span>
-                </div>
+              {medicamentos.map((med, index) => (
 
                 <div
-                  className="row-action"
-                  onClick={openModal}
+                  className="table-row-modern"
+                  key={index}
                 >
-                  ⋮
-                </div>
-              </div>
 
-              <div className="table-row-modern">
-                <div>
-                  <strong>Ibuprofeno 600mg</strong>
-                  <br />
-                  <small className="muted">
-                    Analgésico
-                  </small>
+                  <div>
+                    <strong>{med.nombre}</strong>
+                    <br />
+                    <small className="muted">
+                      {med.categoria}
+                    </small>
+                  </div>
+
+                  <div>
+                    {med.stockMax} unidades
+                    <br />
+                    <small className="success-text">
+                      Nivel óptimo
+                    </small>
+                  </div>
+
+                  <div>{med.vencimiento}</div>
+
+                  <div>
+                    <span className="status-badge in-stock">
+                      In Stock
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "12px",
+                    }}
+                  >
+
+                    <i
+                      className="bi bi-pencil-square"
+                      style={{
+                        cursor: "pointer",
+                        color: "#2563eb",
+                        fontSize: "18px",
+                      }}
+                      onClick={() =>
+                        abrirEditar(med)
+                      }
+                    />
+
+                    <i
+                      className="bi bi-trash"
+                      style={{
+                        cursor: "pointer",
+                        color: "#dc2626",
+                        fontSize: "18px",
+                      }}
+                      onClick={() =>
+                        abrirEliminar(med)
+                      }
+                    />
+
+                  </div>
+
                 </div>
 
-                <div>
-                  120 unidades
-                  <br />
-                  <small className="danger-text">
-                    Bajo stock
-                  </small>
-                </div>
+              ))}
 
-                <div>Nov 2025</div>
-
-                <div>
-                  <span className="status-badge low-stock">
-                    Low Stock
-                  </span>
-                </div>
-
-                <div
-                  className="row-action"
-                  onClick={openModal}
-                >
-                  ⋮
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ===== MODAL (LÓGICA INTACTA) ===== */}
-      <Modal show={showModal} onHide={closeModal} centered>
+      {/* MODAL EDITAR */}
+      <Modal
+        show={modalEditar}
+        onHide={cerrarModales}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>
             Editar Medicamento
@@ -183,57 +245,97 @@ export default function Inventario() {
         </Modal.Header>
 
         <Modal.Body>
+
           <Form>
+
             <Form.Group className="mb-3">
-              <Form.Label>
-                Nombre y categoría
-              </Form.Label>
-              <Col md={12}>
-                <Form.Control type="text" />
-              </Col>
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                name="nombre"
+                value={medSeleccionado?.nombre || ""}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Categoría</Form.Label>
+              <Form.Control
+                name="categoria"
+                value={
+                  medSeleccionado?.categoria || ""
+                }
+                onChange={handleChange}
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Stock</Form.Label>
               <Form.Control
-                type="text"
-                name="paciente"
-                value={formData.paciente}
+                name="stockMax"
+                value={
+                  medSeleccionado?.stockMax || ""
+                }
                 onChange={handleChange}
               />
             </Form.Group>
 
-            <Form.Group>
-              <Form.Label>Estado</Form.Label>
-              <Form.Select
-                name="estado"
-                value={formData.estado}
-                onChange={handleChange}
-              >
-                <option value="Urgente">
-                  Low Stock
-                </option>
-                <option value="Normal">
-                  In Stock
-                </option>
-              </Form.Select>
-            </Form.Group>
           </Form>
+
         </Modal.Body>
 
         <Modal.Footer>
           <Button
             variant="secondary"
-            onClick={closeModal}
+            onClick={cerrarModales}
           >
             Cancelar
           </Button>
+
           <Button
             variant="primary"
-            onClick={closeModal}
+            onClick={guardarCambios}
           >
             Guardar
           </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* MODAL ELIMINAR */}
+      <Modal
+        show={modalEliminar}
+        onHide={cerrarModales}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Eliminar medicamento
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          ¿Seguro que deseas eliminar{" "}
+          <strong>
+            {medSeleccionado?.nombre}
+          </strong>
+          ?
+        </Modal.Body>
+
+        <Modal.Footer>
+
+          <Button
+            variant="secondary"
+            onClick={cerrarModales}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            variant="danger"
+            onClick={eliminarMedicamento}
+          >
+            Eliminar
+          </Button>
+
         </Modal.Footer>
       </Modal>
     </div>

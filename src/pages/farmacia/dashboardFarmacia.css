@@ -203,3 +203,129 @@
     margin-bottom: 12px;
   }
 }
+/* ===== OVERLAY ===== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* ===== CONTENEDOR ===== */
+
+.modal-modern {
+  background: white;
+  width: 420px;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  animation: modalFade 0.25s ease;
+}
+
+/* ===== TITULO ===== */
+
+.modal-modern h4 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+/* ===== INPUTS ===== */
+
+.modal-modern input,
+.modal-modern select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  outline: none;
+  font-size: 14px;
+  transition: all .2s;
+}
+
+.modal-modern input:focus,
+.modal-modern select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* ===== TEXTO ===== */
+
+.modal-modern p {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+/* ===== BOTONES ===== */
+
+.modal-footer-modern {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-footer-modern button {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+/* cancelar */
+
+.modal-footer-modern button:first-child {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.modal-footer-modern button:first-child:hover {
+  background: #e2e8f0;
+}
+
+/* guardar */
+
+.modal-footer-modern button:last-child {
+  background: #2563eb;
+  color: white;
+}
+
+.modal-footer-modern button:last-child:hover {
+  background: #1d4ed8;
+}
+
+/* eliminar */
+
+.modal-footer-modern .btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.modal-footer-modern .btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* ===== ANIMACION ===== */
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: scale(.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

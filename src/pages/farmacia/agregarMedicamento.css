@@ -1,0 +1,52 @@
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+margin-top:10px;
+}
+
+.form-grid input,
+.form-grid select{
+width:100%;
+padding:10px;
+border:1px solid #e2e8f0;
+border-radius:8px;
+outline:none;
+font-size:14px;
+}
+
+.image-card{
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.image-upload{
+width:160px;
+height:160px;
+border:2px dashed #cbd5e1;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#94a3b8;
+}
+
+.actions-row{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+margin-top:20px;
+}
+
+.btn-cancel{
+background:#f1f5f9;
+border:none;
+padding:10px 16px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.btn-cancel:hover{
+background:#e2e8f0;
+}

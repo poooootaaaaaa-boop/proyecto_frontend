@@ -20,6 +20,7 @@ import PerfilPremium from "./components/PerfilEdit/PerfilPremium";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./components/Home/Home";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function App() {
   return (

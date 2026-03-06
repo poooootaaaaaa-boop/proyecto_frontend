@@ -1,84 +1,175 @@
-import { Card, Form, Button, Row, Col } from "react-bootstrap";
+import { Card, Form, Button, Row, Col, Modal, Alert } from "react-bootstrap";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AgregarMedicamento() {
+
+  const navigate = useNavigate();
+
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
+
+  const [medicamento, setMedicamento] = useState({
+    nombre: "",
+    presentacion: "",
+    categoria: "",
+    codigo: "",
+    stockMax: "",
+    stockMin: "",
+    precio: "",
+    vencimiento: "",
+    distribuidor: "",
+    entrega: "",
+  });
+
+  const handleChange = (e) => {
+    setMedicamento({
+      ...medicamento,
+      [e.target.name]: e.target.value,
+    });
+
+    setError("");
+  };
+
+  const cerrarModal = () => setShowModal(false);
+
+  // VALIDAR CAMPOS
+  const abrirModal = () => {
+
+    const campos = Object.values(medicamento);
+
+    const vacio = campos.some((campo) => campo === "");
+
+    if (vacio) {
+      setError("Por favor llena todos los campos.");
+      return;
+    }
+
+    setShowModal(true);
+  };
+
+  const guardarMedicamento = () => {
+
+    const medicamentosGuardados =
+      JSON.parse(localStorage.getItem("medicamentos")) || [];
+
+    medicamentosGuardados.push(medicamento);
+
+    localStorage.setItem(
+      "medicamentos",
+      JSON.stringify(medicamentosGuardados)
+    );
+
+    cerrarModal();
+
+    navigate("/farmacia/inventario");
+  };
+
   return (
-    <div style={{ display: "flex" }}>
+    <div className="home-layout">
       <Sidebar />
 
-      <div style={{ flex: 1, background: "#f7f7f7", minHeight: "100vh" }}>
+      <div className="home-content-modern">
         <Topbar />
 
         <div style={{ padding: "30px" }}>
-          <h5 className="mb-4">Agregar nuevo medicamento</h5>
+          <h2 className="main-title">Agregar nuevo medicamento</h2>
+
+          {/* ALERTA */}
+          {error && (
+            <Alert variant="danger" className="mt-3">
+              {error}
+            </Alert>
+          )}
 
           <Row className="g-4">
-            {/* ===== COLUMNA IZQUIERDA ===== */}
+
+            {/* COLUMNA IZQUIERDA */}
             <Col md={8}>
-              {/* Detalles del medicamento */}
-              <Card className="p-4 rounded-4 border-0 mb-3">
-                <h6 className="mb-3"> Detalles del medicamento</h6>
+
+              <Card className="card-modern p-4 mb-3">
+                <h6 className="mb-3">Detalles del medicamento</h6>
 
                 <Row className="g-3">
                   <Col md={6}>
                     <Form.Label>Nombre Comercial</Form.Label>
-                    <Form.Control placeholder="Ej. Amoxicilina" />
+                    <Form.Control
+                      name="nombre"
+                      onChange={handleChange}
+                      placeholder="Ej. Amoxicilina"
+                    />
                   </Col>
 
                   <Col md={6}>
                     <Form.Label>Presentación</Form.Label>
-                    <Form.Control placeholder="Ej. 500 mg" />
+                    <Form.Control
+                      name="presentacion"
+                      onChange={handleChange}
+                      placeholder="Ej. 500 mg"
+                    />
                   </Col>
 
                   <Col md={12}>
                     <Form.Label>Categoría</Form.Label>
-                    <Form.Control placeholder="Antibiótico" />
+                    <Form.Control
+                      name="categoria"
+                      onChange={handleChange}
+                      placeholder="Antibiótico"
+                    />
                   </Col>
                 </Row>
               </Card>
 
-              {/* Inventario y precios */}
-              <Card className="p-4 rounded-4 border-0 mb-3">
-                <h6 className="mb-3"> Inventario y precios</h6>
+              {/* INVENTARIO */}
+              <Card className="card-modern p-4 mb-3">
+                <h6 className="mb-3">Inventario y precios</h6>
 
                 <Row className="g-3">
                   <Col md={6}>
                     <Form.Label>Código de barras</Form.Label>
-                    <Form.Control />
+                    <Form.Control name="codigo" onChange={handleChange}/>
                   </Col>
 
                   <Col md={6}>
                     <Form.Label>Stock máximo</Form.Label>
-                    <Form.Control />
+                    <Form.Control name="stockMax" onChange={handleChange}/>
                   </Col>
 
                   <Col md={6}>
                     <Form.Label>Stock mínimo</Form.Label>
-                    <Form.Control />
+                    <Form.Control name="stockMin" onChange={handleChange}/>
                   </Col>
 
                   <Col md={6}>
                     <Form.Label>Precio</Form.Label>
-                    <Form.Control />
+                    <Form.Control name="precio" onChange={handleChange}/>
                   </Col>
 
                   <Col md={12}>
                     <Form.Label>Fecha de vencimiento</Form.Label>
-                    <Form.Control type="date" />
+                    <Form.Control
+                      type="date"
+                      name="vencimiento"
+                      onChange={handleChange}
+                    />
                   </Col>
                 </Row>
               </Card>
 
-              {/* Información del distribuidor */}
-              <Card className="p-4 rounded-4 border-0">
-                <h6 className="mb-3"> Información del distribuidor</h6>
+              {/* DISTRIBUIDOR */}
+              <Card className="card-modern p-4">
+                <h6 className="mb-3">Información del distribuidor</h6>
 
                 <Row className="g-3">
                   <Col md={6}>
-                    <Form.Label>Seleccionar distribuidor</Form.Label>
-                    <Form.Select>
-                      <option>Selecciona...</option>
+                    <Form.Label>Distribuidor</Form.Label>
+                    <Form.Select
+                      name="distribuidor"
+                      onChange={handleChange}
+                    >
+                      <option value="">Selecciona...</option>
                       <option>Distribuidor A</option>
                       <option>Distribuidor B</option>
                     </Form.Select>
@@ -86,18 +177,19 @@ export default function AgregarMedicamento() {
 
                   <Col md={6}>
                     <Form.Label>Tiempo de entrega</Form.Label>
-                    <Form.Control placeholder="Ej. 2 días" />
+                    <Form.Control
+                      name="entrega"
+                      onChange={handleChange}
+                      placeholder="Ej. 2 días"
+                    />
                   </Col>
                 </Row>
               </Card>
             </Col>
 
-            {/* ===== COLUMNA DERECHA (IMAGEN) ===== */}
+            {/* COLUMNA DERECHA */}
             <Col md={4}>
-              <Card
-                className="rounded-4 border-0 d-flex justify-content-center align-items-center"
-                style={{ height: "100%" }}
-              >
+              <Card className="card-modern d-flex justify-content-center align-items-center">
                 <div
                   style={{
                     width: "140px",
@@ -114,15 +206,39 @@ export default function AgregarMedicamento() {
                 </div>
               </Card>
             </Col>
+
           </Row>
 
-          {/* ===== BOTONES ===== */}
+          {/* BOTONES */}
           <div className="d-flex justify-content-end gap-3 mt-4">
             <Button variant="light">Cancelar</Button>
-            <Button variant="primary">Agregar</Button>
+            <Button variant="primary" onClick={abrirModal}>
+              Agregar
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* MODAL */}
+      <Modal show={showModal} onHide={cerrarModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar acción</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          ¿Quieres agregar este medicamento al inventario?
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cerrarModal}>
+            Cancelar
+          </Button>
+
+          <Button variant="primary" onClick={guardarMedicamento}>
+            Sí, agregar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

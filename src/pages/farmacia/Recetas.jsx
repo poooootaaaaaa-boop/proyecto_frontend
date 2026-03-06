@@ -1,35 +1,79 @@
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
-import {
-  Card,
-  Table,
-  Badge,
-  Button,
-  Nav,
-  Form,
-  Col,
-  Modal,
-} from "react-bootstrap";
+import "./dashboardFarmacia.css";
 import { useState } from "react";
-import "./RecetasRecibidas.css";
 
 export default function RecetasRecibidas() {
-  const [showModal, setShowModal] = useState(false);
 
-  const [formData, setFormData] = useState({
-    paciente: "",
-    hora: "",
-    estado: "Normal",
-  });
+  const [recetas, setRecetas] = useState([
+    {
+      id: 1,
+      paciente: "Juan Pérez",
+      medicamento: "Amoxicilina",
+      hora: "10:30",
+      prioridad: "Urgente",
+    },
+    {
+      id: 2,
+      paciente: "María López",
+      medicamento: "Paracetamol",
+      hora: "11:15",
+      prioridad: "Normal",
+    },
+    {
+      id: 3,
+      paciente: "Carlos Ruiz",
+      medicamento: "Ibuprofeno",
+      hora: "12:00",
+      prioridad: "Urgente",
+    },
+  ]);
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const [modalEditar, setModalEditar] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+
+  const abrirEditar = (receta) => {
+    setRecetaSeleccionada({ ...receta });
+    setModalEditar(true);
+  };
+
+  const abrirEliminar = (receta) => {
+    setRecetaSeleccionada(receta);
+    setModalEliminar(true);
+  };
+
+  const cerrarModales = () => {
+    setModalEditar(false);
+    setModalEliminar(false);
+    setRecetaSeleccionada(null);
+  };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+
+    setRecetaSeleccionada({
+      ...recetaSeleccionada,
+      [name]: value,
     });
+  };
+
+  const guardarCambios = () => {
+    setRecetas((prev) =>
+      prev.map((r) =>
+        r.id === recetaSeleccionada.id ? recetaSeleccionada : r
+      )
+    );
+
+    cerrarModales();
+  };
+
+  const eliminarReceta = () => {
+    setRecetas((prev) =>
+      prev.filter((r) => r.id !== recetaSeleccionada.id)
+    );
+
+    cerrarModales();
   };
 
   return (
@@ -39,169 +83,188 @@ export default function RecetasRecibidas() {
       <div className="home-content-modern">
         <Topbar />
 
-        <div className="page-wrapper">
-          <h4 className="page-title">Recetas Recibidas</h4>
+        <h2 className="main-title">Recetas Recibidas</h2>
 
-          {/* ===== CARDS RESUMEN ARRIBA ===== */}
-          <div className="stats-grid">
-            <Card className="stat-card">
-              <small>Pendientes hoy</small>
-              <h2>12</h2>
-            </Card>
+        {/* CARDS */}
+        <div className="stats-grid">
 
-            <Card className="stat-card">
-              <small>Validadas hoy</small>
-              <h2>12</h2>
-            </Card>
-
-            <Card className="stat-card">
-              <small>Surtidas hoy</small>
-              <h2>2</h2>
-            </Card>
+          <div className="stat-card-modern">
+            <small>Recetas del día</small>
+            <h3>{recetas.length}</h3>
           </div>
 
-          {/* ===== ACCIONES ===== */}
-          <div className="table-actions">
-            <div className="left-actions">
-              <span className="link-action">Ver receta</span>
+          <div className="stat-card-modern">
+            <small>Urgentes</small>
+            <h3>
+              {recetas.filter((r) => r.prioridad === "Urgente").length}
+            </h3>
+          </div>
+
+          <div className="stat-card-modern">
+            <small>Normales</small>
+            <h3>
+              {recetas.filter((r) => r.prioridad === "Normal").length}
+            </h3>
+          </div>
+
+        </div>
+
+        {/* TABLA */}
+        <div className="card-modern table-card">
+
+          <h5 className="section-title">Lista de Recetas</h5>
+
+          <div className="table-modern">
+
+            <div className="table-header-modern">
+              <span>Paciente</span>
+              <span>Medicamento</span>
+              <span>Hora</span>
+              <span>Prioridad</span>
+              <span>Acciones</span>
             </div>
 
-            <Button className="primary-btn">
-              Validar receta
-            </Button>
+            {recetas.map((receta) => (
+
+              <div className="table-row-modern" key={receta.id}>
+
+                <div>{receta.paciente}</div>
+
+                <div>{receta.medicamento}</div>
+
+                <div>{receta.hora}</div>
+
+                <div>
+                  <span
+                    className={`status-badge ${
+                      receta.prioridad === "Urgente"
+                        ? "urgent"
+                        : "normal"
+                    }`}
+                  >
+                    {receta.prioridad}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", gap: "12px" }}>
+
+                  <i
+                    className="bi bi-pencil-square"
+                    style={{
+                      cursor: "pointer",
+                      color: "#2563eb",
+                      fontSize: "18px",
+                    }}
+                    onClick={() => abrirEditar(receta)}
+                  />
+
+                  <i
+                    className="bi bi-trash"
+                    style={{
+                      cursor: "pointer",
+                      color: "#dc2626",
+                      fontSize: "18px",
+                    }}
+                    onClick={() => abrirEliminar(receta)}
+                  />
+
+                </div>
+
+              </div>
+
+            ))}
+
           </div>
-
-          {/* ===== TABLA ===== */}
-          <Card className="table-card">
-            <h6 className="table-title">Recetas Pendientes</h6>
-
-            <Table responsive borderless className="modern-table">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Paciente</th>
-                  <th>Doctor</th>
-                  <th>ID</th>
-                  <th>Estado</th>
-                  <th></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td>10:30</td>
-                  <td>Juan Pérez</td>
-                  <td>Juan Pérez</td>
-                  <td>#1023</td>
-                  <td>
-                    <Badge className="badge-warning">
-                      Pendiente
-                    </Badge>
-                  </td>
-                  <td
-                    className="actions"
-                    onClick={openModal}
-                  >
-                    ⋮
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>11:15</td>
-                  <td>María López</td>
-                  <td>Dr. Gómez</td>
-                  <td>#1024</td>
-                  <td>
-                    <Badge className="badge-info">
-                      Validando
-                    </Badge>
-                  </td>
-                  <td
-                    className="actions"
-                    onClick={openModal}
-                  >
-                    ⋮
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>12:00</td>
-                  <td>Carlos Ruiz</td>
-                  <td>Dra. Torres</td>
-                  <td>#1025</td>
-                  <td>
-                    <Badge className="badge-success">
-                      Listo para surtir
-                    </Badge>
-                  </td>
-                  <td
-                    className="actions"
-                    onClick={openModal}
-                  >
-                    ⋮
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </Card>
         </div>
+
       </div>
 
-      {/* ===== MODAL (NO SE TOCA LÓGICA) ===== */}
-      <Modal show={showModal} onHide={closeModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Editar receta</Modal.Title>
-        </Modal.Header>
+      {/* MODAL EDITAR */}
+      {modalEditar && (
+        <div className="modal-overlay">
+          <div className="modal-modern">
 
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Fecha</Form.Label>
-              <Col md={12}>
-                <Form.Control type="date" />
-              </Col>
-            </Form.Group>
+            <h4>Editar Receta</h4>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Paciente</Form.Label>
-              <Form.Control
-                type="text"
-                name="paciente"
-                value={formData.paciente}
-                onChange={handleChange}
-              />
-            </Form.Group>
+            <input
+              name="paciente"
+              value={recetaSeleccionada.paciente}
+              onChange={handleChange}
+              placeholder="Paciente"
+            />
 
-            <Form.Group className="mb-3">
-              <Form.Label>Doctor</Form.Label>
-              <Col md={12}>
-                <Form.Control type="text" />
-              </Col>
-            </Form.Group>
+            <input
+              name="medicamento"
+              value={recetaSeleccionada.medicamento}
+              onChange={handleChange}
+              placeholder="Medicamento"
+            />
 
-            <Form.Group>
-              <Form.Label>Estado</Form.Label>
-              <Form.Select
-                name="estado"
-                value={formData.estado}
-                onChange={handleChange}
+            <input
+              type="time"
+              name="hora"
+              value={recetaSeleccionada.hora}
+              onChange={handleChange}
+            />
+
+            <select
+              name="prioridad"
+              value={recetaSeleccionada.prioridad}
+              onChange={handleChange}
+            >
+              <option>Urgente</option>
+              <option>Normal</option>
+            </select>
+
+            <div className="modal-footer-modern">
+
+              <button onClick={cerrarModales}>
+                Cancelar
+              </button>
+
+              <button
+                className="primary-btn"
+                onClick={guardarCambios}
               >
-                <option value="Urgente">Pendiente</option>
-                <option value="Normal">Listo</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
+                Guardar
+              </button>
 
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={closeModal}>
-            Guardar
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ELIMINAR */}
+      {modalEliminar && (
+        <div className="modal-overlay">
+          <div className="modal-modern">
+
+            <h4>Eliminar Receta</h4>
+
+            <p>
+              ¿Seguro que deseas eliminar la receta de{" "}
+              <strong>{recetaSeleccionada?.paciente}</strong>?
+            </p>
+
+            <div className="modal-footer-modern">
+
+              <button onClick={cerrarModales}>
+                Cancelar
+              </button>
+
+              <button
+                className="btn-danger"
+                onClick={eliminarReceta}
+              >
+                Eliminar
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
