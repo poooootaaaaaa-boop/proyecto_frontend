@@ -1,159 +1,246 @@
-import { Card, Table, Badge, Form, Row, Col } from "react-bootstrap";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
+import "./dashboardFarmacia.css";
 import { useState } from "react";
-import "./Configuracion.css";
+import { Form } from "react-bootstrap";
 
 export default function Configuracion() {
+
   const [tab, setTab] = useState("ajustes");
 
   return (
-    <div className="farmacia-layout">
+    <div className="home-layout">
+
       <Sidebar />
 
-      <div className="farmacia-content">
+      <div className="home-content-modern">
+
         <Topbar />
 
-        <div className="config-wrapper">
-          {/* ===== HEADER ===== */}
-          <div className="config-header">
-            <h4>Configuración general</h4>
+        {/* HEADER */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "25px",
+          }}
+        >
 
-            <Form.Control
-              placeholder="Buscar configuración..."
-              className="config-search"
-            />
+          <div>
+            <h2 className="main-title">Configuración</h2>
+            <p style={{ color: "#64748b" }}>
+              Gestiona ajustes del sistema y administración interna.
+            </p>
           </div>
 
-          {/* ===== TABS ===== */}
-          <div className="config-tabs">
-            <span
-              className={tab === "ajustes" ? "tab active" : "tab"}
-              onClick={() => setTab("ajustes")}
-            >
-              Ajustes
-            </span>
+          <Form.Control
+            placeholder="Buscar configuración..."
+            style={{
+              maxWidth: "280px",
+              borderRadius: "10px",
+            }}
+          />
 
-            <span
-              className={tab === "general" ? "tab active" : "tab"}
-              onClick={() => setTab("general")}
-            >
-              General
-            </span>
-          </div>
-
-          {/* ===== CONTENT ===== */}
-          <Row className="g-4">
-            {/* ===== FARMACIAS AFILIADAS ===== */}
-            <Col md={6}>
-              <Card className="farm-card h-100">
-                <h6 className="card-title">Farmacias afiliadas</h6>
-
-                <Table borderless responsive className="farm-table">
-                  <thead>
-                    <tr>
-                      <th>SUCURSAL</th>
-                      <th>UBICACIÓN</th>
-                      <th>ESTADO</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Sucursal Norte</td>
-                      <td>
-                        Av. Central <br />
-                        <small>CP 4556</small>
-                      </td>
-                      <td>
-                        <Badge bg="secondary">Inactiva</Badge>
-                      </td>
-                      <td className="action-dots">⋮</td>
-                    </tr>
-
-                    <tr>
-                      <td>Sucursal Centro</td>
-                      <td>
-                        Calle 5 <br />
-                        <small>CP 4456</small>
-                      </td>
-                      <td>
-                        <Badge bg="success">Activa</Badge>
-                      </td>
-                      <td className="action-dots">⋮</td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card>
-            </Col>
-
-            {/* ===== NOTIFICACIONES ===== */}
-            <Col md={6}>
-              <Card className="farm-card h-100">
-                <h6 className="card-title">
-                  Notificaciones de sistema
-                </h6>
-
-                <div className="switch-group">
-                  <Form.Check
-                    type="switch"
-                    label="Alerta de inventario crítico"
-                    defaultChecked
-                  />
-
-                  <Form.Check
-                    type="switch"
-                    label="Avisos de vencimiento próximo"
-                    defaultChecked
-                  />
-
-                  <Form.Check
-                    type="switch"
-                    label="Actualizaciones de precios"
-                  />
-                </div>
-              </Card>
-            </Col>
-
-            {/* ===== USUARIOS INTERNOS ===== */}
-            <Col md={6}>
-              <Card className="farm-card">
-                <h6 className="card-title">Usuarios internos</h6>
-
-                <Table borderless className="farm-table">
-                  <thead>
-                    <tr>
-                      <th>USUARIO</th>
-                      <th>ESTADO</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Juan Pérez</strong></td>
-                      <td>
-                        <Badge bg="success">Activo</Badge>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td><strong>María López</strong></td>
-                      <td>
-                        <Badge bg="success">Activo</Badge>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td><strong>Carlos Ruiz</strong></td>
-                      <td>
-                        <Badge bg="secondary">Inactivo</Badge>
-                      </td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </Card>
-            </Col>
-          </Row>
         </div>
+
+        {/* TABS */}
+        <div
+          style={{
+            display: "flex",
+            gap: "20px",
+            marginBottom: "25px",
+            fontWeight: "500",
+            cursor: "pointer",
+          }}
+        >
+
+          <span
+            style={{
+              color: tab === "ajustes" ? "#2563eb" : "#64748b",
+              borderBottom: tab === "ajustes" ? "2px solid #2563eb" : "none",
+              paddingBottom: "6px",
+            }}
+            onClick={() => setTab("ajustes")}
+          >
+            Ajustes
+          </span>
+
+
+        </div>
+
+        {/* GRID */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+          }}
+        >
+
+          {/* FARMACIAS */}
+          <div className="card-modern table-card">
+
+            <h5 className="section-title">
+              Farmacias afiliadas
+            </h5>
+
+            <div className="table-modern">
+
+              <div className="table-header-modern">
+                <span>Sucursal</span>
+                <span>Ubicación</span>
+                <span>Estado</span>
+                <span></span>
+              </div>
+
+              <div className="table-row-modern">
+
+                <div>
+                  <strong>Sucursal Norte</strong>
+                </div>
+
+                <div>
+                  Av. Central
+                  <small style={{ display: "block", color: "#64748b" }}>
+                    CP 4556
+                  </small>
+                </div>
+
+                <div>
+                  <span className="status-badge danger">
+                    Inactiva
+                  </span>
+                </div>
+
+
+              </div>
+
+              <div className="table-row-modern">
+
+                <div>
+                  <strong>Sucursal Centro</strong>
+                </div>
+
+                <div>
+                  Calle 5
+                  <small style={{ display: "block", color: "#64748b" }}>
+                    CP 4456
+                  </small>
+                </div>
+
+                <div>
+                  <span className="status-badge success">
+                    Activa
+                  </span>
+                </div>
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* NOTIFICACIONES */}
+          <div className="card-modern">
+
+            <h5 className="section-title">
+              Notificaciones del sistema
+            </h5>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "15px",
+                marginTop: "10px",
+              }}
+            >
+
+              <Form.Check
+                type="switch"
+                label="Alerta de inventario crítico"
+                defaultChecked
+              />
+
+              <Form.Check
+                type="switch"
+                label="Avisos de vencimiento próximo"
+                defaultChecked
+              />
+
+              <Form.Check
+                type="switch"
+                label="Actualizaciones de precios"
+              />
+
+            </div>
+
+          </div>
+
+          {/* USUARIOS */}
+          <div className="card-modern table-card">
+
+            <h5 className="section-title">
+              Usuarios internos
+            </h5>
+
+            <div className="table-modern">
+
+              <div className="table-header-modern">
+                <span>Usuario</span>
+                <span>Estado</span>
+              </div>
+
+              <div className="table-row-modern">
+
+                <div>
+                  <strong>Juan Pérez</strong>
+                </div>
+
+                <div>
+                  <span className="status-badge success">
+                    Activo
+                  </span>
+                </div>
+
+              </div>
+
+              <div className="table-row-modern">
+
+                <div>
+                  <strong>María López</strong>
+                </div>
+
+                <div>
+                  <span className="status-badge success">
+                    Activo
+                  </span>
+                </div>
+
+              </div>
+
+              <div className="table-row-modern">
+
+                <div>
+                  <strong>Carlos Ruiz</strong>
+                </div>
+
+                <div>
+                  <span className="status-badge danger">
+                    Inactivo
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
     </div>
   );

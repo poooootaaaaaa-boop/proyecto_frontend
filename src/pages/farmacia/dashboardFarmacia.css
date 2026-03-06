@@ -120,7 +120,7 @@
 .table-header-modern,
 .table-row-modern {
   display: grid;
-  grid-template-columns: 1.5fr 1.5fr 1fr 1fr 60px;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 1fr;
   align-items: center;
 }
 

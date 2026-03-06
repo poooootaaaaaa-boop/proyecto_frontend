@@ -1,11 +1,16 @@
 import { Nav, Offcanvas } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useMediaQuery } from "@mui/material";
 import LogoutModal from "./LogoutModal";
 
 export default function Sidebar() {
+
   const [openLogout, setOpenLogout] = useState(false);
   const [show, setShow] = useState(false);
+
+  // DETECTA MOBILE
+  const isMobile = useMediaQuery("(max-width:900px)");
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -61,13 +66,11 @@ export default function Sidebar() {
           Inventario
         </Nav.Link>
 
-        {/* DISTRIBUIDORES */}
         <Nav.Link as={NavLink} to="/farmacia/Distribuidores" style={linkStyle}>
           <i className="bi bi-truck"></i>
           Distribuidores
         </Nav.Link>
 
-        {/* DOCTORES */}
         <Nav.Link as={NavLink} to="/farmacia/doctores" style={linkStyle}>
           <i className="bi bi-person-badge"></i>
           Doctores
@@ -104,31 +107,47 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* BOTON HAMBURGUESA SOLO EN MOBILE */}
-      <button
-        className="btn btn-primary d-lg-none m-3"
-        onClick={handleShow}
-      >
-        <i className="bi bi-list"></i>
-      </button>
 
-      {/* SIDEBAR FIJO EN DESKTOP */}
-      <div
-        className="d-none d-lg-flex"
-        style={{
-          width: "250px",
-          background: "linear-gradient(180deg,#1f3fa3,#162c73)",
-          color: "#fff",
-          minHeight: "100vh",
-          padding: "25px 20px",
-          flexDirection: "column",
-        }}
-      >
-        {sidebarContent}
-      </div>
+      {/* BOTON HAMBURGUESA SOLO MOVIL */}
+      {isMobile && (
+        <button
+          onClick={handleShow}
+          style={{
+            position: "fixed",
+            top: "15px",
+            left: "15px",
+            zIndex: 2000,
+            background: "#1f3fa3",
+            border: "none",
+            color: "white",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            cursor: "pointer"
+          }}
+        >
+          <i className="bi bi-list" style={{ fontSize: "20px" }}></i>
+        </button>
+      )}
 
-      {/* SIDEBAR MOBILE */}
-      <Offcanvas show={show} onHide={handleClose} className="d-lg-none">
+      {/* SIDEBAR DESKTOP */}
+      {!isMobile && (
+        <div
+          style={{
+            width: "250px",
+            background: "linear-gradient(180deg,#1f3fa3,#162c73)",
+            color: "#fff",
+            minHeight: "100vh",
+            padding: "25px 20px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {sidebarContent}
+        </div>
+      )}
+
+      {/* SIDEBAR MOVIL */}
+      <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Body
           style={{
             background: "linear-gradient(180deg,#1f3fa3,#162c73)",
@@ -146,6 +165,7 @@ export default function Sidebar() {
         open={openLogout}
         handleClose={() => setOpenLogout(false)}
       />
+
     </>
   );
 }

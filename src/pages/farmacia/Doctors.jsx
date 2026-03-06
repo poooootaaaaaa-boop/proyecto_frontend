@@ -10,38 +10,39 @@ export default function Doctors() {
 
   const [search, setSearch] = useState("");
 
-  const [doctors, setDoctors] = useState([
+  const [doctors, setDoctors] = useState(
+  JSON.parse(localStorage.getItem("doctors")) ||[
     {
       name: "Dr. Sarah Connor",
-      role: "Internal Medicine",
-      specialty: "Cardiologist",
+      role: "Medicina Interna",
+      specialty: "Cardiólogo",
       license: "MLN-88291",
       email: "sarah.c@citypharmacy.com",
-      status: "Active",
+      status: "Activo",
     },
     {
       name: "Dr. James Wilson",
-      role: "General Practice",
-      specialty: "General Practitioner",
+      role: "Medicina General",
+      specialty: "Médico General",
       license: "MLN-44502",
       email: "j.wilson@healthlink.net",
-      status: "Active",
+      status: "Activo",
     },
     {
       name: "Dr. Elena Rodriguez",
-      role: "Dermatology",
-      specialty: "Dermatologist",
+      role: "Dermatología",
+      specialty: "Dermatóloga",
       license: "MLN-11938",
       email: "elena.r@clinical.org",
-      status: "Inactive",
+      status: "Inactivo",
     },
     {
       name: "Dr. Marcus Thorne",
-      role: "Pharmaceutical Sci.",
-      specialty: "Pharmacist",
+      role: "Ciencias Farmacéuticas",
+      specialty: "Farmacéutico",
       license: "MLN-99201",
       email: "m.thorne@citypharmacy.com",
-      status: "Active",
+      status: "Activo",
     },
   ]);
 
@@ -110,19 +111,19 @@ export default function Doctors() {
           }}
         >
           <div>
-            <h2 className="main-title">Doctors Management</h2>
+            <h2 className="main-title">Gestión de Doctores</h2>
             <p style={{ color: "#64748b" }}>
-              Manage medical professionals and clinical staff access.
+              Administra los profesionales médicos del sistema.
             </p>
           </div>
 
           <Button
             as={NavLink}
-            to="/farmacia/"
+            to="/farmacia/agregardoctor"
             size="sm"
             variant="primary"
           >
-            + Add
+            + Agregar
           </Button>
 
         </div>
@@ -131,7 +132,7 @@ export default function Doctors() {
         <div className="card-modern" style={{ marginBottom: "20px" }}>
           <input
             type="text"
-            placeholder="Search by name, specialty, or license number..."
+            placeholder="Buscar por nombre, especialidad o licencia..."
             className="modern-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -144,12 +145,11 @@ export default function Doctors() {
           <div className="table-modern">
 
             <div className="table-header-modern">
-              <span>Doctor Profile</span>
-              <span>Specialty</span>
-              <span>License Number</span>
-              <span>Contact Info</span>
-              <span>Status</span>
-              <span style={{ textAlign: "center" }}>Actions</span>
+              <span>Perfil</span>
+              <span>Especialidad</span>
+              <span>Número de Licencia</span>
+              <span>Contacto</span>
+              <span>Acciones</span>
             </div>
 
             {filteredDoctors.map((doctor, index) => (
@@ -188,31 +188,10 @@ export default function Doctors() {
 
                 <div>{doctor.license}</div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <i className="bi bi-envelope"></i>
-                  {doctor.email}
-                </div>
+                <div>{doctor.email}</div>
 
-                <div>
-                  <span
-                    className={
-                      doctor.status === "Active"
-                        ? "status-badge success"
-                        : "status-badge danger"
-                    }
-                  >
-                    {doctor.status}
-                  </span>
-                </div>
-
-                {/* ACTIONS */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                >
+                {/* ACCIONES */}
+                <div style={{ display: "flex", gap: "8px" }}>
 
                   <button
                     onClick={() => openEditModal(doctor, index)}
@@ -243,6 +222,19 @@ export default function Doctors() {
 
                 </div>
 
+                {/* ESTADO 
+                <div>
+                  <span
+                    className={
+                      doctor.status === "Activo"
+                        ? "status-badge success"
+                        : "status-badge danger"
+                    }
+                  >
+                    {doctor.status}
+                  </span>
+                </div>*/}
+
               </div>
 
             ))}
@@ -256,7 +248,7 @@ export default function Doctors() {
               fontSize: "14px",
             }}
           >
-            Showing {filteredDoctors.length} doctors
+            Mostrando {filteredDoctors.length} doctores
           </div>
 
         </div>
@@ -270,14 +262,14 @@ export default function Doctors() {
             <div className="modal-content">
 
               <div className="modal-header">
-                <h5 className="modal-title">Edit Doctor</h5>
+                <h5 className="modal-title">Editar Doctor</h5>
                 <button className="btn-close" onClick={closeModal}></button>
               </div>
 
               <div className="modal-body">
 
                 <div className="mb-3">
-                  <label>Name</label>
+                  <label>Nombre</label>
                   <input
                     className="form-control"
                     name="name"
@@ -287,7 +279,7 @@ export default function Doctors() {
                 </div>
 
                 <div className="mb-3">
-                  <label>Role</label>
+                  <label>Rol</label>
                   <input
                     className="form-control"
                     name="role"
@@ -297,7 +289,7 @@ export default function Doctors() {
                 </div>
 
                 <div className="mb-3">
-                  <label>Specialty</label>
+                  <label>Especialidad</label>
                   <input
                     className="form-control"
                     name="specialty"
@@ -317,15 +309,15 @@ export default function Doctors() {
                 </div>
 
                 <div className="mb-3">
-                  <label>Status</label>
+                  <label>Estado</label>
                   <select
                     className="form-control"
                     name="status"
                     value={selectedDoctor.status}
                     onChange={handleChange}
                   >
-                    <option>Active</option>
-                    <option>Inactive</option>
+                    <option>Activo</option>
+                    <option>Inactivo</option>
                   </select>
                 </div>
 
@@ -333,11 +325,11 @@ export default function Doctors() {
 
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={closeModal}>
-                  Cancel
+                  Cancelar
                 </button>
 
                 <button className="btn btn-primary" onClick={saveDoctor}>
-                  Save Changes
+                  Guardar Cambios
                 </button>
               </div>
 
@@ -353,7 +345,7 @@ export default function Doctors() {
             <div className="modal-content">
 
               <div className="modal-header">
-                <h5 className="modal-title">Delete Doctor</h5>
+                <h5 className="modal-title">Eliminar Doctor</h5>
                 <button
                   className="btn-close"
                   onClick={() => setShowDeleteModal(false)}
@@ -361,7 +353,7 @@ export default function Doctors() {
               </div>
 
               <div className="modal-body">
-                <p>Are you sure you want to delete this doctor?</p>
+                <p>¿Estás seguro de que deseas eliminar este doctor?</p>
               </div>
 
               <div className="modal-footer">
@@ -370,14 +362,14 @@ export default function Doctors() {
                   className="btn btn-secondary"
                   onClick={() => setShowDeleteModal(false)}
                 >
-                  Cancel
+                  Cancelar
                 </button>
 
                 <button
                   className="btn btn-danger"
                   onClick={deleteDoctor}
                 >
-                  Delete
+                  Eliminar
                 </button>
 
               </div>

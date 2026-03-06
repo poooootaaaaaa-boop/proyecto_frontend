@@ -24,6 +24,7 @@ import Home from "./components/Home/Home";
 import DoctorInfo from "./components/registros/DoctorInfo";
 import ClinicInfo from "./components/registros/ClinicInfo";
 import FinishRegister from "./components/registros/FinishRegister";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 
 export default function App() {
