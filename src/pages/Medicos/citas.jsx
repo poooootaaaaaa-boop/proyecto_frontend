@@ -16,6 +16,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import Mensaje from "./mensaje";
+import "./calendar.css";
 
 function citas({ data, setData }){
     const [tipoCita, setTipoCita] = useState("");
@@ -97,7 +98,7 @@ function citas({ data, setData }){
                                         <Form.Label>Fecha y hora de la cita</Form.Label>
 
                                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                <StaticDateTimePicker orientation="landscape" value={fechaCita} onChange={(newValue) => setFechaCita(newValue)} />
+                                                <StaticDateTimePicker orientation="landscape" value={fechaCita} onChange={(newValue) => setFechaCita(newValue)} className="calendar-clean"  slotProps={{actionBar: {actions: []}}}/>
                                             </LocalizationProvider>
 
                                     </div>

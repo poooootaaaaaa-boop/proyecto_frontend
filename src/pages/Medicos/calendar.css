@@ -1,0 +1,222 @@
+.calendar-container{
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid #e2e8f0;
+  background:white;
+  font-family:Inter,sans-serif;
+}
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  width:100%;
+}
+/* HEADER */
+
+.calendar-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px;
+  border-bottom:1px solid #e2e8f0;
+  color:black;
+}
+
+/* WEEK */
+
+.calendar-week-row{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  background:#f1f5f9;
+  text-align:center;
+  font-size:13px;
+  font-weight:600;
+  color:#64748b;
+}
+
+.calendar-week-row div{
+  padding:10px 0;
+  border-right:1px solid #e2e8f0;
+}
+
+/* GRID */
+
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  color:black;
+}
+
+/* DAY */
+
+.calendar-day{
+  height:70px;
+  border-right:1px solid #e2e8f0;
+  border-bottom:1px solid #e2e8f0;
+  padding:10px;
+  position:relative;
+  background:white;
+  cursor:pointer;
+}
+
+.calendar-day:hover{
+  background:#f1f5ff;
+}
+
+.calendar-day.empty{
+  background:#f8fafc;
+  cursor:default;
+}
+
+.calendar-day-number{
+  font-weight:700;
+  font-size:15px;
+}
+
+/* DOT */
+
+.calendar-dot{
+  width:6px;
+  height:6px;
+  background:#135bec;
+  border-radius:50%;
+  position:absolute;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+/* SELECTED */
+
+.calendar-day.selected{
+  border:2px solid #135bec;
+  background:#eef3ff;
+}
+
+/* BOOKED */
+
+.calendar-day.booked{
+  background:#f3f4f6;
+  cursor:not-allowed;
+}
+
+
+
+
+
+.calendar-red-dot{
+  width:6px;
+  height:6px;
+  background:red;
+  border-radius:50%;
+  position:absolute;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* citas  */
+
+
+.calendar-clean{
+  width:100%;
+  max-width:900px;
+}
+
+/* contenedor del calendario */
+.calendar-clean .MuiPickersLayout-root{
+  width:900px !important;
+}
+
+/* calendario */
+.calendar-clean .MuiDayCalendar-root{
+  width:100%;
+}
+
+.calendar-clean{
+  background:#f8fafc;
+  border-radius:20px;
+  padding:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+  width:100%;
+  max-width:950px;
+}
+
+/* header mes */
+.calendar-clean .MuiPickersCalendarHeader-label{
+  font-weight:600;
+  font-size:18px;
+  color:#0f172a;
+}
+
+/* flechas */
+.calendar-clean .MuiPickersArrowSwitcher-button{
+  color:#64748b;
+}
+
+/* dias semana */
+.calendar-clean .MuiDayCalendar-weekDayLabel{
+  color:#64748b;
+  font-size:13px;
+  font-weight:500;
+}
+
+/* dias */
+.calendar-clean .MuiPickersDay-root{
+  font-size:14px;
+  color:#0f172a;
+  border-radius:50%;
+}
+
+/* hover */
+.calendar-clean .MuiPickersDay-root:hover{
+  background:#e2e8f0;
+}
+
+
+/* quitar highlight azul */
+.calendar-clean .MuiPickersDay-root.Mui-selected:hover{
+    background:#135bec !important;
+  color:white !important;
+  border:none !important;
+}
+
+
+/* ocultar texto SELECT DATE & TIME */
+.MuiPickersToolbar-root{
+  display:none !important;
+}
+
+/* ocultar reloj */
+.MuiClock-root{
+  display:none !important;
+}
+
+/* ocultar AM PM */
+.MuiClock-amButton,
+.MuiClock-pmButton{
+  display:none !important;
+}

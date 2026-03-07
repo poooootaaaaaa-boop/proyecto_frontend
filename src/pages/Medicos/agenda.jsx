@@ -5,15 +5,13 @@ import Button from 'react-bootstrap/Button';
 import AddIcon from '@mui/icons-material/Add';
 import "./Tablas.css";
 import { Link } from "react-router-dom";
+import Calendar from "./Calendar";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
 function agenda({data=[]}){ 
-    const eventos = data.map(cita => ({
 
-        title: cita.nombre + " " + cita.apellidoP,
 
-        start: cita.fechaCita,
-        color: "green" 
 
-        }));
     return(
         <div>
             <Layout_Medicos>
@@ -36,17 +34,19 @@ function agenda({data=[]}){
 
 
                     
-                    {/* Calendario */}
-                    <div className="bg-light p-3 rounded shadow-sm">
+                        {/* CALENDARIO */}
+                        <div
+                        style={{
+                            background: "#fff",
+                            padding: "20px",
+                            borderRadius: "20px",
+                            border: "1px solid #e5e7eb"
+                        }}
+                        >
 
-                        <FullCalendar
-                            plugins={[dayGridPlugin]}
-                            initialView="dayGridMonth"
-                            events={eventos}
-                            height={600}
-                        />
+                        <Calendar citas={data} />
 
-                    </div>
+                        </div>
 
                 </div>
 
