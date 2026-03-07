@@ -99,7 +99,7 @@ function Consulta({data,setData, dataPacientes}){
                                         
                                          <Col md={8}>
 
-                                            <Row className="mt-3">
+                                            <Row>
                                                 <Col md={12}> 
 
                                                     <Form.Label className="text-dark fw-bold"> Sintomas</Form.Label>
@@ -114,9 +114,11 @@ function Consulta({data,setData, dataPacientes}){
 
                                                  <Col md={12}>
 
-                                                    <Form.Label className="text-dark fw-bold"> Examen físico</Form.Label>
+                                                 <Form.Label className="fw-bold" style={{color:"#7c3aed"}}>
+                                                    📝 Notas del médico
+                                                </Form.Label>
 
-                                                    <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)}/>  
+                                             <Form.Control as="textarea"rows={8} placeholder="Escriba aquí observaciones adicionales, recomendaciones o notas importantes..." style={{background:"#faf5ff",border:"1px solid #e9d5ff",resize:"none"}}  value={notas} onChange={(e)=>setNotas(e.target.value)}/>
                                                  
                                                  
                                                  </Col>
@@ -124,21 +126,17 @@ function Consulta({data,setData, dataPacientes}){
                                             </Row>
                                                
                                          
-                                         </Col>
+                                        </Col>
 
                                            {/* LADO DERECHO */}
 
                                         {/* INPUT DE NOTAS */}
                                          <Col md={4}>
-                                            <Form.Label className="fw-bold" style={{color:"#7c3aed"}}>
-                                                    📝 Notas del médico
-                                                </Form.Label>
+                                            <Form.Label className="text-dark fw-bold"> Examen físico</Form.Label>
 
-                                             <Form.Control as="textarea"rows={8} placeholder="Escriba aquí observaciones adicionales, recomendaciones o notas importantes..." style={{background:"#faf5ff",border:"1px solid #e9d5ff",resize:"none"}}  value={notas} onChange={(e)=>setNotas(e.target.value)}/>
+                                            <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)}/> 
+
                                         </Col>
-
-
-
 
                                     </Row>
 

@@ -13,10 +13,19 @@ function tratamientos_largos() {
 const [editando, setEditando] = useState(null);
 const [showModal, setShowModal] = useState(false);
 
+
+
+
+const [showTratamiento, setShowTratamiento] = useState(false);
+const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
+
+
+
+
 const [item, setItem] = useState([
-  {nombre:"Erick Sanches", progreso:70, cita:"05/02/2025"},
-  {nombre:"Ricardo Rodriguez", progreso:40, cita:"05/02/2025"},
-  {nombre:"Alexito", progreso:90, cita:"05/02/2025"}
+  {nombre:"Erick Sanches", progreso:70, cita:"05/02/2025", tratamiento:"Rehabilitación de rodilla con ejercicios de movilidad y fortalecimiento muscular."},
+  {nombre:"Ricardo Rodriguez", progreso:40, cita:"05/02/2025", tratamiento:"Tratamiento de fisioterapia para dolor lumbar con sesiones de estiramiento y electroterapia."},
+  {nombre:"Alexito", progreso:90, cita:"05/02/2025", tratamiento:"Recuperación post operatoria con terapia manual y ejercicios de estabilidad."}
 ]);
 
 const cambiarProgreso = (index, valor) => {
@@ -140,7 +149,15 @@ return (
           {p.nombre.charAt(0)}
         </div>
 
-        {p.nombre}
+        <span
+          style={{cursor:"pointer",fontWeight:"600",color:"#000000"}}
+          onClick={()=>{
+            setPacienteSeleccionado(p);
+            setShowTratamiento(true);
+          }}
+        >
+          {p.nombre}
+        </span>
       </div>
     </div>
 
@@ -235,6 +252,52 @@ return (
     </Modal.Footer>
 
   </Modal>
+
+
+
+
+
+
+  <Modal show={showTratamiento} onHide={()=>setShowTratamiento(false)} centered>
+
+  <Modal.Header closeButton>
+    <Modal.Title>Tratamiento del paciente</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+
+    {pacienteSeleccionado && (
+      <>
+        <Typography style={{fontWeight:"600",marginBottom:"10px"}}>
+          Paciente: {pacienteSeleccionado.nombre}
+        </Typography>
+
+        <Typography style={{color:"#374151"}}>
+          {pacienteSeleccionado.tratamiento}
+        </Typography>
+      </>
+    )}
+
+  </Modal.Body>
+
+  <Modal.Footer>
+
+    <Button
+      onClick={()=>setShowTratamiento(false)}
+      style={{
+        background:"#6b7280",
+        border:"none",
+        borderRadius:"30px",
+        padding:"10px 20px",
+        fontWeight:"600"
+      }}
+    >
+      Cerrar
+    </Button>
+
+  </Modal.Footer>
+
+</Modal>
 
 
 </Layout_Medicos>

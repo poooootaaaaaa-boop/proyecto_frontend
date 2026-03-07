@@ -389,7 +389,7 @@ font-weight: 600;
 /* Encabezados */
 .agenda-table th {
   text-align: left;
-  padding: 15px 20px;
+   padding: 12px 20px;
   color: #94a3b8; /* Gris azulado suave */
   font-size: 12px;
   text-transform: uppercase;
@@ -451,7 +451,7 @@ font-weight: 600;
   font-weight: 700;             /* Negrita fuerte */
   color: #1e293b;               /* Azul pizarra oscuro (profesional) */
   letter-spacing: -0.02em;      /* Letras más juntas para look moderno */
-  margin-bottom: 20px;          /* Espacio con la tabla */
+  margin-bottom: 5px;          /* Espacio con la tabla */
   margin-top: 10px;
 }
 
@@ -472,3 +472,23 @@ font-weight: 600;
   transform: translateY(-1px);          /* Pequeño efecto de elevación */
   box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

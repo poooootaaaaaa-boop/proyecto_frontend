@@ -1,0 +1,71 @@
+.stats-row{
+  display:flex;
+  gap:25px;
+  margin:5px;
+}
+
+/* tarjeta */
+.stat-card{
+  flex:1;
+  background:white;
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.05);
+  transition:all 0.2s ease;
+}
+
+.stat-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 15px 30px rgba(0,0,0,0.08);
+}
+
+/* header */
+.stat-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+/* icono */
+.icon-box{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  color:white;
+}
+
+/* colores */
+.icon-box.blue{
+  background:#2563eb;
+}
+
+.icon-box.orange{
+  background:#f59e0b;
+}
+
+.icon-box.green{
+  background:#10b981;
+}
+
+.icon-box.purple{
+  background:#8b5cf6;
+}
+
+/* titulo */
+.stat-title{
+  font-size:14px;
+  color:#64748b;
+  margin:0;
+}
+
+/* numero */
+.stat-number{
+  font-size:32px;
+  font-weight:700;
+  color:#0f172a;
+  margin-top:5px;
+}

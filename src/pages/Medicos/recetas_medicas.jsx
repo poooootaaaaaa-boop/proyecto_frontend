@@ -8,6 +8,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Link } from "react-router-dom";
 
 function recetas_medicas({ data = [], dataPacientes=[]}){
     const [busqueda, setBusqueda] = useState("");
@@ -217,44 +218,40 @@ const handleDownloadFullPDF = () => {
             Consulte y descargue las recetas médicas de sus pacientes.
         </Typography>
         <br />
-        <br />
 
 
+                    <div className="container mt-3">
+
+                        <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #e5e7eb",boxShadow:"0 2px 10px rgba(0,0,0,0.05)"}}>
+
+                                <div className="row justify-content-center">
+
+                                    <div className="col-lg-10">
+
+                                        <div style={{position:"relative"}}>
+
+                                            <Form.Control type="text"placeholder="Buscar por nombre....."style={{height:"55px",borderRadius:"30px",background:"#f3f4f6",border:"none",paddingLeft:"20px",paddingRight:"60px"}} value={busqueda} onChange={handleBusqueda}/>
 
 
+                                        </div>
 
+                                    </div>
 
+                                </div>
 
+                                <div  className="row mt-4 align-items-center">
 
-            <div className="container mt-4">
+                                        <div className="col-12 text-end">
+                                            <Button style={{background:"#1d4ed8",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600"}} as={Link} to="/Medicos/consulta">+ Nueva Consulta</Button>
 
-                <div style={{background: "#f8fafc",borderRadius: "20px",padding: "25px",boxShadow: "0 4px 10px rgba(0,0,0,0.05)",border: "1px solid #e5e7eb"}}>
+                                        </div>
 
-                    
-                    <h5 style={{fontWeight:"700", marginBottom:"5px"}}>Buscar Paciente</h5>
+                                 </div>
 
-                    <p style={{color:"#6b7280", marginBottom:"20px"}}>Ingrese el nombre del paciente para filtrar las recetas y acceder a su historial completo.</p>
-
-
-                    <div className="row align-items-center">
-
-                        <div className="col-md-9 position-relative">
-
-                            <Form>
-                                <Form.Group>
-
-                                    <Form.Control type="text"placeholder="🔍 Buscar por nombre del paciente..." style={{borderRadius:"30px",padding:"12px 20px",border:"none",background:"#e5e7eb",fontSize:"15px"}} value={busqueda} onChange={handleBusqueda}/>
-
-                                </Form.Group>
-                            </Form>
 
                         </div>
 
                     </div>
-
-                </div>
-
-            </div>
          <br />
          <br />
 

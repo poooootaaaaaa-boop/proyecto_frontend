@@ -8,6 +8,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import {  CardContent, Typography,Chip} from "@mui/material";
 import ArticleIcon from '@mui/icons-material/Article';
 import "./Tablas.css";
+import "./card.css";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
@@ -18,6 +19,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PrintIcon from '@mui/icons-material/Print';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MedicationIcon from '@mui/icons-material/Medication';
 
 function Dashboard_medicos({citas, consultas=[]}) {
   
@@ -25,9 +27,10 @@ function Dashboard_medicos({citas, consultas=[]}) {
     <div>
       <Layout_Medicos>
 
-          <div style={{display:"flex"}}>
+          <div style={{display:"flex", alignItems:"center"}}>
             <h1 className="titulo-dashboard" style={{ marginLeft: '20px' }}>Hola Dr. García</h1>
-            <Button  className="btn-nueva-consulta" style={{ marginLeft: "700px" }}  as={Link}  to="/Medicos/consulta"> + Nueva Consulta</Button>
+            <Button  className="btn-nueva-consulta" style={{ marginLeft: "800px" }}  as={Link}  to="/Medicos/consulta"> + Nueva Consulta</Button>
+            
           </div>
 
 
@@ -39,40 +42,55 @@ function Dashboard_medicos({citas, consultas=[]}) {
               <div className="main-section">
                 
                 {/* Fila de Tarjetas */}
-                <div className="stats-row">
+                  <div className="stats-row">
+
                     <div className="stat-card">
-                        <div className="stat-header">
-                          <div className="icon-box icon-blue"><CalendarMonthIcon /></div>
-                          <span className="trend trend-up"><TrendingUpIcon fontSize="inherit" /> 12%</span>
+                      <div className="stat-header">
+                        <div className="icon-box blue">
+                          <CalendarMonthIcon />
                         </div>
-                        <p className="stat-title">Citas del día</p>
-                        <h2 className="stat-number">18</h2>
+                      </div>
+                      <p className="stat-title">Citas del día</p>
+                      <h2 className="stat-number">18</h2>
                     </div>
 
                     <div className="stat-card">
-                        <div className="stat-header">
-                          <div className="icon-box icon-orange"><AssignmentLateIcon /></div>
-                          <span className="trend trend-up"><TrendingUpIcon fontSize="inherit" /> 5%</span>
+                      <div className="stat-header">
+                        <div className="icon-box orange">
+                          <AssignmentLateIcon />
                         </div>
-                        <p className="stat-title">Pacientes en espera</p>
-                        <h2 className="stat-number">5</h2>
+                      </div>
+                      <p className="stat-title">Pacientes en espera</p>
+                      <h2 className="stat-number">5</h2>
                     </div>
 
                     <div className="stat-card">
-                        <div className="stat-header">
-                          <div className="icon-box icon-green"><TaskAltIcon /></div>
-                          <span className="trend trend-down"><TrendingDownIcon fontSize="inherit" /> 2%</span>
+                      <div className="stat-header">
+                        <div className="icon-box green">
+                          <TaskAltIcon />
                         </div>
-                        <p className="stat-title">Consultas completadas</p>
-                        <h2 className="stat-number">12</h2>
+                      </div>
+                      <p className="stat-title">Consultas completadas</p>
+                      <h2 className="stat-number">12</h2>
                     </div>
-                </div>
+
+                    <div className="stat-card">
+                      <div className="stat-header">
+                        <div className="icon-box purple">
+                          <MedicationIcon />
+                        </div>
+                      </div>
+                      <p className="stat-title">Recetas del día</p>
+                      <h2 className="stat-number">2</h2>
+                    </div>
+
+                  </div>
 
                 {/* TABLA DE CITAS */}
                 <h1 className="titulo-dashboard" style={{ marginLeft: '20px' }}>Citas del día</h1>
 
                 <div style={{ display: "flex" }}>
-                    <div style={{ width: '750px', marginLeft: '20px', marginTop: '10px', backgroundColor: 'white', borderRadius: '24px', padding: '10px' }}>
+                    <div style={{ width: '750px', marginLeft: '20px',backgroundColor: 'white', borderRadius: '24px', padding: '5px',marginTop: '0px'}}>
                       <Table className="agenda-table">
                           <thead>
                             <tr>
