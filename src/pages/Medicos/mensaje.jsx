@@ -1,5 +1,6 @@
 import { Card, Button, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Link } from "react-router-dom";
 
 function Mensaje({
   titulo,
@@ -46,7 +47,9 @@ function Mensaje({
         <Button
           variant="contained"
           fullWidth
-          onClick={onPrincipal}
+          component={typeof onPrincipal === "string" ? Link : "button"}
+          to={typeof onPrincipal === "string" ? onPrincipal : undefined}
+          onClick={typeof onPrincipal === "function" ? onPrincipal : undefined}
           style={{marginTop:"20px", borderRadius:"20px"}}
         >
           {botonPrincipal}

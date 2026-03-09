@@ -10,7 +10,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import Button from 'react-bootstrap/Button';
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -53,7 +53,7 @@ function citas({ data, setData }){
                             titulo="¡Cita Registrada!"
                             descripcion="La cita fue agregada correctamente."
                             botonPrincipal="Volver"
-                            onPrincipal={()=>setMostrarMensaje(false)}
+                            onPrincipal="/Medicos/agendar-cita"
                         />) : ( 
                 <div className="container mt-4">
                      <h1 style={{fontWeight:"600"}}>Crear Nueva Cita</h1>
@@ -144,9 +144,9 @@ function citas({ data, setData }){
 
                         <div className="text-end mb-5">
 
-                            <Button variant="danger" style={{marginRight:"10px"}}> Cancelar</Button>
+                            <Button variant="danger" style={{width:"25%", marginRight: "10px" }}as={Link} to="/Medicos/agendar-cita"> Cancelar</Button>
 
-                            <Button onClick={FinalizarCita}> Finalizar Registro </Button>
+                            <Button onClick={FinalizarCita}style={{width:"25%"}}> Finalizar Registro </Button>
 
                         </div>
 

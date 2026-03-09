@@ -10,7 +10,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
 import Mensaje from "./mensaje";
-
+import { Link } from "react-router-dom";
 
 function Alta_pacientes({ data, setData }){
 
@@ -70,7 +70,7 @@ function Alta_pacientes({ data, setData }){
             titulo="¡Paciente Registrado!"
             descripcion="El paciente fue agregado correctamente."
             botonPrincipal="Volver"
-            onPrincipal={()=>setMostrarMensaje(false)}
+            onPrincipal="/Medicos/lista_paciente"
             />
 
             ) : (  <div className="container mt-4" >
@@ -200,9 +200,9 @@ function Alta_pacientes({ data, setData }){
 
                 <div className="text-end mb-5">
 
-                    <Button variant="danger" style={{marginRight:"10px"}}> Cancelar</Button>
+                    <Button variant="danger" style={{width:"25%", marginRight: "10px" }} as={Link} to="/Medicos/lista_paciente"> Cancelar</Button>
 
-                    <Button onClick={finalizar}> Finalizar Registro </Button>
+                    <Button onClick={finalizar} style={{width:"25%"}}> Finalizar Registro </Button>
 
                 </div>
 

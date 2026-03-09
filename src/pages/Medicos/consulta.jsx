@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Mensaje from "./mensaje";
+import { Link } from "react-router-dom";
 
 function Consulta({data,setData, dataPacientes}){
     const [pacienteId, setPacienteId] = useState("");
@@ -52,7 +53,7 @@ function Consulta({data,setData, dataPacientes}){
                         titulo="¡Consulta Registrada!"
                         descripcion="La consulta fue agregada correctamente."
                         botonPrincipal="Volver"
-                        onPrincipal={()=>setMostrarMensaje(false)}
+                        onPrincipal="/Medicos/recetas_medicas"
                     />
                 
                             ) : (  
@@ -155,7 +156,7 @@ function Consulta({data,setData, dataPacientes}){
             
 
                                     <div className="text-end">
-                                        <Button variant="danger" style={{width:"25%", marginRight: "10px" }}>Cancelar consulta</Button>
+                                        <Button variant="danger" style={{width:"25%", marginRight: "10px" }}as={Link} to="/Medicos/recetas_medicas">Cancelar consulta</Button>
 
                                         <Button onClick={guardar} style={{width:"25%"}}> Finalizar Consulta</Button>
                                     
