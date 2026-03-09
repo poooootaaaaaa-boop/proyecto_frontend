@@ -6,6 +6,7 @@ import Lista_paciente from "./lista_paciente";
 import Citas from "./citas";
 import Agenda from "./agenda";
 import Dashboard_medicos from "./Dashboard_medicos";
+import Tratamientos_largos from "./tratamientos_largos"
 function ClinicaApp() {
   const [data, setData] = useState([]); 
    const [dataPacientes, setDataPacientes] = useState([]);
@@ -15,6 +16,7 @@ function ClinicaApp() {
     <>
       <Consulta data={data} setData={setData} dataPacientes={dataPacientes}/> {/* solo agregue esto dataPacientes={dataPacientes} */}
       <Recetas_medicas data={data} /> 
+      <Tratamientos_largos data={data}/>
 
 
       <Alta_pacientes data={dataPacientes} setData={setDataPacientes} />

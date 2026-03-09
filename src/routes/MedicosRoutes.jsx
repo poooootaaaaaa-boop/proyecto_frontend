@@ -28,42 +28,42 @@ export default function MedicosRoute(){
           
          
          
-         
+                                {/* PARTE DE RECETAS,CONSUKTA Y HISTORIAL */}
           <Route path="/recetas_medicas" element={<Recetas_medicas data={pacientes} />} />
+          <Route path="/tratamientos_largos" element={<Tratamientos_largos data={pacientes} setData={setPacientes}/>} />
+
+          
           <Route path="/consulta" element={<Consulta data={pacientes} setData={setPacientes} dataPacientes={dataPacientes} />} />{/* solo agregue esto dataPacientes={dataPacientes} */}
           <Route path="/historial" element={<Historial data={pacientes} />} />
            
 
     
-        <Route path="/alta_pacientes" element={<Alta_pacientes data={dataPacientes} setData={setDataPacientes} />} />
-    
 
+                                {/* PARTE DE PACIENTES */}
+        <Route path="/alta_pacientes" element={<Alta_pacientes data={dataPacientes} setData={setDataPacientes} />} />
         <Route path="/lista_paciente" element={<Lista_paciente data={dataPacientes}/>} />
 
 
 
 
 
-
+                                    {/* PARTE DE CITAS */}
         <Route path="/citas" element={<Citas data={dataCitas} setData={setDataCitas} />} />
         <Route path="/agendar-cita" element={<Agenda data={dataCitas} />} />
-        
-        <Route path="/Dashboard_medicos" element={
-            <Dashboard_medicos 
-            citas={dataCitas}
-            consultas={pacientes}/>} />
 
 
 
-        
-    
+
+
+                                {/* PARTE DE DASHBOARD*/}
+        <Route path="/Dashboard_medicos" element={<Dashboard_medicos citas={dataCitas}consultas={pacientes}/>} />
+
+
+                                {/* RUTAS NORMALES */}
         <Route path="/Medicos/citas" element={<Citas/>} />
         <Route path="/Medicos/consulta" element={<Consulta/>} />
         <Route path="/Medicos/alta_pacientes" element={<Alta_pacientes/>} />
-
-
-
-        <Route path="/tratamientos_largos" element={<Tratamientos_largos/>} />
+        
         
 
 

@@ -8,9 +8,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 
-function tratamientos_largos() {
+function tratamientos_largos({ data, setData }) {
 
-const [editando, setEditando] = useState(null);
+const [tratamientoEditando, setTratamientoEditando] = useState(null);
 const [showModal, setShowModal] = useState(false);
 
 
@@ -21,38 +21,49 @@ const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
 
 
 
+const cambiarProgreso = (id, valor) => {
 
-const [item, setItem] = useState([
-  {nombre:"Erick Sanches", progreso:70, cita:"05/02/2025", tratamiento:"Rehabilitación de rodilla con ejercicios de movilidad y fortalecimiento muscular."},
-  {nombre:"Ricardo Rodriguez", progreso:40, cita:"05/02/2025", tratamiento:"Tratamiento de fisioterapia para dolor lumbar con sesiones de estiramiento y electroterapia."},
-  {nombre:"Alexito", progreso:90, cita:"05/02/2025", tratamiento:"Recuperación post operatoria con terapia manual y ejercicios de estabilidad."}
-]);
+  const nuevos = data.map((t) =>
+    t.id === id ? { ...t, progreso: valor } : t
+  );
 
-const cambiarProgreso = (index, valor) => {
-  const nuevoItem = [...item];
-  nuevoItem[index].progreso = valor;
-  setItem(nuevoItem);
+  setData(nuevos);
+
+  // actualizar el objeto del modal con el nuevo valor
+  const actualizado = nuevos.find((t) => t.id === id);
+  setTratamientoEditando(actualizado);
 };
 
 
 const finalizarTratamiento = () => {
 
-  const nuevoItem = [...item];
-  nuevoItem[editando].progreso = 100;
+  const nuevos = data.map((t) =>
+    t.id === tratamientoEditando.id
+      ? { ...t, progreso: 100 }
+      : t
+  );
 
-  setItem(nuevoItem);
+  setData(nuevos);
   setShowModal(false);
-  setEditando(null);
+  setTratamientoEditando(null);
+
 };
 
 const cancelarTratamiento = () => {
 
-  const nuevoItem = item.filter((_, index) => index !== editando);
+  const nuevos = data.filter(
+    (t) => t.id !== tratamientoEditando.id
+  );
 
-  setItem(nuevoItem);
+  setData(nuevos);
   setShowModal(false);
-  setEditando(null);
+  setTratamientoEditando(null);
+
 };
+
+const tratamientos = data.filter(
+  (item) => item.tratamientoLargo === "si"
+);
 
 return (
 <Layout_Medicos>
@@ -75,7 +86,7 @@ return (
           <CardContent style={{display:"flex",justifyContent:"space-between"}}>
             <div>
               <Typography style={{color:"#6b7280"}}>Tratamientos activos</Typography>
-              <h2>{item.length}</h2>
+              <h2>{tratamientos.length}</h2>
             </div>
             <AssignmentIcon style={{fontSize:"40px",color:"#2563eb"}}/>
           </CardContent>
@@ -87,7 +98,7 @@ return (
           <CardContent style={{display:"flex",justifyContent:"space-between"}}>
            <div>
               <Typography style={{color:"#6b7280"}}>Próximas citas</Typography>
-              <h2>{item.length}</h2>
+              <h2>{tratamientos.length}</h2>
            </div>
             <EventIcon style={{fontSize:"40px",color:"#f59e0b"}}/>
           </CardContent>
@@ -138,9 +149,9 @@ return (
     </div>
 
     {/* PACIENTES */}
-    {item.map((p,i)=>(
+    {tratamientos.map((p)=>(
 
-    <div className="row align-items-center mb-4" key={i}>
+    <div className="row align-items-center mb-4" key={p.id}>
 
     {/* NOMBRE */}
     <div className="col-md-4">
@@ -164,17 +175,16 @@ return (
         {/* PROGRESO */}
           <div className="col-md-4">
 
-                {editando === i ? (
 
-              <input type="range" min="0" max="100" value={p.progreso} onChange={(e)=>cambiarProgreso(i,e.target.value)} style={{width:"100%"}} />
+              <input type="range" min="0" max="100" value={p.progreso} onChange={(e)=>cambiarProgreso(p.id, Number(e.target.value))} style={{width:"100%"}} />
 
-              ) : (
+              
 
                 <div style={{ height:"8px", background:"#e5e7eb", borderRadius:"20px" }}>
                   <div style={{width:`${p.progreso}%`,background:"#6366f1",height:"8px",borderRadius:"20px"}}></div>
                 </div>
 
-              )}
+             
 
               <Typography style={{fontSize:"12px",color:"#6b7280"}}>
               {p.progreso}% completado
@@ -184,13 +194,13 @@ return (
 
         {/* CITA */}
         <div className="col-md-2">
-          {p.cita}
+           {p.fechaTratamiento}
         </div>
 
         {/* EDITAR */}
         <div className="col-md-2">
 
-          <EditIcon style={{cursor:"pointer",color:"#374151"}} onClick={()=>{ setEditando(i); setShowModal(true);}}/>
+          <EditIcon style={{cursor:"pointer",color:"#374151"}} onClick={()=>{ setTratamientoEditando(p); setShowModal(true);}}/>
 
         </div>
 
@@ -209,31 +219,37 @@ return (
         <Modal.Title>Editar Tratamiento</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body>
+                <Modal.Body>
 
-      {editando !== null && (
+          {tratamientoEditando && (
 
-     <>
-
+          <>
           <Typography style={{fontWeight:"600", marginBottom:"10px"}}>
-          Paciente: {item[editando].nombre}
+          Paciente: {tratamientoEditando.nombre}
           </Typography>
 
           <Typography style={{fontSize:"14px", marginBottom:"10px"}}>
           Progreso del tratamiento
           </Typography>
 
-        <input type="range"min="0"max="100"value={item[editando].progreso}onChange={(e)=>cambiarProgreso(editando, e.target.value)}style={{width:"100%"}}/>
+          <input
+          type="range"
+          min="0"
+          max="100"
+          value={tratamientoEditando.progreso}
+          onChange={(e)=>cambiarProgreso(tratamientoEditando.id, Number(e.target.value))}
+          style={{width:"100%"}}
+          />
 
-        <Typography style={{marginTop:"10px", color:"#6b7280"}}>
-          {item[editando].progreso}% completado
-        </Typography>
+          <Typography style={{marginTop:"10px", color:"#6b7280"}}>
+          {tratamientoEditando.progreso}% completado
+          </Typography>
 
-     </>
+          </>
 
-    )}
+          )}
 
-    </Modal.Body>
+          </Modal.Body>
 
     <Modal.Footer>
 
@@ -272,8 +288,11 @@ return (
           Paciente: {pacienteSeleccionado.nombre}
         </Typography>
 
-        <Typography style={{color:"#374151"}}>
-          {pacienteSeleccionado.tratamiento}
+        <Typography style={{fontWeight:"600"}}>
+          Motivo del tratamiento:
+        </Typography>
+        <Typography style={{marginBottom:"10px",color:"#374151"}}>
+          {pacienteSeleccionado.motivo}
         </Typography>
       </>
     )}

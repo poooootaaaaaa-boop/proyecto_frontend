@@ -16,6 +16,8 @@ function Consulta({data,setData, dataPacientes}){
     const[examen, setExamen]=useState("");
     const [mostrarMensaje,setMostrarMensaje]=useState(false);
     const [notas, setNotas] = useState("");
+    const [tratamientoLargo, setTratamientoLargo] = useState("");
+    const [fechaTratamiento, setFechaTratamiento] = useState("");
 
       const guardar = () => {
     // find patient info so we can include name in the stored record
@@ -27,6 +29,9 @@ function Consulta({data,setData, dataPacientes}){
       sintomas,
       examen,
       notas,
+      tratamientoLargo,
+      fechaTratamiento,
+      progreso: 0,
       nombre: selected?.nombre || "",
       apellido: selected?.apellidoP || ""
     };
@@ -40,6 +45,8 @@ function Consulta({data,setData, dataPacientes}){
     setSintomas("");
     setExamen("");
     setNotas("");
+    setTratamientoLargo("");
+    setFechaTratamiento("");
   };
 
 
@@ -110,6 +117,33 @@ function Consulta({data,setData, dataPacientes}){
                                                 </Col>
                                             </Row>
 
+                                             <Form.Label className="text-dark fw-bold mt-3">
+                                                ¿Requiere tratamiento largo?
+                                            </Form.Label>
+
+                                            <Form.Select 
+                                                value={tratamientoLargo}
+                                                onChange={(e)=>setTratamientoLargo(e.target.value)}
+                                            >
+                                                <option value="">Seleccionar</option>
+                                                <option value="si">Sí</option>
+                                                <option value="no">No</option>
+                                            </Form.Select>
+
+                                            {tratamientoLargo === "si" && (
+                                                <>
+                                                    <Form.Label className="text-dark fw-bold mt-3">
+                                                        Fecha de control
+                                                    </Form.Label>
+
+                                                    <Form.Control
+                                                        type="date"
+                                                        value={fechaTratamiento}
+                                                        onChange={(e)=>setFechaTratamiento(e.target.value)}
+                                                    />
+                                                </>
+                                            )}
+
 
                                             <Row className="mt-3">
 
@@ -138,6 +172,13 @@ function Consulta({data,setData, dataPacientes}){
                                             <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)}/> 
 
                                         </Col>
+
+
+
+
+
+
+                                           
 
                                     </Row>
 
