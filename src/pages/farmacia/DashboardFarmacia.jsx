@@ -6,6 +6,26 @@ import { useState } from "react";
 
 export default function DashboardFarmacia() {
 
+
+  const [movimientos, setMovimientos] = useState([
+  {
+    id: 1,
+    fecha: "2026-03-01",
+    medicamento: "Paracetamol",
+    proveedor: "Farmadis",
+    tipo: "entrada",
+    cantidad: 100,
+  },
+  {
+    id: 2,
+    fecha: "2026-03-02",
+    medicamento: "Amoxicilina",
+    proveedor: "MedSupply",
+    tipo: "salida",
+    cantidad: 20,
+  },
+]);
+
   const [recetas, setRecetas] = useState([
     {
       id: 1,
@@ -23,6 +43,44 @@ export default function DashboardFarmacia() {
     },
   ]);
 
+
+const recetasPendientes = recetas.length;
+  const movimientosInventario = {
+  series: [
+    {
+      name: "Entradas",
+      data: [40, 35, 50, 60, 70, 80],
+    },
+    {
+      name: "Salidas",
+      data: [30, 25, 40, 45, 50, 55],
+    },
+  ],
+
+  options: {
+   chart: {
+  type: "bar",
+  height: 350,
+  stacked: true,
+  toolbar: { show: false }
+},
+
+    colors: ["#16a34a", "#dc2626"],
+
+    xaxis: {
+      categories: ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+    },
+
+    fill: {
+      opacity: 1,
+    },
+
+    legend: {
+      position: "right",
+    },
+  },
+};
+  const [mesFiltro, setMesFiltro] = useState("2026-03");
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
@@ -72,7 +130,7 @@ export default function DashboardFarmacia() {
     cerrarModales();
   };
 
-  // 🔹 CHARTS
+  //  CHARTS
   const topProductos = {
     series: [{ name: "Solicitudes", data: [45, 38, 30, 22, 18] }],
     options: {
@@ -113,7 +171,17 @@ export default function DashboardFarmacia() {
       <div className="home-content-modern">
         <Topbar />
 
-        <h2 className="main-title">Dashboard de Farmacia</h2>
+    <div className="dashboard-header">
+  <h2 className="main-title">Dashboard de Farmacia</h2>
+
+  <div className="month-filter">
+    <input
+      type="month"
+      value={mesFiltro}
+      onChange={(e) => setMesFiltro(e.target.value)}
+    />
+  </div>
+</div>
 
         {/* CARDS */}
         <div className="stats-grid">
@@ -123,9 +191,16 @@ export default function DashboardFarmacia() {
           </div>
 
           <div className="stat-card-modern">
-            <small>Recetas pendientes</small>
-            <h3>{recetas.length}</h3>
-          </div>
+
+<small>Recetas pendientes</small>
+
+<h3>{recetasPendientes}</h3>
+
+<p className="card-desc">
+Pacientes que aún no han recogido su medicamento
+</p>
+
+</div>
 
           <div className="stat-card-modern">
             <small>Productos por caducar</small>
@@ -187,6 +262,48 @@ export default function DashboardFarmacia() {
           </div>
         </div>
 
+        <div className="card-modern table-card">
+
+<h5 className="section-title">
+Historial de Movimientos de Inventario
+</h5>
+
+<div className="table-modern">
+
+<div className="table-header-modern">
+<span>Fecha</span>
+<span>Medicamento</span>
+<span>Proveedor</span>
+<span>Tipo</span>
+<span>Cantidad</span>
+</div>
+
+{movimientos.map((m) => (
+<div className="table-row-modern" key={m.id}>
+
+<div>{m.fecha}</div>
+
+<div>{m.medicamento}</div>
+
+<div>{m.proveedor}</div>
+
+<div>
+<span className={`badge ${m.tipo}`}>
+{m.tipo}
+</span>
+</div>
+
+<div>{m.cantidad}</div>
+
+</div>
+))}
+
+</div>
+
+
+
+</div>
+
         {/* CHARTS */}
         <div className="charts-grid">
           <div className="card-modern">
@@ -208,9 +325,35 @@ export default function DashboardFarmacia() {
               height={320}
             />
           </div>
+
+
+           <div className="card-modern">
+            <h5 className="section-title">Top Productos</h5>
+ <Chart
+options={movimientosInventario.options}
+series={movimientosInventario.series}
+type="bar"
+height={320}
+/>
+          </div>
         </div>
       </div>
 
+
+
+      <div className="card-modern">
+
+<h5>Predicción de Stock IA</h5>
+
+<p>
+El sistema predice que
+<strong> Paracetamol </strong>
+se agotará en
+<strong> 15 días </strong>
+si el consumo continúa igual.
+</p>
+
+</div>
       {/* MODAL EDITAR */}
       {modalEditar && (
         <div className="modal-overlay">

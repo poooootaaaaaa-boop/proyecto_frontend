@@ -7,14 +7,37 @@ import {
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Inventario.css";
+import axios from "axios";
+
 
 export default function Inventario() {
 
-  const [medicamentos, setMedicamentos] = useState(
-    JSON.parse(localStorage.getItem("medicamentos")) || []
-  );
+const [medicamentos, setMedicamentos] = useState([]);
+const [imagenNueva, setImagenNueva] = useState(null);
+const [categorias, setCategorias] = useState([]);
+
+
+const obtenerCategorias = async () => {
+
+  try {
+
+    const res = await axios.get(
+      "http://localhost:8000/api/categorias"
+    );
+
+    setCategorias(res.data);
+
+  } catch (error) {
+    console.error(error);
+  }
+
+};
+
+const handleImagen = (e) => {
+  setImagenNueva(e.target.files[0]);
+};
 
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
@@ -45,37 +68,99 @@ export default function Inventario() {
     });
   };
 
-  const guardarCambios = () => {
+  useEffect(() => {
+  obtenerMedicamentos();
+  obtenerCategorias();
+}, []);
 
-    const nuevos = medicamentos.map((m) =>
-      m.nombre === medSeleccionado.nombre
-        ? medSeleccionado
-        : m
+const obtenerMedicamentos = async () => {
+  try {
+
+    const res = await axios.get(
+      "http://localhost:8000/api/medicamentos"
     );
 
-    setMedicamentos(nuevos);
-    localStorage.setItem(
-      "medicamentos",
-      JSON.stringify(nuevos)
+    setMedicamentos(res.data);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+const totalItems = medicamentos.length;
+
+const lowStock = medicamentos.filter(
+  (m) => m.stock <= m.stock_minimo
+).length;
+
+const expired = medicamentos.filter((m) => {
+
+  if (!m.fecha_caducidad) return false;
+
+  const hoy = new Date();
+  const cad = new Date(m.fecha_caducidad);
+
+  return cad < hoy;
+
+}).length;
+
+
+const guardarCambios = async () => {
+
+  try {
+
+    const datos = new FormData();
+
+    datos.append("operacion", "Modificar");
+    datos.append("id", medSeleccionado.id);
+    datos.append("nombre", medSeleccionado.nombre);
+    datos.append("categoria_id", medSeleccionado.categoria_id);
+    datos.append("stock", medSeleccionado.stock);
+    datos.append("sustancia_activa", medSeleccionado.sustancia_activa);
+
+    if(imagenNueva){
+      datos.append("imagen", imagenNueva);
+    }
+
+    await axios.post(
+      "http://localhost:8000/api/medicamentos/operaciones",
+      datos
     );
 
+    obtenerMedicamentos();
     cerrarModales();
-  };
 
-  const eliminarMedicamento = () => {
+  } catch (error) {
+    console.error(error);
+  }
 
-    const nuevos = medicamentos.filter(
-      (m) => m.nombre !== medSeleccionado.nombre
+};
+
+
+
+const eliminarMedicamento = async () => {
+
+  try {
+
+    const datos = new FormData();
+
+    datos.append("operacion", "Eliminar");
+    datos.append("id", medSeleccionado.id);
+
+    await axios.post(
+      "http://localhost:8000/api/medicamentos/operaciones",
+      datos
     );
 
-    setMedicamentos(nuevos);
-    localStorage.setItem(
-      "medicamentos",
-      JSON.stringify(nuevos)
-    );
-
+    obtenerMedicamentos();
     cerrarModales();
-  };
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   return (
     <div className="home-layout">
@@ -108,7 +193,7 @@ export default function Inventario() {
 
             <div className="stat-card-modern">
               <small>Total Items</small>
-              <h3>{medicamentos.length}</h3>
+              <h3>{totalItems}</h3>
               <span className="stat-badge success">
                 +2.4% último mes
               </span>
@@ -116,7 +201,7 @@ export default function Inventario() {
 
             <div className="stat-card-modern">
               <small>Low Stock</small>
-              <h3>12</h3>
+              <h3>{lowStock}</h3>
               <span className="stat-badge warning">
                 6 pendientes
               </span>
@@ -124,7 +209,7 @@ export default function Inventario() {
 
             <div className="stat-card-modern">
               <small>Expired</small>
-              <h3>2</h3>
+              <h3>{expired}</h3>
               <span className="stat-badge danger">
                 Revisión urgente
               </span>
@@ -167,7 +252,29 @@ export default function Inventario() {
                 >
 
                   <div>
-                    <strong>{med.nombre}</strong>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+
+  <img
+    src={`http://localhost:8000/api/medicamentos/imagen/${med.imagen_url}`}
+    alt={med.nombre}
+    style={{
+      width: "40px",
+      height: "40px",
+      objectFit: "cover",
+      borderRadius: "6px",
+    }}
+  />
+
+  <div>
+    <strong>{med.nombre}</strong>
+    <br />
+    <small className="muted">
+      {med.sustancia_activa}
+    </small>
+  </div>
+
+</div>
+
                     <br />
                     <small className="muted">
                       {med.categoria}
@@ -175,19 +282,33 @@ export default function Inventario() {
                   </div>
 
                   <div>
-                    {med.stockMax} unidades
+                    {med.stock} unidades
                     <br />
                     <small className="success-text">
                       Nivel óptimo
                     </small>
                   </div>
 
-                  <div>{med.vencimiento}</div>
+                  <div>
+  {med.lote}
+  <br />
+  <small>{med.fecha_caducidad}</small>
+</div>
+
 
                   <div>
-                    <span className="status-badge in-stock">
-                      In Stock
-                    </span>
+                    <span
+  className={`status-badge ${
+    med.stock <= med.stock_minimo
+      ? "low-stock"
+      : "in-stock"
+  }`}
+>
+  {med.stock <= med.stock_minimo
+    ? "Low Stock"
+    : "In Stock"}
+</span>
+
                   </div>
 
                   <div
@@ -250,36 +371,77 @@ export default function Inventario() {
 
             <Form.Group className="mb-3">
               <Form.Label>Nombre</Form.Label>
-              <Form.Control
+               <Form.Control
                 name="nombre"
-                value={medSeleccionado?.nombre || ""}
+                value={
+                  medSeleccionado?.nombre || ""
+                }
                 onChange={handleChange}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Categoría</Form.Label>
-              <Form.Control
-                name="categoria"
-                value={
-                  medSeleccionado?.categoria || ""
-                }
-                onChange={handleChange}
-              />
+              <Form.Select
+name="categoria_id"
+value={medSeleccionado?.categoria_id || ""}
+onChange={handleChange}
+>
+
+<option value="">Selecciona</option>
+
+{categorias.map(cat => (
+
+<option key={cat.id} value={cat.id}>
+{cat.nombre}
+</option>
+
+))}
+
+</Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Stock</Form.Label>
               <Form.Control
-                name="stockMax"
+                name="stock"
                 value={
-                  medSeleccionado?.stockMax || ""
+                  medSeleccionado?.stock || ""
                 }
                 onChange={handleChange}
               />
             </Form.Group>
+<Form.Group className="mb-3">
+  <Form.Label>Sustancia activa</Form.Label>
+  <Form.Control
+    name="sustancia_activa"
+    value={medSeleccionado?.sustancia_activa || ""}
+    onChange={handleChange}
+  />
+</Form.Group>
 
           </Form>
+<Form.Group className="mb-3">
+  <Form.Label>Imagen</Form.Label>
+
+  <Form.Control
+    type="file"
+    accept="image/*"
+    onChange={handleImagen}
+  />
+
+  {medSeleccionado?.imagen_url && (
+    <img
+      src={`http://localhost:8000/api/medicamentos/imagen/${medSeleccionado.imagen_url}`}
+      alt="preview"
+      style={{
+        width: "80px",
+        marginTop: "10px",
+        borderRadius: "6px"
+      }}
+    />
+  )}
+</Form.Group>
 
         </Modal.Body>
 
