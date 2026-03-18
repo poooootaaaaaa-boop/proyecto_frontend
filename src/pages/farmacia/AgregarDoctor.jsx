@@ -3,6 +3,7 @@ import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function AgregarDoctor() {
 
@@ -10,14 +11,13 @@ export default function AgregarDoctor() {
 
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [doctor, setDoctor] = useState({
-    name: "",
-    role: "",
-    specialty: "",
-    license: "",
-    email: "",
-    status: "",
+    especialidad_id: "",
+    cedula_profesional: "",
+    anios_exp: "",
+    telefono: "",
   });
 
   const handleChange = (e) => {
@@ -34,11 +34,12 @@ export default function AgregarDoctor() {
   // VALIDAR CAMPOS
   const abrirModal = () => {
 
-    const campos = Object.values(doctor);
-
-    const vacio = campos.some((campo) => campo === "");
-
-    if (vacio) {
+    if (
+      !doctor.especialidad_id ||
+      !doctor.cedula_profesional ||
+      !doctor.anios_exp ||
+      !doctor.telefono
+    ) {
       setError("Por favor llena todos los campos.");
       return;
     }
@@ -46,21 +47,41 @@ export default function AgregarDoctor() {
     setShowModal(true);
   };
 
-  const guardarDoctor = () => {
+  // GUARDAR DOCTOR
+  const guardarDoctor = async () => {
 
-    const doctorsGuardados =
-      JSON.parse(localStorage.getItem("doctors")) || [];
+    setLoading(true);
 
-    doctorsGuardados.push(doctor);
+    try {
 
-    localStorage.setItem(
-      "doctors",
-      JSON.stringify(doctorsGuardados)
-    );
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/doctores",
+        {
+          especialidad_id: parseInt(doctor.especialidad_id),
+          cedula_profesional: doctor.cedula_profesional,
+          anios_exp: parseInt(doctor.anios_exp),
+          telefono: doctor.telefono,
+        }
+      );
 
-    cerrarModal();
+      console.log("Doctor guardado:", response.data);
 
-    navigate("/farmacia/doctores");
+      cerrarModal();
+      navigate("/farmacia/doctores");
+
+    } catch (err) {
+
+      console.log(err);
+
+      if (err.response) {
+        setError(err.response.data.message || "Error del servidor");
+      } else {
+        setError("No se pudo conectar con el servidor");
+      }
+
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,7 +97,6 @@ export default function AgregarDoctor() {
 
           <h2 className="main-title">Agregar nuevo doctor</h2>
 
-          {/* ALERTA */}
           {error && (
             <Alert variant="danger" className="mt-3">
               {error}
@@ -85,7 +105,6 @@ export default function AgregarDoctor() {
 
           <Row className="g-4">
 
-            {/* COLUMNA IZQUIERDA */}
             <Col md={8}>
 
               <Card className="card-modern p-4 mb-3">
@@ -95,61 +114,37 @@ export default function AgregarDoctor() {
                 <Row className="g-3">
 
                   <Col md={6}>
-                    <Form.Label>Nombre</Form.Label>
+                    <Form.Label>Especialidad ID</Form.Label>
                     <Form.Control
-                      name="name"
+                      type="number"
+                      name="especialidad_id"
                       onChange={handleChange}
-                      placeholder="Ej. Dr. Juan Pérez"
                     />
                   </Col>
 
                   <Col md={6}>
-                    <Form.Label>Rol</Form.Label>
+                    <Form.Label>Cédula Profesional</Form.Label>
                     <Form.Control
-                      name="role"
+                      name="cedula_profesional"
                       onChange={handleChange}
-                      placeholder="Ej. Medicina General"
                     />
                   </Col>
 
                   <Col md={6}>
-                    <Form.Label>Especialidad</Form.Label>
+                    <Form.Label>Años de experiencia</Form.Label>
                     <Form.Control
-                      name="specialty"
+                      type="number"
+                      name="anios_exp"
                       onChange={handleChange}
-                      placeholder="Ej. Cardiólogo"
                     />
                   </Col>
 
                   <Col md={6}>
-                    <Form.Label>Número de licencia</Form.Label>
+                    <Form.Label>Teléfono</Form.Label>
                     <Form.Control
-                      name="license"
+                      name="telefono"
                       onChange={handleChange}
-                      placeholder="MLN-00000"
                     />
-                  </Col>
-
-                  <Col md={12}>
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                      name="email"
-                      type="email"
-                      onChange={handleChange}
-                      placeholder="doctor@email.com"
-                    />
-                  </Col>
-
-                  <Col md={12}>
-                    <Form.Label>Estado</Form.Label>
-                    <Form.Select
-                      name="status"
-                      onChange={handleChange}
-                    >
-                      <option value="">Selecciona...</option>
-                      <option>Activo</option>
-                      <option>Inactivo</option>
-                    </Form.Select>
                   </Col>
 
                 </Row>
@@ -158,7 +153,6 @@ export default function AgregarDoctor() {
 
             </Col>
 
-            {/* COLUMNA DERECHA */}
             <Col md={4}>
 
               <Card className="card-modern d-flex justify-content-center align-items-center">
@@ -184,7 +178,6 @@ export default function AgregarDoctor() {
 
           </Row>
 
-          {/* BOTONES */}
           <div className="d-flex justify-content-end gap-3 mt-4">
 
             <Button
@@ -207,7 +200,6 @@ export default function AgregarDoctor() {
 
       </div>
 
-      {/* MODAL */}
       <Modal show={showModal} onHide={cerrarModal} centered>
 
         <Modal.Header closeButton>
@@ -220,18 +212,16 @@ export default function AgregarDoctor() {
 
         <Modal.Footer>
 
-          <Button
-            variant="secondary"
-            onClick={cerrarModal}
-          >
+          <Button variant="secondary" onClick={cerrarModal}>
             Cancelar
           </Button>
 
           <Button
             variant="primary"
             onClick={guardarDoctor}
+            disabled={loading}
           >
-            Sí, agregar
+            {loading ? "Guardando..." : "Sí, agregar"}
           </Button>
 
         </Modal.Footer>
