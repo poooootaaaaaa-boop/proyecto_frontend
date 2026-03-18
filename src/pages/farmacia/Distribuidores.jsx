@@ -11,6 +11,7 @@ import {
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
+import Axios from "axios";
 
 export default function Distribuidores() {
 
@@ -22,9 +23,29 @@ export default function Distribuidores() {
   const [distribuidorEdit, setDistribuidorEdit] = useState(null);
   const [distribuidorDelete, setDistribuidorDelete] = useState(null);
 
-  const [nombre, setNombre] = useState("");
+  /*const [nombre, setNombre] = useState("");*/
+
+  const [formData, setFormData] = useState({
+  nombre: "",
+  rfc: "",
+  categoria: "",
+  contacto: "",
+  correo: "",
+  telefono: "",
+  direccion: "",
+  entrega: "",
+  ciudad: ""
+});
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   // ===== CARGAR DATOS =====
+  /* 
   useEffect(() => {
 
     const data = JSON.parse(localStorage.getItem("distribuidores"));
@@ -50,16 +71,40 @@ export default function Distribuidores() {
       localStorage.setItem("distribuidores", JSON.stringify(ejemplo));
     }
 
-  }, []);
+  }, []); */ 
+
+
+  useEffect(() => {
+
+  Axios.get("http://127.0.0.1:8000/api/MostrarDistribuidor")
+    .then((response) => {
+
+     setDistribuidores(response.data.distribuidor || []);
+
+    })
+    .catch((error) => {
+
+      console.error("Error al obtener distribuidores:", error);
+
+    });
+
+}, []);
 
   // ===== ABRIR EDITAR =====
+  /*
   const abrirEditar = (item) => {
     setDistribuidorEdit(item);
     setNombre(item.nombre);
     setShowModal(true);
-  };
+  };*/
+  const abrirEditar = (item) => {
+  setDistribuidorEdit(item);
+  setFormData(item); 
+  setShowModal(true);
+};
 
   // ===== GUARDAR =====
+  /* 
   const guardarEdicion = () => {
 
     const actualizados = distribuidores.map((d) =>
@@ -71,6 +116,29 @@ export default function Distribuidores() {
 
     setShowModal(false);
   };
+  */
+const guardarEdicion = () => {
+
+  Axios.put(
+    `http://127.0.0.1:8000/api/UpdateDistribuidor/${distribuidorEdit.id}`,
+     formData
+  )
+  .then((response) => {
+
+    const actualizado = response.data.distribuidor;
+
+    const actualizados = distribuidores.map((d) =>
+      d.id === actualizado.id ? actualizado : d
+    );
+
+    setDistribuidores(actualizados);
+    setShowModal(false);
+
+  })
+  .catch((error) => {
+    console.error("Error al actualizar:", error);
+  });
+};
 
   // ===== ABRIR ELIMINAR =====
   const abrirEliminar = (item) => {
@@ -79,6 +147,7 @@ export default function Distribuidores() {
   };
 
   // ===== CONFIRMAR ELIMINAR =====
+  /* 
   const eliminarDistribuidor = () => {
 
     const filtrados = distribuidores.filter(
@@ -90,6 +159,30 @@ export default function Distribuidores() {
 
     setShowDelete(false);
   };
+  */
+
+  const eliminarDistribuidor = () => {
+
+  Axios.delete(
+       `http://127.0.0.1:8000/api/DeleteDistribuidor/${distribuidorDelete.id}`
+  )
+  .then(() => {
+
+    // quitar del estado (UI inmediata)
+    const filtrados = distribuidores.filter(
+      (d) => d.id !== distribuidorDelete.id
+    );
+
+    setDistribuidores(filtrados);
+    setShowDelete(false);
+
+  })
+  .catch((error) => {
+    console.error("Error al eliminar:", error);
+    alert("No se pudo eliminar");
+  });
+
+};
 
   return (
     <div style={{ display: "flex" }}>
@@ -231,14 +324,89 @@ export default function Distribuidores() {
           <Form>
 
             <Form.Group>
+                <Form>
+                      <Form.Group className="mb-2">
+                         <Form.Label>Nombre del distribuidor</Form.Label>
+                        <Form.Control
+                          name="nombre"
+                          value={formData.nombre}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
 
-              <Form.Label>Nombre del distribuidor</Form.Label>
+                      <Form.Group className="mb-2">
+                        <Form.Label>RFC</Form.Label>
+                        <Form.Control
+                          name="rfc"
+                          value={formData.rfc}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
 
-              <Form.Control
-                type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-              />
+                      <Form.Group className="mb-2">
+                        <Form.Label>Categoría</Form.Label>
+                        <Form.Control
+                          name="categoria"
+                          value={formData.categoria}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="mb-2">
+                        <Form.Label>Contacto</Form.Label>
+                        <Form.Control
+                          name="contacto"
+                          value={formData.contacto}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="mb-2">
+                        <Form.Label>Correo</Form.Label>
+                        <Form.Control
+                          name="correo"
+                          value={formData.correo}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="mb-2">
+                        <Form.Label>Teléfono</Form.Label>
+                        <Form.Control
+                          name="telefono"
+                          value={formData.telefono}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="mb-2">
+                        <Form.Label>Dirección</Form.Label>
+                        <Form.Control
+                          name="direccion"
+                          value={formData.direccion}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="mb-2">
+                        <Form.Label>Entrega</Form.Label>
+                        <Form.Control
+                          name="entrega"
+                          value={formData.entrega}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                      <Form.Group className="mb-2">
+                        <Form.Label>Ciudad</Form.Label>
+                        <Form.Control
+                          name="ciudad"
+                          value={formData.ciudad}
+                          onChange={handleChange}
+                        />
+                      </Form.Group>
+
+                </Form>
 
             </Form.Group>
 

@@ -7,6 +7,9 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Mensaje from "./mensaje";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import { Link } from "react-router-dom";
 
 function Consulta({data,setData, dataPacientes}){
@@ -17,7 +20,7 @@ function Consulta({data,setData, dataPacientes}){
     const [mostrarMensaje,setMostrarMensaje]=useState(false);
     const [notas, setNotas] = useState("");
     const [tratamientoLargo, setTratamientoLargo] = useState("");
-    const [fechaTratamiento, setFechaTratamiento] = useState("");
+    const [fechaTratamiento, setFechaTratamiento] = useState(null);
 
       const guardar = () => {
     // find patient info so we can include name in the stored record
@@ -30,7 +33,7 @@ function Consulta({data,setData, dataPacientes}){
       examen,
       notas,
       tratamientoLargo,
-      fechaTratamiento,
+      fechaTratamiento:fechaTratamiento?.format("YYYY-MM-DD HH:mm"),
       progreso: 0,
       nombre: selected?.nombre || "",
       apellido: selected?.apellidoP || ""
@@ -48,6 +51,8 @@ function Consulta({data,setData, dataPacientes}){
     setTratamientoLargo("");
     setFechaTratamiento("");
   };
+
+  console.log(fechaTratamiento)
 
 
     return(
@@ -135,12 +140,15 @@ function Consulta({data,setData, dataPacientes}){
                                                     <Form.Label className="text-dark fw-bold mt-3">
                                                         Fecha de control
                                                     </Form.Label>
-
-                                                    <Form.Control
-                                                        type="date"
+                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                        <StaticDateTimePicker
+                                                        orientation="landscape"
                                                         value={fechaTratamiento}
-                                                        onChange={(e)=>setFechaTratamiento(e.target.value)}
-                                                    />
+                                                        onChange={(newValue)=>setFechaTratamiento(newValue)}
+                                                        className="calendar-clean"
+                                                        slotProps={{actionBar:{actions:[]}}}
+                                                        />
+                                                        </LocalizationProvider>
                                                 </>
                                             )}
 
@@ -169,7 +177,7 @@ function Consulta({data,setData, dataPacientes}){
                                          <Col md={4}>
                                             <Form.Label className="text-dark fw-bold"> Examen físico</Form.Label>
 
-                                            <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)}/> 
+                                            <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)} type="file"/> 
 
                                         </Col>
 

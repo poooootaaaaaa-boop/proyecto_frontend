@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
+import Axios from 'axios';
 
 export default function AgregarDistribuidor() {
 
@@ -58,7 +59,7 @@ export default function AgregarDistribuidor() {
 
     setShowModal(true);
   };
-
+/* 
   const guardarDistribuidor = () => {
 
     const distribuidoresGuardados =
@@ -75,6 +76,41 @@ export default function AgregarDistribuidor() {
 
     navigate("/farmacia/Distribuidores");
   };
+*/
+
+
+      const guardarDistribuidor = () => {
+
+        const dataToSend = {
+          nombre: distribuidor.nombre,
+          rfc: distribuidor.rfc,
+          categoria: distribuidor.categoria,
+          contacto: distribuidor.contacto,
+          correo: distribuidor.correo,
+          telefono: distribuidor.telefono,
+          direccion: distribuidor.direccion,
+          entrega: distribuidor.entrega,
+          ciudad: distribuidor.ciudad,
+          pago: distribuidor.pago
+        };
+
+        Axios.post(
+          "http://127.0.0.1:8000/api/distribuidores",
+          dataToSend
+        )
+          .then((response) => {
+
+            alert("Distribuidor guardado correctamente ID: " + response.data.id);
+
+            cerrarModal();
+            navigate("/farmacia/Distribuidores");
+          })
+          .catch((error) => {
+
+            alert("Error al enviar datos: " + error.message);
+            console.error(error);
+          });
+      };
 
   return (
     <div style={{ display: "flex", background: "#f7f7f7", minHeight: "100vh" }}>
