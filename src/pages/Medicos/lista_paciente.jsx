@@ -9,7 +9,8 @@ import { Typography} from "@mui/material";
 import "./Tablas.css";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Datagrid from "./Datagrid";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Axios from "axios";
 
 
 

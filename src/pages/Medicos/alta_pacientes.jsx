@@ -11,6 +11,7 @@ import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
 import Mensaje from "./mensaje";
 import { Link } from "react-router-dom";
+import Axios from "axios";
 
 function Alta_pacientes({ data, setData }){
 
@@ -33,14 +34,34 @@ function Alta_pacientes({ data, setData }){
         
 
         const finalizar = () => {
-            const altaPaciente = { id: Date.now(),nombre,apellidoP, apellidoM, nacimiento, genero,telefono,correo,colonia,ciudad,estado,codigoPostal,tipoSangre,alergias,padecimientoHeredofamiliar};
+            const altaPaciente = { id: Date.now(),nombre,apellidoP, apellidoM, nacimiento, genero,telefono,correo,colonia,ciudad,estado,codigoPostal,tipoSangre,alergias,padecimientoHeredofamiliar,direccion};
             if (typeof setData === "function") {
             setData(prev => [...prev, altaPaciente]); 
             setMostrarMensaje(true); 
-            }  else {
+            } 
+            
+             // ✅ BACKEND LARAVEL (NUEVO)
+            Axios.post(
+                "http://127.0.0.1:8000/api/AltaPaciente",
+                altaPaciente
+            )
+            .then((response) => {
+                console.log("Guardado en Laravel:", response.data);
+            })
+            .catch((error) => {
+                console.error("Error guardando en backend:", error);
+            });
+
+            console.log("Paciente registrado:", altaPaciente);
+            
+            
+            
+            
+            
+            /*else {
             console.error("setData no es una función", setData);
             }
-            console.log("Paciente registrado:", altaPaciente);
+            console.log("Paciente registrado:", altaPaciente);*/
 
             setNombre("");
             setApellidoP("");
