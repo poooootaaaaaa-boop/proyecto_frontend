@@ -14,18 +14,22 @@ import Axios from "axios";
 
 
 
-function lista_paciente({data=[]}) { 
+function lista_paciente(/*{data=[]}*/) { 
       
     
     const buscarPaciente = () => {
     console.log("Buscando paciente")
   }
 
+  /*
     const [busqueda, setBusqueda] = useState("");
     const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
+    const [data, setData] = useState([]);
 
-
-
+*/
+    const [busqueda, setBusqueda] = useState("");
+    const [data, setData] = useState([]); // ✅ primero
+    const [pacientesFiltrados, setPacientesFiltrados] = useState([]); 
 
 
   const handleBusqueda = (e) => {
@@ -38,6 +42,24 @@ function lista_paciente({data=[]}) {
 
     setPacientesFiltrados(resultado);
 };
+
+
+useEffect(() => {
+
+  Axios.get("http://127.0.0.1:8000/api/MostrarPaciente")
+    .then((response) => {
+
+      const pacientes = response.data.paciente || [];
+
+      setData(pacientes);
+      setPacientesFiltrados(pacientes); 
+
+    })
+    .catch((error) => {
+      console.error("Error cargando pacientes:", error);
+    });
+
+}, []);
 
 
   // navigation handled via Link component in the table rows
@@ -149,6 +171,8 @@ function lista_paciente({data=[]}) {
                                     as={Link}
                                     to="/Medicos/historial"
                                     state={{ paciente }}
+                                    
+                                    
                                 >
                                     Ver Expediente
                                 </Button>

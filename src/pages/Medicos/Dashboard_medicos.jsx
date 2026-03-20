@@ -20,8 +20,21 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PrintIcon from '@mui/icons-material/Print';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MedicationIcon from '@mui/icons-material/Medication';
+import Axios from "axios";
+import { useState, useEffect } from "react";
+function Dashboard_medicos({citas /*consultas=[]*/}) {
 
-function Dashboard_medicos({citas, consultas=[]}) {
+  const [consultas, setConsultas] = useState([]);
+
+  useEffect(() => {
+  Axios.get("http://127.0.0.1:8000/api/MostrarConsulta")
+    .then((res) => {
+      setConsultas(res.data);
+    })
+    .catch((error) => {
+      console.error("Error cargando consultas:", error);
+    });
+}, []);
   
   return (
     <div>
@@ -70,7 +83,7 @@ function Dashboard_medicos({citas, consultas=[]}) {
                           <TaskAltIcon />
                         </div>
                       </div>
-                      <p className="stat-title">Consultas completadas</p>
+                      <p className="stat-title">completadas</p>
                       <h2 className="stat-number">12</h2>
                     </div>
 
@@ -148,15 +161,20 @@ function Dashboard_medicos({citas, consultas=[]}) {
                 <h4 className="sidebar-label" style={{ marginTop: '32px' }}>ÚLTIMAS RECETAS</h4>
                   <div className="prescriptions-list">
 
-                    {consultas.map((pacientes, i) => (
-                      <div key={i} className="prescription-card">
-                        <div className="doc-icon-box"><DescriptionIcon fontSize="small" /></div>
-                        <div className="prescription-content">
-                          <h5>{pacientes.motivo}</h5>
-                          <p>{pacientes.nombre} {pacientes.apellido}</p>
-                        </div>
+                  {consultas.map((consulta, i) => (
+                    <div key={i} className="prescription-card">
+                      <div className="doc-icon-box">
+                        <DescriptionIcon fontSize="small" />
                       </div>
-                    ))}
+
+                      <div className="prescription-content">
+                        <h5>{consulta.motivo}</h5>
+                        <p>
+                          {consulta.paciente?.nombre} {consulta.paciente?.apellidoP}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
 
                   </div>
               </div>
