@@ -40,7 +40,7 @@ function Alta_pacientes({ data, setData }){
             setMostrarMensaje(true); 
             } 
             
-             // ✅ BACKEND LARAVEL (NUEVO)
+             //  BACKEND LARAVEL (NUEVO)
             Axios.post(
                 "http://127.0.0.1:8000/api/AltaPaciente",
                 altaPaciente
