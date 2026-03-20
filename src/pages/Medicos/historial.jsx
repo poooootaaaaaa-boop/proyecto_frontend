@@ -3,7 +3,7 @@ import Layout_Medicos from "./Layout_Medicos"
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
+import { useParams } from "react-router-dom";
 function Historial({ data }) {
   const location = useLocation();
   const paciente = location.state?.paciente;

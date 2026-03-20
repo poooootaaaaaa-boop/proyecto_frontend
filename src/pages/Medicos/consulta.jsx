@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect} from "react";
 import Layout_Medicos from "./Layout_Medicos";
 import {  CardContent, Typography,Chip} from "@mui/material";
 import Container from 'react-bootstrap/Container';
@@ -11,9 +11,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import { Link } from "react-router-dom";
-
-function Consulta({data,setData, dataPacientes}){
+import Axios from "axios";
+function Consulta({data,setData /*dataPacientes*/}){
     const [pacienteId, setPacienteId] = useState("");
+    const [dataPacientes, setDataPacientes] = useState([]);
     const[motivo, setMotivo]=useState("");
     const[sintomas, setSintomas]=useState("");
     const[examen, setExamen]=useState("");
@@ -21,6 +22,16 @@ function Consulta({data,setData, dataPacientes}){
     const [notas, setNotas] = useState("");
     const [tratamientoLargo, setTratamientoLargo] = useState("");
     const [fechaTratamiento, setFechaTratamiento] = useState(null);
+
+    useEffect(() => {
+  Axios.get("http://127.0.0.1:8000/api/MostrarPaciente")
+    .then((response) => {
+      setDataPacientes(response.data.paciente);
+    })
+    .catch((error) => {
+      console.error("Error cargando pacientes:", error);
+    });
+}, []);
 
       const guardar = () => {
     // find patient info so we can include name in the stored record
@@ -41,9 +52,35 @@ function Consulta({data,setData, dataPacientes}){
     if (typeof setData === "function") {
       setData(prev => [...prev, nuevoPaciente]);
       setMostrarMensaje(true);  
-    } else {
+    } 
+
+        // ✅ BACKEND LARAVEL
+    Axios.post(
+        "http://127.0.0.1:8000/api/AddConsulta",
+        nuevoPaciente
+        /*
+    {
+        pacienteId: pacienteId,
+        motivo,
+        sintomas,
+        examen,
+        notas,
+        fechaTratamiento: fechaTratamiento?.format("YYYY-MM-DD HH:mm")
+    }*/
+)
+    .then((response) => {
+        console.log("Consulta guardada en Laravel:", response.data);
+    })
+    .catch((error) => {
+        console.error("Error guardando consulta:", error);
+    });
+
+    console.log("Consulta registrada:", nuevoPaciente);
+    
+    /*else {
       console.error("setData no es una función", setData);
     }
+    */
     setMotivo("");
     setSintomas("");
     setExamen("");
@@ -179,14 +216,7 @@ function Consulta({data,setData, dataPacientes}){
 
                                             <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)} type="file"/> 
 
-                                        </Col>
-
-
-
-
-
-
-                                           
+                                        </Col> 
 
                                     </Row>
 

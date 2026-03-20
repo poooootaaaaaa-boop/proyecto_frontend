@@ -9,23 +9,40 @@ import { useState } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Link } from "react-router-dom";
+import Axios from "axios";
+import { useEffect } from "react";
 
 function recetas_medicas({ data = [], dataPacientes=[]}){
     const [busqueda, setBusqueda] = useState("");
     const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
     const [openFullModal, setOpenFullModal] = useState(false);
+    const [consultas, setConsultas] = useState([]);
+
 
 const handleBusqueda = (e) => {
     const valor = e.target.value;
     setBusqueda(valor);
 
-    const resultado = data.filter((p) =>
-        p.nombre.toLowerCase().includes(valor.toLowerCase())
-    );
+    const resultado = consultas.filter((c) =>
+    c.paciente?.nombre?.toLowerCase().includes(valor.toLowerCase())||
+    c.paciente?.apellidoP?.toLowerCase().includes(valor.toLowerCase())
+
+    
+);
 
     setPacientesFiltrados(resultado);
 };
 
+
+useEffect(() => {
+  Axios.get("http://127.0.0.1:8000/api/MostrarConsulta")
+    .then((res) => {
+      setConsultas(res.data);
+    })
+    .catch((error) => {
+      console.error("Error cargando consultas:", error);
+    });
+}, []);
 
 const handleDownloadFullPDF = () => {
   const doc = new jsPDF();
@@ -105,109 +122,6 @@ const handleDownloadFullPDF = () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     return(
     <Layout_Medicos>
 
@@ -258,24 +172,24 @@ const handleDownloadFullPDF = () => {
 
         <div className="container mt-4">
             <div className="row g-4">
-                {(busqueda ? pacientesFiltrados : data).map((paciente, index) => (
+                {(busqueda ? pacientesFiltrados : consultas).map((consulta, index) => (
                     <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={index}>
                         <Card  style={{ borderRadius: "20px", border: "1px solid #e5e7eb",boxShadow: "0 4px 10px rgba(0,0,0,0.05)",padding: "10px"}}>
                             <CardContent>
                                 <div>
                                     <div style={{ display:"flex", alignItems:"center" }}>
                                             <div style={{width:"40px", height:"40px", borderRadius:"50%", background:"#dbeafe", display:"flex", alignItems:"center",justifyContent:"center",color:"#1d4ed8",fontWeight:"bold",marginRight:"15px"}}>
-                                                {paciente.nombre?.charAt(0)}
-                                                {paciente.apellido?.charAt(0)}
+                                                {consulta.paciente?.nombre?.charAt(0)}
+                                                {consulta.paciente?.apellidoP?.charAt(0)}
                                             </div>
 
                                             <Typography style={{ fontWeight:"700", fontSize:"18px" }}>
-                                                {paciente.nombre} {paciente.apellido}
+                                                {consulta.paciente?.nombre} {consulta.paciente?.apellidoP}
                                             </Typography>
 
                                         </div>
                                     <Typography style={{ fontSize: "13px", color: "#6b7280", background: "#f3f4f6", padding: "5px 10px", borderRadius: "10px",display: "inline-block" }}>
-                                        Motivo: {paciente.motivo}
+                                         Motivo: {consulta.motivo}
                                     </Typography>
                                 </div>
                         {/* Botón */}
