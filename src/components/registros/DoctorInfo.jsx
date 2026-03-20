@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   TextField,
   Button,
-  LinearProgress
+  LinearProgress,
+  MenuItem
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import "./doctorInfo.css";
-import { saveRegisterData } from "../../utils/registerStorage";
+import { saveRegisterData,clearRegisterData  } from "../../utils/registerStorage";
+import axios from "axios";
 
 export default function DoctorInfo() {
   const [form, setForm] = useState({
     specialty: "",
     license: "",
-    experience: ""
+    experience: "",
+    name: "",
+    university: ""
   });
+
+  const [especialidades, setEspecialidades] = useState([]);
+  const [newSpecialty, setNewSpecialty] = useState("");
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,33 +33,51 @@ export default function DoctorInfo() {
       [e.target.name]: e.target.value
     });
   };
-const handleNext = () => {
 
-  saveRegisterData({
-    role: "medico",
-    specialty: form.specialty,
-    license: form.license,
-    experience: form.experience
-  });
+  useEffect(() => {
+    const fetchEspecialidades = async () => {
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/api/especialidades");
+        setEspecialidades(res.data);
+      } catch (error) {
+        console.error("Error cargando especialidades");
+      }
+    };
 
-  navigate("/registro/finish");
-};
+    fetchEspecialidades();
+  }, []);
+
+  const handleNext = () => {
+
+    clearRegisterData(); 
+saveRegisterData({
+  role: "medico",
+  name: form.name, //  FALTABA ESTO
+  specialty: form.specialty === "otro" ? null : form.specialty,
+  specialty_name: form.specialty === "otro" ? newSpecialty : null,
+  license: form.license,
+  experience: form.experience,
+  university: form.university
+});
+
+    navigate("/registro/finish");
+  };
+
   const isValid =
     form.specialty !== "" &&
     form.license !== "" &&
-    form.experience !== "";
+    form.experience !== "" &&
+    (form.specialty !== "otro" || newSpecialty !== "");
 
   return (
     <Box className="doctor-container">
 
-      {/* Progress Bar */}
       <LinearProgress
         variant="determinate"
         value={50}
         className="progress-bar"
       />
 
-      {/* Header */}
       <Box className="doctor-header">
         <MedicalServicesIcon className="header-icon" />
         <Typography variant="h6" className="header-title">
@@ -59,7 +85,6 @@ const handleNext = () => {
         </Typography>
       </Box>
 
-      {/* Main */}
       <Box className="doctor-main">
 
         <Box className="doctor-text">
@@ -72,9 +97,11 @@ const handleNext = () => {
           </Typography>
         </Box>
 
-        <Box component="form" className="doctor-form" >
+        <Box component="form" className="doctor-form">
 
+          {/*  SELECT */}
           <TextField
+            select
             label="Especialidad Médica"
             name="specialty"
             fullWidth
@@ -82,7 +109,29 @@ const handleNext = () => {
             value={form.specialty}
             onChange={handleChange}
             className="doctor-input"
-          />
+          >
+            <MenuItem value="">Seleccione</MenuItem>
+
+            {especialidades.map((esp) => (
+              <MenuItem key={esp.id} value={esp.id}>
+                {esp.nombre}
+              </MenuItem>
+            ))}
+
+            <MenuItem value="otro">Otra (crear nueva)</MenuItem>
+          </TextField>
+
+          {/*  INPUT DINÁMICO */}
+          {form.specialty === "otro" && (
+            <TextField
+              label="Nueva especialidad"
+              fullWidth
+              size="small"
+              value={newSpecialty}
+              onChange={(e) => setNewSpecialty(e.target.value)}
+              className="doctor-input"
+            />
+          )}
 
           <TextField
             label="Número de Licencia Profesional"
@@ -104,6 +153,22 @@ const handleNext = () => {
             onChange={handleChange}
             inputProps={{ min: 0 }}
             className="doctor-input"
+          />
+
+          <TextField
+            label="Nombre Completo"
+            name="name"
+            fullWidth
+            value={form.name}
+            onChange={handleChange}
+          />
+
+          <TextField
+            label="Universidad"
+            name="university"
+            fullWidth
+            value={form.university}
+            onChange={handleChange}
           />
 
           <Box className="doctor-button-container">

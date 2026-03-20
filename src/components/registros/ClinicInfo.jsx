@@ -158,6 +158,30 @@ export default function ClinicInfo() {
             <MenuItem value="otro">Otro</MenuItem>
           </TextField>
 
+          <TextField
+  label="Teléfono del Establecimiento"
+  name="phone"
+  fullWidth
+  value={form.phone}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="Horario de Atención"
+  name="schedule"
+  fullWidth
+  value={form.schedule}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="Nombre del Responsable"
+  name="responsible"
+  fullWidth
+  value={form.responsible}
+  onChange={handleChange}
+/>
+
           <Box className="clinic-button-container">
             <Button
               variant="contained"

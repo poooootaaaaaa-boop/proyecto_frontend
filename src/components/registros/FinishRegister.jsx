@@ -20,6 +20,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import "./finishRegister.css";
+import { registerUser } from "../../api/authService";
+
 
 export default function FinishRegister() {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,34 +48,61 @@ export default function FinishRegister() {
     form.whatsapp &&
     form.password.length >= 8 &&
     form.terms;
-const handleCreateAccount = () => {
 
-  // Obtener datos guardados de pasos anteriores
-  const registerData = getRegisterData();
+const handleCreateAccount = async () => {
+  try {
+    const registerData = getRegisterData();
 
-  const newUser = {
-    email: form.email,
-    password: form.password,
-    whatsapp: form.whatsapp,
-    role: registerData.role,
-    ...registerData
-  };
+    // MAPEO REAL SEGÚN TU BASE DE DATOS
+    const roleMap = {
+      paciente: 2,
+      medico: 3,
+      clinica: 4,
+      farmacia: 4
+    };
 
-  // Obtener usuarios guardados
-  const savedUsers =
-    JSON.parse(localStorage.getItem("registeredUsers")) || [];
+const payload = {
+  nombre: registerData.name || "Usuario",
+  correo: form.email,
+  telefono: form.whatsapp,
+  password: form.password,
+  rol_id: roleMap[registerData.role] || 3,
 
-  // Agregar nuevo usuario
-  savedUsers.push(newUser);
+  nombre_clinica: registerData.name,
+  direccion: registerData.address,
+  anios_exp: registerData.experience || null,
 
-  // Guardar nuevamente
-  localStorage.setItem("registeredUsers", JSON.stringify(savedUsers));
+  especialidad_id: registerData.specialty || null,
+  especialidad_nombre: registerData.specialty_name || null, //  AQUI
+  cedula_profesional: registerData.license || null,
+};
 
-  // limpiar registro temporal
-  localStorage.removeItem("registerData");
+    const response = await registerUser(payload);
 
-  // ir al login
-  navigate("/login");
+    console.log("Registro exitoso", response);
+
+    localStorage.setItem("token", response.token);
+
+    const user = response.usuario;
+
+// redirigir según rol
+switch (user.rol_id) {
+  case 3:
+    navigate("/medicos/dashboard_medicos");
+    break;
+
+  case 4:
+    navigate("/farmacia/dashboard");
+    break;
+
+  default:
+    navigate("/dashboard");
+}
+
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    alert("Error al registrar");
+  }
 };
   return (
     <Box className="finish-container">
@@ -113,7 +142,7 @@ const handleCreateAccount = () => {
             name="email"
             type="email"
             fullWidth
-            value={form.email}
+            value={form.email || ""}
             onChange={handleChange}
             placeholder="tu@clinica.com"
             InputProps={{
@@ -131,7 +160,7 @@ const handleCreateAccount = () => {
             name="whatsapp"
             type="tel"
             fullWidth
-            value={form.whatsapp}
+            value={form.whatsapp || ""}
             onChange={handleChange}
             placeholder="9991234567"
             InputProps={{
@@ -149,7 +178,7 @@ const handleCreateAccount = () => {
             name="password"
             type={showPassword ? "text" : "password"}
             fullWidth
-            value={form.password}
+            value={form.password || ""}
             onChange={handleChange}
             placeholder="••••••••"
             InputProps={{
@@ -181,7 +210,7 @@ const handleCreateAccount = () => {
             control={
               <Checkbox
                 name="terms"
-                checked={form.terms}
+                checked={form.terms || false}
                 onChange={handleChange}
               />
             }
