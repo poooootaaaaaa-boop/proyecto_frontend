@@ -140,27 +140,6 @@ const caducidad = {
   },
 };
 
-const flujoInventario = {
-  series: [
-    {
-      name: "Entradas",
-      data: [entradasMes],
-    },
-    {
-      name: "Salidas",
-      data: [salidasMes],
-    },
-  ],
-  options: {
-    chart: { type: "bar", stacked: true },
-    colors: ["#16a34a", "#dc2626"],
-    xaxis: {
-      categories: ["Mes actual"],
-    },
-  },
-};
-
-
 
   // abrir editar
   const abrirEditar = (receta) => {
@@ -252,7 +231,7 @@ const flujoInventario = {
   </div>
 
   <div className="stat-card-modern">
-    <small>🧾 Recetas pendientes</small>
+    <small>🧾 Recetas del mes</small>
     <h3>{recetasPendientes}</h3>
   </div>
 
@@ -260,7 +239,7 @@ const flujoInventario = {
 
         {/* TABLA */}
         <div className="card-modern table-card">
-          <h5 className="section-title">Recetas Pendientes</h5>
+          <h5 className="section-title">Recetas del Mes</h5>
 
           <div className="table-modern">
             <div className="table-header-modern">
@@ -367,10 +346,6 @@ Historial de Movimientos de Inventario
     <Chart options={caducidad.options} series={caducidad.series} type="donut" height={300}/>
   </div>
 
-  <div className="card-modern">
-    <h5 className="section-title">Flujo de Inventario</h5>
-    <Chart options={flujoInventario.options} series={flujoInventario.series} type="bar" height={300}/>
-  </div>
 
 </div>
       </div>
