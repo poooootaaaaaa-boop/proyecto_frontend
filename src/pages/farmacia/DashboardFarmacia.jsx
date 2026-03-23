@@ -6,8 +6,19 @@ import { useState, useEffect } from "react";
 
 export default function DashboardFarmacia() {
 
-
+  const [loading, setLoading] = useState(true);
+  const [consumo, setConsumo] = useState([]);
   const [mesFiltro, setMesFiltro] = useState("2026-03");
+// PAGINACIÓN
+const [paginaRecetas, setPaginaRecetas] = useState(1);
+const [paginaMovimientos, setPaginaMovimientos] = useState(1);
+useEffect(() => {
+  setPaginaRecetas(1);
+  setPaginaMovimientos(1);
+}, [mesFiltro]);
+
+const itemsPorPagina = 5;
+
     // STOCK SIMULADO
 
       const [movimientos, setMovimientos] = useState([
@@ -58,9 +69,7 @@ const [inventario, setInventario] = useState([
 
 const recetasPendientes = recetas.length;
 
-const movimientosFiltrados = movimientos.filter((m) =>
-  m.fecha.startsWith(mesFiltro)
-);
+const movimientosFiltrados = movimientos;
 
 const entradasMes = movimientosFiltrados
   .filter((m) => m.tipo === "entrada")
@@ -78,30 +87,38 @@ const proximosCaducar = inventario.filter(
   (p) => p.caducaEn <= 15
 );
 
- 
+ const cambiarPaginaRecetas = (nueva) => {
+  setPaginaRecetas(nueva);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
 useEffect(() => {
-  if (productosBajos.length > 0) {
-    console.log("⚠️ Stock bajo");
-  }
+  setLoading(true);
 
-  if (proximosCaducar.length > 0) {
-    console.log("⚠️ Por caducar");
-  }
-}, [productosBajos, proximosCaducar]);
+  fetch(`http://localhost:8000/api/dashboard-farmacia?mes=${mesFiltro}`)
+    .then(res => res.json())
+    .then(data => {
+      setMovimientos(data.movimientos);
+      setRecetas(data.recetas.data || []);
+      setInventario(data.inventario);
+      setConsumo(data.consumo);
+    })
+    .finally(() => setLoading(false));
+
+}, [mesFiltro]);
 
 const consumoMedicamentos = {
   series: [
     {
       name: "Consumo",
-      data: [120, 90, 70, 50, 30],
+      data: consumo.map(c => c.total),
     },
   ],
   options: {
     chart: { type: "bar", toolbar: { show: false } },
     colors: ["#2563eb"],
     xaxis: {
-      categories: ["Paracetamol", "Ibuprofeno", "Amoxicilina", "Aspirina", "Vitamina C"],
+      categories: consumo.map(c => c.nombre),
     },
   },
 };
@@ -139,7 +156,25 @@ const caducidad = {
     labels: ["30 días", "15 días", "7 días"],
   },
 };
+const totalPaginasRecetas = Math.max(1, Math.ceil(recetas.length / itemsPorPagina));
 
+const recetasPaginadas = Array.isArray(recetas)
+  ? recetas.slice(
+      (paginaRecetas - 1) * itemsPorPagina,
+      paginaRecetas * itemsPorPagina
+    )
+  : [];
+const totalPaginasMovimientos = Math.max(1, Math.ceil(movimientosFiltrados.length / itemsPorPagina));
+
+const movimientosPaginados = movimientosFiltrados.slice(
+  (paginaMovimientos - 1) * itemsPorPagina,
+  paginaMovimientos * itemsPorPagina
+);
+
+const cambiarPaginaMovimientos = (nueva) => {
+  setPaginaMovimientos(nueva);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
   // abrir editar
   const abrirEditar = (receta) => {
@@ -185,7 +220,9 @@ const caducidad = {
 
     cerrarModales();
   };
-
+if (loading) {
+  return <div style={{ padding: "20px" }}>Cargando dashboard...</div>;
+}
   //  CHARTS
 
   return (
@@ -250,22 +287,20 @@ const caducidad = {
               <span>Acciones</span>
             </div>
 
-            {recetas.map((receta) => (
+            {recetasPaginadas.map((receta) => (
               <div className="table-row-modern" key={receta.id}>
                 <div>{receta.paciente}</div>
                 <div>{receta.medicamento}</div>
                 <div>{receta.hora}</div>
 
                 <div>
-                  <span
-                    className={`status-badge ${
-                      receta.prioridad === "Urgente"
-                        ? "urgent"
-                        : "normal"
-                    }`}
-                  >
-                    {receta.prioridad}
-                  </span>
+                 <span
+  className={`status-badge ${
+    receta.prioridad === "Urgente" ? "urgent" : "normal"
+  }`}
+>
+  {receta.prioridad || "Normal"}
+</span>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px" }}>
@@ -282,8 +317,26 @@ const caducidad = {
                   />
                 </div>
               </div>
+              
             ))}
           </div>
+                  <div className="paginacion">
+  <button 
+    disabled={paginaRecetas === 1}
+    onClick={() => cambiarPaginaRecetas(paginaRecetas - 1)}
+  >
+    ←
+  </button>
+
+  <span>Página {paginaRecetas} de {totalPaginasRecetas}</span>
+
+  <button 
+    disabled={paginaRecetas === totalPaginasRecetas}
+    onClick={() => cambiarPaginaRecetas(paginaRecetas + 1)}
+  >
+    →
+  </button>
+</div>
         </div>
 
         <div className="card-modern table-card">
@@ -302,14 +355,14 @@ Historial de Movimientos de Inventario
 <span>Cantidad</span>
 </div>
 
-{movimientosFiltrados.map((m) => (
+{movimientosPaginados.map((m) => (
 <div className="table-row-modern" key={m.id}>
 
 <div>{m.fecha}</div>
 
 <div>{m.medicamento}</div>
 
-<div>{m.proveedor}</div>
+<div>{m.proveedor || "N/A"}</div>
 
 <div>
 <span className={`badge ${m.tipo}`}>
@@ -323,9 +376,23 @@ Historial de Movimientos de Inventario
 ))}
 
 </div>
+<div className="paginacion">
+  <button 
+    disabled={paginaMovimientos === 1}
+    onClick={() => setPaginaMovimientos(paginaMovimientos - 1)}
+  >
+    ←
+  </button>
 
+  <span>Página {paginaMovimientos} de {totalPaginasMovimientos}</span>
 
-
+  <button 
+    disabled={paginaMovimientos === totalPaginasMovimientos}
+    onClick={() => setPaginaMovimientos(paginaMovimientos + 1)}
+  >
+    →
+  </button>
+</div>
 </div>
 
         {/* CHARTS */}

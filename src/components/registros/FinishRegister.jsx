@@ -18,7 +18,7 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
+import { useLocation } from "react-router-dom";
 import "./finishRegister.css";
 import { registerUser } from "../../api/authService";
 
@@ -26,6 +26,8 @@ import { registerUser } from "../../api/authService";
 export default function FinishRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+const logoFile = location.state?.logo;
 
   const [form, setForm] = useState({
     email: "",
@@ -61,23 +63,65 @@ const handleCreateAccount = async () => {
       farmacia: 4
     };
 
-const payload = {
-  nombre: registerData.name || "Usuario",
-  correo: form.email,
-  telefono: form.whatsapp,
-  password: form.password,
-  rol_id: roleMap[registerData.role] || 3,
+const formData = new FormData();
 
-  nombre_clinica: registerData.name,
-  direccion: registerData.address,
-  anios_exp: registerData.experience || null,
+// BASE (TODOS LOS USUARIOS)
+formData.append("nombre", registerData.name || "Usuario");
+formData.append("correo", form.email);
+formData.append("telefono", form.whatsapp);
+formData.append("password", form.password);
+formData.append("rol_id", roleMap[registerData.role] || 3);
 
-  especialidad_id: registerData.specialty || null,
-  especialidad_nombre: registerData.specialty_name || null, //  AQUI
-  cedula_profesional: registerData.license || null,
-};
+// LOGO (SI EXISTE)
+if (logoFile instanceof File) {
+  formData.append("foto", logoFile);
+}
 
-    const response = await registerUser(payload);
+// ==========================
+// 👨‍⚕️ DOCTOR (ROL 3)
+// ==========================
+if (roleMap[registerData.role] === 3) {
+
+  if (registerData.specialty) {
+    formData.append("especialidad_id", registerData.specialty);
+  }
+
+  if (registerData.specialty_name) {
+    formData.append("especialidad_nombre", registerData.specialty_name);
+  }
+
+  if (registerData.license) {
+    formData.append("cedula_profesional", registerData.license);
+  }
+
+  if (registerData.experience) {
+    formData.append("anios_exp", registerData.experience);
+  }
+}
+
+// ==========================
+// 🏥 CLINICA / FARMACIA (ROL 4)
+// ==========================
+if (roleMap[registerData.role] === 4) {
+
+  formData.append("nombre_clinica", registerData.name || "");
+  formData.append("direccion", registerData.address || "");
+
+  // SI LUEGO LOS USAS
+  if (registerData.city) {
+    formData.append("ciudad", registerData.city);
+  }
+
+  if (registerData.state) {
+    formData.append("estado", registerData.state);
+  }
+
+  if (registerData.country) {
+    formData.append("pais", registerData.country);
+  }
+}
+
+    const response = await registerUser(formData);
 
     console.log("Registro exitoso", response);
 
@@ -86,7 +130,9 @@ const payload = {
     const user = response.usuario;
 
 // redirigir según rol
-switch (user.rol_id) {
+const rol = roleMap[registerData.role];
+
+switch (rol) {
   case 3:
     navigate("/medicos/dashboard_medicos");
     break;

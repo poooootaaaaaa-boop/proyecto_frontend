@@ -33,7 +33,6 @@ export default function Distribuidores() {
   correo: "",
   telefono: "",
   direccion: "",
-  entrega: "",
   ciudad: ""
 });
 
@@ -384,15 +383,6 @@ const guardarEdicion = () => {
                         <Form.Control
                           name="direccion"
                           value={formData.direccion}
-                          onChange={handleChange}
-                        />
-                      </Form.Group>
-
-                      <Form.Group className="mb-2">
-                        <Form.Label>Entrega</Form.Label>
-                        <Form.Control
-                          name="entrega"
-                          value={formData.entrega}
                           onChange={handleChange}
                         />
                       </Form.Group>

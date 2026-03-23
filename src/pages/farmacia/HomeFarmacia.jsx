@@ -1,17 +1,39 @@
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./homeFarmacia.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Pagination from "@mui/material/Pagination";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeFarmacia() {
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({});
+  useEffect(() => {
+  fetchRecetas(page);
+}, [page]);
 
-  const [recetas, setRecetas] = useState([
-    { id: 1, paciente: "Juan Pérez", hora: "10:30", estado: "Urgente" },
-    { id: 2, paciente: "María López", hora: "11:00", estado: "Normal" },
-    { id: 3, paciente: "Carlos Ruiz", hora: "12:15", estado: "Normal" },
-  ]);
+  const fetchRecetas = async (pageNumber = 1) => {
+  try {
+    const res = await fetch(
+      `http://localhost:8000/api/dashboard-farmacia?page=${pageNumber}`
+    );
+
+    const data = await res.json();
+    console.log(data);
+
+    setRecetas(data.recetas.data || []);
+setPagination(data.recetas);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const handlePageChange = (event, value) => {
+  setPage(value);
+};
+
+const [recetas, setRecetas] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -39,14 +61,16 @@ export default function HomeFarmacia() {
     setRecetaSeleccionada(null);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const handleChange = (e) => {
+  if (!recetaSeleccionada) return;
 
-    setRecetaSeleccionada({
-      ...recetaSeleccionada,
-      [name]: value,
-    });
-  };
+  const { name, value } = e.target;
+
+  setRecetaSeleccionada({
+    ...recetaSeleccionada,
+    [name]: value,
+  });
+};
 
   // 🔹 guardar edición
   const handleSave = () => {
@@ -111,15 +135,15 @@ export default function HomeFarmacia() {
                   <div>{receta.hora}</div>
 
                   <div>
-                    <span
-                      className={`status-badge ${
-                        receta.estado === "Urgente"
-                          ? "urgent"
-                          : "normal"
-                      }`}
-                    >
-                      {receta.estado}
-                    </span>
+                  <span
+  className={`status-badge ${
+    receta.prioridad === "Urgente"
+      ? "urgent"
+      : "normal"
+  }`}
+>
+  {receta.prioridad}
+</span>
                   </div>
 
                   {/* ICONOS */}
@@ -153,6 +177,15 @@ export default function HomeFarmacia() {
                 </div>
               ))}
             </div>
+
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>
+  <Pagination
+    count={pagination.last_page || 1}
+    page={page}
+    onChange={handlePageChange}
+    color="primary"
+  />
+</div>
           </div>
 
           {/* ACCESOS RAPIDOS */}
@@ -181,12 +214,12 @@ export default function HomeFarmacia() {
 
             <div className="card-modern stats-card">
               <small>Recetas por validar</small>
-              <h3>{recetas.length}</h3>
+              <h3>{pagination.total || 0}</h3>
             </div>
 
             <div className="card-modern stats-card">
               <small>Alerta de stock</small>
-              <h3>5</h3>
+              <h3>{pagination.total || 0}</h3>
             </div>
           </div>
         </div>
@@ -215,14 +248,14 @@ export default function HomeFarmacia() {
                   onChange={handleChange}
                 />
 
-                <select
-                  name="estado"
-                  value={recetaSeleccionada.estado}
-                  onChange={handleChange}
-                >
-                  <option value="Urgente">Urgente</option>
-                  <option value="Normal">Normal</option>
-                </select>
+              <select
+  name="prioridad"
+  value={recetaSeleccionada.prioridad}
+  onChange={handleChange}
+>
+  <option value="Urgente">Urgente</option>
+  <option value="Normal">Normal</option>
+</select>
               </>
             )}
 

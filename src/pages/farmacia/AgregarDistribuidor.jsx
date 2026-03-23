@@ -29,9 +29,7 @@ export default function AgregarDistribuidor() {
     correo: "",
     telefono: "",
     direccion: "",
-    entrega: "",
-    ciudad: "",
-    pago: ""
+    ciudad: ""
   });
 
   const handleChange = (e) => {
@@ -89,9 +87,7 @@ export default function AgregarDistribuidor() {
           correo: distribuidor.correo,
           telefono: distribuidor.telefono,
           direccion: distribuidor.direccion,
-          entrega: distribuidor.entrega,
-          ciudad: distribuidor.ciudad,
-          pago: distribuidor.pago
+          ciudad: distribuidor.ciudad
         };
 
         Axios.post(
@@ -228,30 +224,12 @@ export default function AgregarDistribuidor() {
                   onChange={handleChange}
                 />
               </Col>
-
-              <Col md={6} className="mb-3">
-                <Form.Label>Tiempo de entrega</Form.Label>
-                <Form.Control
-                  name="entrega"
-                  value={distribuidor.entrega}
-                  onChange={handleChange}
-                />
-              </Col>
-
+              
               <Col md={6} className="mb-3">
                 <Form.Label>Ciudad</Form.Label>
                 <Form.Control
                   name="ciudad"
                   value={distribuidor.ciudad}
-                  onChange={handleChange}
-                />
-              </Col>
-
-              <Col md={6}>
-                <Form.Label>Términos de pago</Form.Label>
-                <Form.Control
-                  name="pago"
-                  value={distribuidor.pago}
                   onChange={handleChange}
                 />
               </Col>

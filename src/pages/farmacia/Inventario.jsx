@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./Inventario.css";
 import axios from "axios";
+import Pagination from "@mui/material/Pagination";
 
 
 export default function Inventario() {
@@ -17,7 +18,8 @@ export default function Inventario() {
 const [medicamentos, setMedicamentos] = useState([]);
 const [imagenNueva, setImagenNueva] = useState(null);
 const [categorias, setCategorias] = useState([]);
-
+const [paginaActual, setPaginaActual] = useState(1);
+const itemsPorPagina = 5;
 
 const obtenerCategorias = async () => {
 
@@ -59,6 +61,18 @@ const handleImagen = (e) => {
     setMedSeleccionado(null);
   };
 
+  const indexUltimo = paginaActual * itemsPorPagina;
+const indexPrimero = indexUltimo - itemsPorPagina;
+
+const medicamentosPaginados = medicamentos.slice(
+  indexPrimero,
+  indexUltimo
+);
+
+const totalPaginas = Math.ceil(
+  medicamentos.length / itemsPorPagina
+);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -81,6 +95,7 @@ const obtenerMedicamentos = async () => {
     );
 
     setMedicamentos(res.data);
+    setPaginaActual(1);
 
   } catch (error) {
     console.error(error);
@@ -137,6 +152,9 @@ const guardarCambios = async () => {
 
 };
 
+const handleChangePage = (event, value) => {
+  setPaginaActual(value);
+};
 
 
 const eliminarMedicamento = async () => {
@@ -244,7 +262,7 @@ const eliminarMedicamento = async () => {
                 <span>Acciones</span>
               </div>
 
-              {medicamentos.map((med, index) => (
+              {medicamentosPaginados.map((med, index) => (
 
                 <div
                   className="table-row-modern"
@@ -350,6 +368,18 @@ const eliminarMedicamento = async () => {
 
             </div>
           </div>
+{totalPaginas > 1 && (
+  <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+<Pagination
+  count={totalPaginas}
+  page={paginaActual}
+  onChange={handleChangePage}
+  variant="outlined"
+  color="primary"
+  shape="rounded"
+/>
+  </div>
+)}
         </div>
       </div>
 
