@@ -44,7 +44,7 @@ useEffect(() => {
     });
 }, []);
 
-const handleDownloadFullPDF = () => {
+/*const handleDownloadFullPDF = (consulta) => {
   const doc = new jsPDF();
 
   // ===== HEADER =====
@@ -117,6 +117,130 @@ const handleDownloadFullPDF = () => {
 
   setOpenFullModal(false);
   setOpenAlert(true);
+};*/
+
+
+const handleDownloadFullPDF = (consulta) => {
+
+  const doc = new jsPDF();
+
+  /* =========================
+        HEADER MÉDICO
+  ==========================*/
+  doc.setFillColor(15, 76, 129); // azul médico elegante
+  doc.rect(0, 0, 210, 35, "F");
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text("HISTORIAL CLÍNICO", 20, 20);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text("Sistema Profesional Médico", 20, 28);
+
+  // línea decorativa
+  doc.setDrawColor(200, 200, 200);
+  doc.line(20, 40, 190, 40);
+
+  doc.setTextColor(0, 0, 0);
+
+  /* =========================
+        TARJETA PACIENTE
+  ==========================*/
+  doc.setFillColor(245, 247, 250);
+  doc.roundedRect(20, 45, 170, 35, 5, 5, "F");
+
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.text("Información del Paciente", 25, 55);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+
+  doc.text(
+    `Nombre: ${consulta.paciente?.nombre ?? ""} ${consulta.paciente?.apellidoP ?? ""}`,
+    25,
+    65
+  );
+
+  doc.text(
+    `ID Consulta: #${consulta.id}`,
+    25,
+    72
+  );
+
+
+  /* =========================
+        SECCIÓN CONSULTA
+  ==========================*/
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Detalle de la Consulta Médica", 20, 95);
+
+  autoTable(doc, {
+    startY: 100,
+    head: [["Motivo", "Síntomas", "Notas Médicas"]],
+    body: [
+      [
+        consulta.motivo ?? "N/A",
+        consulta.sintomas ?? "N/A",
+        consulta.notas ?? "N/A",
+      ],
+    ],
+    theme: "grid",
+
+    styles: {
+      fontSize: 11,
+      cellPadding: 6,
+      valign: "middle",
+    },
+
+    headStyles: {
+      fillColor: [15, 76, 129],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "center",
+    },
+
+    alternateRowStyles: {
+      fillColor: [248, 250, 252],
+    },
+  });
+
+  /* =========================
+        FIRMA MÉDICA
+  ==========================*/
+  const finalY = doc.lastAutoTable.finalY + 25;
+
+  doc.setDrawColor(150);
+  doc.line(130, finalY, 190, finalY);
+
+  doc.setFontSize(10);
+  doc.text("Firma del Médico", 145, finalY + 5);
+
+  /* =========================
+        FOOTER PROFESIONAL
+  ==========================*/
+  const pageHeight = doc.internal.pageSize.height;
+
+  doc.setDrawColor(220);
+  doc.line(20, pageHeight - 20, 190, pageHeight - 20);
+
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(
+    "Documento generado automáticamente • Sistema Médico Profesional",
+    20,
+    pageHeight - 10
+  );
+
+  /* =========================
+        DESCARGA
+  ==========================*/
+  doc.save(
+    `Consulta_${consulta.paciente?.nombre}_${consulta.id}.pdf`
+  );
 };
 
 
@@ -195,7 +319,7 @@ const handleDownloadFullPDF = () => {
                         {/* Botón */}
                         <div style={{ marginTop: "15px", textAlign: "center" }}>
 
-                            <Button style={{background: "#1d4ed8",border: "none",borderRadius: "25px",padding: "8px 20px",fontWeight: "600"}} onClick={() => handleDownloadFullPDF(true)}>
+                            <Button style={{background: "#1d4ed8",border: "none",borderRadius: "25px",padding: "8px 20px",fontWeight: "600"}} onClick={() => handleDownloadFullPDF(consulta)}>
                                 <DownloadIcon /> Descargar PDF
                             </Button>
 

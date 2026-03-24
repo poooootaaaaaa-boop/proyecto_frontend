@@ -129,7 +129,16 @@ function Alta_pacientes({ data, setData }){
 
                         <Col md={6}>
                             <Form.Label>Genero</Form.Label>
-                            <Form.Control value={genero} onChange={(e) => setGenero(e.target.value)} type="text"/>
+
+                            <Form.Select
+                                value={genero}
+                                onChange={(e) => setGenero(e.target.value)}
+                            >
+                                <option value="">Seleccionar género</option>
+                                <option value="Masculino">M</option>
+                                <option value="Femenino">F</option>
+                            </Form.Select>
+
                         </Col>
 
                     </Row>
