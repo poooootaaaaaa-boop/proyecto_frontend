@@ -20,13 +20,20 @@ export default function ClinicInfo() {
   const [darkMode, setDarkMode] = useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
   const navigate = useNavigate();
+  const [logoFile, setLogoFile] = useState(null);
 
-  const [form, setForm] = useState({
-    name: "",
-    sanitary: "",
-    address: "",
-    type: ""
-  });
+const [form, setForm] = useState({
+  name: "",
+  sanitary: "",
+  address: "",
+  type: "",
+  phone: "",
+  schedule: "",
+  responsible: "",
+  city: "",        //  NUEVO
+  state: "",       //  NUEVO
+  country: ""      //  NUEVO
+});
 
   const handleChange = (e) => {
     setForm({
@@ -35,25 +42,33 @@ export default function ClinicInfo() {
     });
   };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLogoPreview(URL.createObjectURL(file));
-    }
-  };
+const handleLogoChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setLogoPreview(URL.createObjectURL(file));
+    setLogoFile(file); // IMPORTANTE
+  }
+};
 
   const handleNext = () => {
 
-  saveRegisterData({
-    role: "clinica", 
-    name: form.name,
-    sanitary: form.sanitary,
-    address: form.address,
-    type: form.type,
-    logo: logoPreview
-  });
+saveRegisterData({
+  role: "clinica", 
+  name: form.name,
+  sanitary: form.sanitary,
+  address: form.address,
+  type: form.type,
+  phone: form.phone,
+  schedule: form.schedule,
+  responsible: form.responsible,
+  city: form.city,        // 
+  state: form.state,      // 
+  country: form.country,  // 
+});
 
-  navigate("/registro/finish");
+navigate("/registro/finish", {
+  state: { logo: logoFile }
+});
 };
 
   const isValid =
@@ -157,6 +172,54 @@ export default function ClinicInfo() {
             <MenuItem value="laboratorio">Laboratorio</MenuItem>
             <MenuItem value="otro">Otro</MenuItem>
           </TextField>
+
+          <TextField
+  label="Teléfono del Establecimiento"
+  name="phone"
+  fullWidth
+  value={form.phone}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="Horario de Atención"
+  name="schedule"
+  fullWidth
+  value={form.schedule}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="Nombre del Responsable"
+  name="responsible"
+  fullWidth
+  value={form.responsible}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="Ciudad"
+  name="city"
+  fullWidth
+  value={form.city}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="Estado"
+  name="state"
+  fullWidth
+  value={form.state}
+  onChange={handleChange}
+/>
+
+<TextField
+  label="País"
+  name="country"
+  fullWidth
+  value={form.country}
+  onChange={handleChange}
+/>
 
           <Box className="clinic-button-container">
             <Button

@@ -2,12 +2,26 @@ import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./dashboardFarmacia.css";
 import Chart from "react-apexcharts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DashboardFarmacia() {
 
+  const [loading, setLoading] = useState(true);
+  const [consumo, setConsumo] = useState([]);
+  const [mesFiltro, setMesFiltro] = useState("2026-03");
+// PAGINACIÓN
+const [paginaRecetas, setPaginaRecetas] = useState(1);
+const [paginaMovimientos, setPaginaMovimientos] = useState(1);
+useEffect(() => {
+  setPaginaRecetas(1);
+  setPaginaMovimientos(1);
+}, [mesFiltro]);
 
-  const [movimientos, setMovimientos] = useState([
+const itemsPorPagina = 5;
+
+    // STOCK SIMULADO
+
+      const [movimientos, setMovimientos] = useState([
   {
     id: 1,
     fecha: "2026-03-01",
@@ -42,48 +56,125 @@ export default function DashboardFarmacia() {
       prioridad: "Normal",
     },
   ]);
-
-
-const recetasPendientes = recetas.length;
-  const movimientosInventario = {
-  series: [
-    {
-      name: "Entradas",
-      data: [40, 35, 50, 60, 70, 80],
-    },
-    {
-      name: "Salidas",
-      data: [30, 25, 40, 45, 50, 55],
-    },
-  ],
-
-  options: {
-   chart: {
-  type: "bar",
-  height: 350,
-  stacked: true,
-  toolbar: { show: false }
-},
-
-    colors: ["#16a34a", "#dc2626"],
-
-    xaxis: {
-      categories: ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
-    },
-
-    fill: {
-      opacity: 1,
-    },
-
-    legend: {
-      position: "right",
-    },
-  },
-};
-  const [mesFiltro, setMesFiltro] = useState("2026-03");
+const [inventario, setInventario] = useState([
+  { nombre: "Paracetamol", stock: 20, minimo: 25, caducaEn: 10 },
+  { nombre: "Amoxicilina", stock: 15, minimo: 20, caducaEn: 5 },
+  { nombre: "Ibuprofeno", stock: 5, minimo: 10, caducaEn: 30 },
+  { nombre: "Aspirina", stock: 8, minimo: 10, caducaEn: 7 },
+]);
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+
+
+const recetasPendientes = recetas.length;
+
+const movimientosFiltrados = movimientos;
+
+const entradasMes = movimientosFiltrados
+  .filter((m) => m.tipo === "entrada")
+  .reduce((acc, m) => acc + m.cantidad, 0);
+
+const salidasMes = movimientosFiltrados
+  .filter((m) => m.tipo === "salida")
+  .reduce((acc, m) => acc + m.cantidad, 0);
+
+const productosBajos = inventario.filter(
+  (p) => p.stock < p.minimo
+);
+
+const proximosCaducar = inventario.filter(
+  (p) => p.caducaEn <= 15
+);
+
+ const cambiarPaginaRecetas = (nueva) => {
+  setPaginaRecetas(nueva);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+useEffect(() => {
+  setLoading(true);
+
+  fetch(`http://localhost:8000/api/dashboard-farmacia?mes=${mesFiltro}`)
+    .then(res => res.json())
+    .then(data => {
+      setMovimientos(data.movimientos);
+      setRecetas(data.recetas.data || []);
+      setInventario(data.inventario);
+      setConsumo(data.consumo);
+    })
+    .finally(() => setLoading(false));
+
+}, [mesFiltro]);
+
+const consumoMedicamentos = {
+  series: [
+    {
+      name: "Consumo",
+      data: consumo.map(c => c.total),
+    },
+  ],
+  options: {
+    chart: { type: "bar", toolbar: { show: false } },
+    colors: ["#2563eb"],
+    xaxis: {
+      categories: consumo.map(c => c.nombre),
+    },
+  },
+};
+
+
+
+const stockMinimo = {
+  series: [
+    {
+      name: "Stock",
+      data: inventario.map((p) => p.stock),
+    },
+    {
+      name: "Mínimo",
+      data: inventario.map((p) => p.minimo),
+    },
+  ],
+  options: {
+    chart: { type: "bar" },
+    colors: ["#16a34a", "#dc2626"],
+    xaxis: {
+      categories: inventario.map((p) => p.nombre),
+    },
+  },
+};
+
+const caducidad = {
+  series: [
+    inventario.filter((p) => p.caducaEn <= 30).length,
+    inventario.filter((p) => p.caducaEn <= 15).length,
+    inventario.filter((p) => p.caducaEn <= 7).length,
+  ],
+  options: {
+    chart: { type: "donut" },
+    labels: ["30 días", "15 días", "7 días"],
+  },
+};
+const totalPaginasRecetas = Math.max(1, Math.ceil(recetas.length / itemsPorPagina));
+
+const recetasPaginadas = Array.isArray(recetas)
+  ? recetas.slice(
+      (paginaRecetas - 1) * itemsPorPagina,
+      paginaRecetas * itemsPorPagina
+    )
+  : [];
+const totalPaginasMovimientos = Math.max(1, Math.ceil(movimientosFiltrados.length / itemsPorPagina));
+
+const movimientosPaginados = movimientosFiltrados.slice(
+  (paginaMovimientos - 1) * itemsPorPagina,
+  paginaMovimientos * itemsPorPagina
+);
+
+const cambiarPaginaMovimientos = (nueva) => {
+  setPaginaMovimientos(nueva);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
   // abrir editar
   const abrirEditar = (receta) => {
@@ -129,40 +220,10 @@ const recetasPendientes = recetas.length;
 
     cerrarModales();
   };
-
+if (loading) {
+  return <div style={{ padding: "20px" }}>Cargando dashboard...</div>;
+}
   //  CHARTS
-  const topProductos = {
-    series: [{ name: "Solicitudes", data: [45, 38, 30, 22, 18] }],
-    options: {
-      chart: { type: "bar", toolbar: { show: false } },
-      plotOptions: { bar: { borderRadius: 8, columnWidth: "45%" } },
-      dataLabels: { enabled: false },
-      colors: ["#2563eb"],
-      xaxis: {
-        categories: [
-          "Paracetamol",
-          "Ibuprofeno",
-          "Amoxicilina",
-          "Vitamina C",
-          "Aspirina",
-        ],
-      },
-    },
-  };
-
-  const topDistribuidores = {
-    series: [40, 30, 20, 10],
-    options: {
-      chart: { type: "donut" },
-      labels: [
-        "Distribuidor A",
-        "Distribuidor B",
-        "Distribuidor C",
-        "Distribuidor D",
-      ],
-      colors: ["#2563eb", "#1e40af", "#60a5fa", "#93c5fd"],
-    },
-  };
 
   return (
     <div className="home-layout">
@@ -184,38 +245,38 @@ const recetasPendientes = recetas.length;
 </div>
 
         {/* CARDS */}
-        <div className="stats-grid">
-          <div className="stat-card-modern">
-            <small>Recetas del día</small>
-            <h3>{recetas.length}</h3>
-          </div>
+     <div className="stats-grid">
 
-          <div className="stat-card-modern">
+  <div className="stat-card-modern">
+    <small>📦 Entradas del mes</small>
+    <h3>{entradasMes}</h3>
+  </div>
 
-<small>Recetas pendientes</small>
+  <div className="stat-card-modern">
+    <small>📉 Salidas del mes</small>
+    <h3>{salidasMes}</h3>
+  </div>
 
-<h3>{recetasPendientes}</h3>
+  <div className="stat-card-modern">
+    <small>⚠️ Stock bajo</small>
+    <h3>{productosBajos.length}</h3>
+  </div>
 
-<p className="card-desc">
-Pacientes que aún no han recogido su medicamento
-</p>
+  <div className="stat-card-modern">
+    <small>⏳ Por caducar</small>
+    <h3>{proximosCaducar.length}</h3>
+  </div>
+
+  <div className="stat-card-modern">
+    <small>🧾 Recetas del mes</small>
+    <h3>{recetasPendientes}</h3>
+  </div>
 
 </div>
 
-          <div className="stat-card-modern">
-            <small>Productos por caducar</small>
-            <h3>4</h3>
-          </div>
-
-          <div className="stat-card-modern">
-            <small>Total de productos</small>
-            <h3>248</h3>
-          </div>
-        </div>
-
         {/* TABLA */}
         <div className="card-modern table-card">
-          <h5 className="section-title">Recetas Pendientes</h5>
+          <h5 className="section-title">Recetas del Mes</h5>
 
           <div className="table-modern">
             <div className="table-header-modern">
@@ -226,22 +287,20 @@ Pacientes que aún no han recogido su medicamento
               <span>Acciones</span>
             </div>
 
-            {recetas.map((receta) => (
+            {recetasPaginadas.map((receta) => (
               <div className="table-row-modern" key={receta.id}>
                 <div>{receta.paciente}</div>
                 <div>{receta.medicamento}</div>
                 <div>{receta.hora}</div>
 
                 <div>
-                  <span
-                    className={`status-badge ${
-                      receta.prioridad === "Urgente"
-                        ? "urgent"
-                        : "normal"
-                    }`}
-                  >
-                    {receta.prioridad}
-                  </span>
+                 <span
+  className={`status-badge ${
+    receta.prioridad === "Urgente" ? "urgent" : "normal"
+  }`}
+>
+  {receta.prioridad || "Normal"}
+</span>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px" }}>
@@ -258,8 +317,26 @@ Pacientes que aún no han recogido su medicamento
                   />
                 </div>
               </div>
+              
             ))}
           </div>
+                  <div className="paginacion">
+  <button 
+    disabled={paginaRecetas === 1}
+    onClick={() => cambiarPaginaRecetas(paginaRecetas - 1)}
+  >
+    ←
+  </button>
+
+  <span>Página {paginaRecetas} de {totalPaginasRecetas}</span>
+
+  <button 
+    disabled={paginaRecetas === totalPaginasRecetas}
+    onClick={() => cambiarPaginaRecetas(paginaRecetas + 1)}
+  >
+    →
+  </button>
+</div>
         </div>
 
         <div className="card-modern table-card">
@@ -278,14 +355,14 @@ Historial de Movimientos de Inventario
 <span>Cantidad</span>
 </div>
 
-{movimientos.map((m) => (
+{movimientosPaginados.map((m) => (
 <div className="table-row-modern" key={m.id}>
 
 <div>{m.fecha}</div>
 
 <div>{m.medicamento}</div>
 
-<div>{m.proveedor}</div>
+<div>{m.proveedor || "N/A"}</div>
 
 <div>
 <span className={`badge ${m.tipo}`}>
@@ -299,61 +376,50 @@ Historial de Movimientos de Inventario
 ))}
 
 </div>
+<div className="paginacion">
+  <button 
+    disabled={paginaMovimientos === 1}
+    onClick={() => setPaginaMovimientos(paginaMovimientos - 1)}
+  >
+    ←
+  </button>
 
+  <span>Página {paginaMovimientos} de {totalPaginasMovimientos}</span>
 
-
+  <button 
+    disabled={paginaMovimientos === totalPaginasMovimientos}
+    onClick={() => setPaginaMovimientos(paginaMovimientos + 1)}
+  >
+    →
+  </button>
+</div>
 </div>
 
         {/* CHARTS */}
-        <div className="charts-grid">
-          <div className="card-modern">
-            <h5 className="section-title">Top Productos</h5>
-            <Chart
-              options={topProductos.options}
-              series={topProductos.series}
-              type="bar"
-              height={320}
-            />
-          </div>
+ <div className="charts-grid">
 
-          <div className="card-modern">
-            <h5 className="section-title">Top Distribuidores</h5>
-            <Chart
-              options={topDistribuidores.options}
-              series={topDistribuidores.series}
-              type="donut"
-              height={320}
-            />
-          </div>
+  <div className="card-modern">
+    <h5 className="section-title">Consumo de Medicamentos</h5>
+    <Chart options={consumoMedicamentos.options} series={consumoMedicamentos.series} type="bar" height={300}/>
+  </div>
+
+  <div className="card-modern">
+    <h5 className="section-title">Stock vs Mínimo</h5>
+    <Chart options={stockMinimo.options} series={stockMinimo.series} type="bar" height={300}/>
+  </div>
+
+  <div className="card-modern">
+    <h5 className="section-title">Caducidad</h5>
+    <Chart options={caducidad.options} series={caducidad.series} type="donut" height={300}/>
+  </div>
 
 
-           <div className="card-modern">
-            <h5 className="section-title">Top Productos</h5>
- <Chart
-options={movimientosInventario.options}
-series={movimientosInventario.series}
-type="bar"
-height={320}
-/>
-          </div>
-        </div>
+</div>
       </div>
 
 
 
-      <div className="card-modern">
 
-<h5>Predicción de Stock IA</h5>
-
-<p>
-El sistema predice que
-<strong> Paracetamol </strong>
-se agotará en
-<strong> 15 días </strong>
-si el consumo continúa igual.
-</p>
-
-</div>
       {/* MODAL EDITAR */}
       {modalEditar && (
         <div className="modal-overlay">
