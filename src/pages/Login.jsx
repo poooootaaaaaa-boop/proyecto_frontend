@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { loginUser } from "../api/authService"; // ajusta la ruta
 import "./Login.css";
 
 export default function Login() {
@@ -31,37 +33,56 @@ export default function Login() {
     },
   ];
 
-const handleLogin = () => {
+const handleLogin = async () => {
 
-  const savedUsers =
-    JSON.parse(localStorage.getItem("registeredUsers")) || [];
+  try {
+    //  LOGIN CON BACKEND
+    const response = await loginUser({
+      correo: email,
+      password: password,
+    });
 
-  const allUsers = [...demoUsers, ...savedUsers];
+    const user = response.usuario;
 
-  const foundUser = allUsers.find(
-    (u) => u.email === email && u.password === password
-  );
+    // guardar usuario y token
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", response.token);
 
-  if (foundUser) {
     setError("");
 
-    localStorage.setItem("user", JSON.stringify(foundUser));
-
-    // decidir ruta según rol
-    if (foundUser.route) {
-      navigate(foundUser.route);
-    } else if (foundUser.role === "medico") {
+    //  REDIRECCIÓN POR ROL (IMPORTANTE)
+    if (user.rol_id === 3) {
       navigate("/Medicos/Dashboard_medicos");
-    } else if (foundUser.role === "clinica") {
+    } else if (user.rol_id === 4) {
       navigate("/Farmacia/dashboard");
-    } else if (foundUser.role === "paciente") {
+    } else {
       navigate("/dashboard_paciente");
     }
 
-  } else {
-    setError("Credenciales incorrectas");
+  } catch (err) {
+
+    //  FALLBACK (tu lógica actual)
+    const savedUsers =
+      JSON.parse(localStorage.getItem("registeredUsers")) || [];
+
+    const allUsers = [...demoUsers, ...savedUsers];
+
+    const foundUser = allUsers.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (foundUser) {
+      setError("");
+
+      localStorage.setItem("user", JSON.stringify(foundUser));
+
+      navigate(foundUser.route);
+    } else {
+      setError("Credenciales incorrectas");
+    }
   }
 };
+
 
   return (
     <div className="login-container">
