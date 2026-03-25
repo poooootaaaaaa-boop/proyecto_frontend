@@ -145,14 +145,14 @@ useEffect(() => {
                                     <div style={{width:"40px",height:"40px",borderRadius:"50%",background:"#dbeafe",display:"flex",alignItems:"center",justifyContent:"center",color:"#1d4ed8",fontWeight:"bold",marginRight:"15px"}}>
 
                                         {paciente.nombre?.charAt(0)}
-                                        {paciente.apellidoP?.charAt(0)}
+                                        
 
                                     </div>
 
 
                                     <div>
 
-                                        <div style={{fontWeight:"600"}}>{paciente.nombre} {paciente.apellidoP}</div>
+                                        <div style={{fontWeight:"600"}}>{paciente.nombre} </div>
 
                                         <div style={{fontSize:"12px",color:"#94a3b8" }}> Paciente registrado </div>
 
