@@ -15,6 +15,7 @@ export default function AgregarMedicamento() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
 const [categorias, setCategorias] = useState([]);
+const [distribuidores, setDistribuidores] = useState([]);
 
 
   const [imagen, setImagen] = useState(null);
@@ -30,11 +31,17 @@ const seleccionarImagen = (e) => {
 
 useEffect(() => {
 
-axios.get("http://localhost:8000/api/categorias")
-.then(res => {
-  setCategorias(res.data);
-})
-.catch(err => console.log(err));
+  axios.get("http://localhost:8000/api/categorias")
+    .then(res => {
+      setCategorias(res.data);
+    })
+    .catch(err => console.log(err));
+
+  axios.get("http://localhost:8000/api/distribuidores/select")
+    .then(res => {
+      setDistribuidores(res.data.data); // ahora sí existe
+    })
+    .catch(err => console.log(err));
 
 }, []);
 
@@ -336,14 +343,19 @@ onChange={handleChange}
     <Col md={12}>
       <Form.Label>Distribuidor</Form.Label>
 
-      <Form.Select
-        name="distribuidor_id"
-        onChange={handleChange}
-      >
-        <option value="">Selecciona...</option>
-        <option value="1">Distribuidor A</option>
-        <option value="2">Distribuidor B</option>
-      </Form.Select>
+<Form.Select
+  name="distribuidor_id"
+  onChange={handleChange}
+>
+  <option value="">Selecciona...</option>
+
+{Array.isArray(distribuidores) && distribuidores.map(dist => (
+  <option key={dist.id} value={dist.id}>
+    {dist.nombre}
+  </option>
+))}
+
+</Form.Select>
 
     </Col>
 

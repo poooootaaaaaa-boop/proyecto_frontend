@@ -12,6 +12,8 @@ export default function DashboardFarmacia() {
 // PAGINACIÓN
 const [paginaRecetas, setPaginaRecetas] = useState(1);
 const [paginaMovimientos, setPaginaMovimientos] = useState(1);
+const [busqueda, setBusqueda] = useState("");
+const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState("");
 useEffect(() => {
   setPaginaRecetas(1);
   setPaginaMovimientos(1);
@@ -65,10 +67,19 @@ const [inventario, setInventario] = useState([
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+const inventarioCritico = [...inventario]
+  .sort((a, b) => (a.stock - a.minimo) - (b.stock - b.minimo))
+  .slice(0, 3);
 
+
+const inventarioFiltrado = medicamentoSeleccionado
+  ? inventario.filter(p => p.nombre === medicamentoSeleccionado)
+  : inventario;
 
 const recetasPendientes = recetas.length;
-
+const dataMostrar = medicamentoSeleccionado
+  ? inventarioFiltrado
+  : inventarioCritico;
 const movimientosFiltrados = movimientos;
 
 const entradasMes = movimientosFiltrados
@@ -125,32 +136,44 @@ const consumoMedicamentos = {
 
 
 
+const inventarioOrdenado = [...inventario].sort(
+  (a, b) => a.stock - b.stock
+);
+
 const stockMinimo = {
   series: [
     {
-      name: "Stock",
-      data: inventario.map((p) => p.stock),
+      name: "Stock actual",
+      data: dataMostrar.map((p) => p.stock),
     },
     {
-      name: "Mínimo",
-      data: inventario.map((p) => p.minimo),
+      name: "Stock mínimo",
+      data: dataMostrar.map((p) => p.minimo),
     },
   ],
   options: {
     chart: { type: "bar" },
+
+    plotOptions: {
+      bar: {
+        columnWidth: "30%",
+      },
+    },
+
     colors: ["#16a34a", "#dc2626"],
+
     xaxis: {
-      categories: inventario.map((p) => p.nombre),
+      categories: dataMostrar.map((p) => p.nombre),
     },
   },
 };
 
 const caducidad = {
-  series: [
-    inventario.filter((p) => p.caducaEn <= 30).length,
-    inventario.filter((p) => p.caducaEn <= 15).length,
-    inventario.filter((p) => p.caducaEn <= 7).length,
-  ],
+series: [
+  inventario.filter((p) => p.caducaEn > 15 && p.caducaEn <= 30).length,
+  inventario.filter((p) => p.caducaEn > 7 && p.caducaEn <= 15).length,
+  inventario.filter((p) => p.caducaEn <= 7).length,
+],
   options: {
     chart: { type: "donut" },
     labels: ["30 días", "15 días", "7 días"],
@@ -403,10 +426,39 @@ Historial de Movimientos de Inventario
     <Chart options={consumoMedicamentos.options} series={consumoMedicamentos.series} type="bar" height={300}/>
   </div>
 
-  <div className="card-modern">
-    <h5 className="section-title">Stock vs Mínimo</h5>
-    <Chart options={stockMinimo.options} series={stockMinimo.series} type="bar" height={300}/>
+<div className="card-modern">
+  <h5 className="section-title">Disponibilidad de Medicamentos</h5>
+ <select
+  value={medicamentoSeleccionado}
+  onChange={(e) => setMedicamentoSeleccionado(e.target.value)}
+  style={{
+    marginBottom: "10px",
+    padding: "8px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    width: "100%",
+  }}
+>
+  <option value="">Todos los medicamentos</option>
+
+  {inventario.map((p, i) => (
+    <option key={i} value={p.nombre}>
+      {p.nombre}
+    </option>
+  ))}
+</select>
+
+  <div style={{ overflowX: "auto" }}>
+    <div style={{ minWidth: `${inventario.length * 10}px` }}>
+      <Chart
+        options={stockMinimo.options}
+        series={stockMinimo.series}
+        type="bar"
+        height={300}
+      />
+    </div>
   </div>
+</div>
 
   <div className="card-modern">
     <h5 className="section-title">Caducidad</h5>
