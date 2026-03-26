@@ -11,7 +11,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Datagrid from "./Datagrid";
 import { useState, useEffect } from "react";
 import Axios from "axios";
-
+import Pagination from 'react-bootstrap/Pagination';
 
 
 function lista_paciente(/*{data=[]}*/) { 
@@ -30,6 +30,22 @@ function lista_paciente(/*{data=[]}*/) {
     const [busqueda, setBusqueda] = useState("");
     const [data, setData] = useState([]); // ✅ primero
     const [pacientesFiltrados, setPacientesFiltrados] = useState([]); 
+
+    //Nuevo
+    const [paginaActual, setPaginaActual] = useState(1);
+    const pacientesPorPagina = 5;
+
+
+    const listaActual = busqueda ? pacientesFiltrados : data;
+
+    const indiceUltimo = paginaActual * pacientesPorPagina;
+    const indicePrimero = indiceUltimo - pacientesPorPagina;
+
+    const pacientesMostrados = listaActual.slice(
+    indicePrimero,
+    indiceUltimo
+    );
+    
 
 
   const handleBusqueda = (e) => {
@@ -132,7 +148,7 @@ useEffect(() => {
 
                     <tbody>
 
-                        {(busqueda ? pacientesFiltrados : data).map((paciente, index) => (
+                            {pacientesMostrados.map((paciente, index) => (
 
                             <tr key={index} style={{borderTop:"1px solid #f1f5f9"}}>
 
@@ -186,7 +202,39 @@ useEffect(() => {
 
                     </tbody>
             </Table>
+
         </div>
+
+         <div className="d-flex justify-content-center mt-4 mb-4">
+  <Pagination>
+
+    <Pagination.Prev
+      onClick={() => setPaginaActual(paginaActual - 1)}
+      disabled={paginaActual === 1}
+    />
+
+    {[...Array(Math.ceil(listaActual.length / pacientesPorPagina))].map(
+      (_, index) => (
+        <Pagination.Item
+          key={index}
+          active={index + 1 === paginaActual}
+          onClick={() => setPaginaActual(index + 1)}
+        >
+          {index + 1}
+        </Pagination.Item>
+      )
+    )}
+
+    <Pagination.Next
+      onClick={() => setPaginaActual(paginaActual + 1)}
+      disabled={
+        paginaActual ===
+        Math.ceil(listaActual.length / pacientesPorPagina)
+      }
+    />
+
+  </Pagination>
+</div>
 
 
 
