@@ -30,7 +30,7 @@ export default function MedicosRoute(){
          
                                 {/* PARTE DE RECETAS,CONSUKTA Y HISTORIAL */}
           <Route path="/recetas_medicas" element={<Recetas_medicas data={pacientes} />} />
-          <Route path="/tratamientos_largos" element={<Tratamientos_largos data={pacientes} setData={setPacientes}/>} />
+          <Route path="/tratamientos_largos" element={<Tratamientos_largos /*data={pacientes} setData={setPacientes}*/   />} />
 
           
           <Route path="/consulta" element={<Consulta data={pacientes} setData={setPacientes} dataPacientes={dataPacientes} />} />{/* solo agregue esto dataPacientes={dataPacientes} */}

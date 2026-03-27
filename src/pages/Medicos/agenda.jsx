@@ -10,6 +10,30 @@ import dayjs from "dayjs";
 import "dayjs/locale/es";
 function agenda({data=[]}){ 
 
+const citasFijas = [
+  {
+    fechaCita: "2026-03-01 08:00",
+    nombre: "Juan",
+    apellidoP: "Pérez",
+    motivoCita: "Consulta general",
+    tipoCita: "Presencial"
+  },
+  {
+    fechaCita: "2026-03-10 10:30",
+    nombre: "María",
+    apellidoP: "López",
+    motivoCita: "Control médico",
+    tipoCita: "Presencial"
+  },
+  {
+    fechaCita: "2026-03-21 09:00",
+    nombre: "Carlos",
+    apellidoP: "Gómez",
+    motivoCita: "Revisión",
+    tipoCita: "Virtual"
+  }
+];
+
 
 
     return(
@@ -44,7 +68,7 @@ function agenda({data=[]}){
                         }}
                         >
 
-                        <Calendar citas={data} />
+                        <Calendar citas={citasFijas} />
 
                         </div>
 

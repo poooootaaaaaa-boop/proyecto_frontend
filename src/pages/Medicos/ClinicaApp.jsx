@@ -16,7 +16,7 @@ function ClinicaApp() {
     <>
       <Consulta data={data} setData={setData} dataPacientes={dataPacientes}/> {/* solo agregue esto dataPacientes={dataPacientes} */}
       <Recetas_medicas data={data} /> 
-      <Tratamientos_largos data={data}/>
+      <Tratamientos_largos /*data={data}*//>
 
 
       <Alta_pacientes data={dataPacientes} setData={setDataPacientes} />

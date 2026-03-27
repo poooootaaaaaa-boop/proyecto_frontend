@@ -22,7 +22,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MedicationIcon from '@mui/icons-material/Medication';
 import Axios from "axios";
 import { useState, useEffect } from "react";
-function Dashboard_medicos({citas /*consultas=[]*/}) {
+function Dashboard_medicos(/*{citas consultas=[]}*/) {
 
   const [consultas, setConsultas] = useState([]);
 
@@ -35,6 +35,27 @@ function Dashboard_medicos({citas /*consultas=[]*/}) {
       console.error("Error cargando consultas:", error);
     });
 }, []);
+
+const citas = [
+  {
+    fechaCita: "08:00 AM",
+    nombre: "Juan",
+    apellidoP: "Pérez",
+    motivoCita: "Consulta general"
+  },
+  {
+    fechaCita: "09:30 AM",
+    nombre: "María",
+    apellidoP: "López",
+    motivoCita: "Control médico"
+  },
+  {
+    fechaCita: "11:00 AM",
+    nombre: "Carlos",
+    apellidoP: "Gómez",
+    motivoCita: "Revisión"
+  }
+];
   
   return (
     <div>

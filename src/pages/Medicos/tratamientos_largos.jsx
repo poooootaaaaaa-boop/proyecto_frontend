@@ -8,7 +8,28 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 
-function tratamientos_largos({ data, setData }) {
+/*function tratamientos_largos({ data, setData }) {*/
+function tratamientos_largos({
+  data = [
+    {
+      id: 1,
+      nombre: "Juan Pérez",
+      progreso: 40,
+      tratamientoLargo: "si",
+      fechaTratamiento: "28 Mar 2026",
+      motivo: "Tratamiento dental prolongado"
+    },
+    {
+      id: 2,
+      nombre: "María López",
+      progreso: 70,
+      tratamientoLargo: "si",
+      fechaTratamiento: "30 Mar 2026",
+      motivo: "Rehabilitación física"
+    }
+  ],
+  setData = () => {}
+}){ 
 
 const [tratamientoEditando, setTratamientoEditando] = useState(null);
 const [showModal, setShowModal] = useState(false);
