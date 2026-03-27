@@ -5,6 +5,7 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Typography} from "@mui/material";
+import TablePagination from '@mui/material/TablePagination';
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import "./prueba.css";
@@ -17,6 +18,19 @@ function Prueba() {
   const [cantidad, setCantidad] = useState("");
   const [motivo, setMotivo] = useState("");
   const [medicamentos, setMedicamentos] = useState([]);
+  const [proveedores, setProveedores] = useState([]);
+const [recetas, setRecetas] = useState([]);
+const [proveedorId, setProveedorId] = useState("");
+const [recetaId, setRecetaId] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const handleChangePage = (event, newPage) => {
+  setPage(newPage);
+};
+const handleChangeRowsPerPage = (event) => {
+  setRowsPerPage(parseInt(event.target.value, 10));
+  setPage(0);
+};
 
   /*
   useEffect(() => {
@@ -48,6 +62,24 @@ function Prueba() {
 </select>
     */
   // ===== FUNCIONES =====
+
+  const [historial, setHistorial] = useState([]);
+
+useEffect(() => {
+  Axios.get("http://127.0.0.1:8000/api/medicamentosselct")
+    .then(res => setMedicamentos(res.data));
+
+  Axios.get("http://127.0.0.1:8000/api/proveedores")
+    .then(res => setProveedores(res.data));
+
+  Axios.get("http://127.0.0.1:8000/api/recetas")
+    .then(res => setRecetas(res.data));
+
+  Axios.get("http://127.0.0.1:8000/api/movimientos")
+    .then(res => setHistorial(res.data));
+
+}, []);
+
   const Entrada = () => {
     setTipoMovimiento("entrada");
     setMostrarEntrada(!mostrarEntrada);
@@ -61,44 +93,53 @@ function Prueba() {
   };
 
 
-  const guardarMovimiento = () => {
+const guardarMovimiento = () => {
 
   if (!tipoMovimiento) {
     alert("Selecciona Entrada o Salida");
     return;
   }
 
+  if (tipoMovimiento === "entrada" && !proveedorId) {
+    alert("Selecciona proveedor");
+    return;
+  }
+
+  if (tipoMovimiento === "salida" && !recetaId) {
+    alert("Selecciona receta");
+    return;
+  }
+
   const dataToSend = {
     tipo: tipoMovimiento,
-    producto: producto,
-    cantidad: cantidad,
-    motivo: motivo
+    medicamento_id: producto,
+    cantidad,
+    motivo,
+    proveedor_id: tipoMovimiento === "entrada" ? proveedorId : null,
+    receta_id: tipoMovimiento === "salida" ? recetaId : null
   };
 
-  Axios.post(
-    "http://127.0.0.1:8000/api/guardarMovimientos",
-    dataToSend
-  )
-    .then((response) => {
+  Axios.post("http://127.0.0.1:8000/api/guardarMovimientos", dataToSend)
+    .then(() => {
 
-      alert("Movimiento guardado correctamente ");
+      alert("Guardado correctamente");
 
-      // limpiar formulario
+      //  refrescar tabla automáticamente
+      Axios.get("http://127.0.0.1:8000/api/movimientos")
+        .then(res => setHistorial(res.data));
+
+      // limpiar
       setProducto("");
       setCantidad("");
       setMotivo("");
+      setProveedorId("");
+      setRecetaId("");
       setTipoMovimiento("");
-
       setMostrarEntrada(false);
       setMostrarSalida(false);
 
     })
-    .catch((error) => {
-
-      alert("Error al enviar datos: " + error.message);
-      console.error(error);
-
-    });
+    .catch(err => console.error(err));
 };
 
 
@@ -151,17 +192,54 @@ function Prueba() {
 
             <label className="form-label">Producto</label>
             <br />
-             <select
-                className="form-control"
-                value={producto}
-                onChange={(e) => setProducto(e.target.value)}
-                >
-                <option value="">Selecciona un producto</option>
-                <option value="Paracetamol">Paracetamol</option>
-                <option value="Ibuprofeno">Ibuprofeno</option>
-            </select>
+       <select
+  className="form-control"
+  value={producto}
+  onChange={(e) => setProducto(e.target.value)}
+>
+  <option value="">Selecciona medicamento</option>
+  {medicamentos.map((med) => (
+    <option key={med.id} value={med.id}>
+      {med.nombre}
+    </option>
+  ))}
+</select>
             
+{tipoMovimiento === "entrada" && (
+  <>
+    <label>Proveedor</label>
+    <select
+      className="form-control"
+      value={proveedorId}
+      onChange={(e) => setProveedorId(e.target.value)}
+    >
+      <option value="">Selecciona proveedor</option>
+      {proveedores.map((prov) => (
+        <option key={prov.id} value={prov.id}>
+          {prov.nombre}
+        </option>
+      ))}
+    </select>
+  </>
+)}
 
+{tipoMovimiento === "salida" && (
+  <>
+    <label>Receta</label>
+    <select
+      className="form-control"
+      value={recetaId}
+      onChange={(e) => setRecetaId(e.target.value)}
+    >
+      <option value="">Selecciona receta</option>
+      {recetas.map((rec) => (
+        <option key={rec.id} value={rec.id}>
+          Paciente: {rec.paciente_nombre}
+        </option>
+      ))}
+    </select>
+  </>
+)}
             <br />
 
             <label className="form-label">Cantidad</label>
@@ -236,25 +314,52 @@ function Prueba() {
             </tr>
           </thead>
 
-          <tbody>
-            <tr>
-              <th>1</th>
-              <td>Mark</td>
-              <td>Entrada</td>
-              <td>10</td>
-              <td>Compra</td>
-            </tr>
+<tbody>
+  {historial.length > 0 ? (
+    historial
+  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  .map((mov) => (
+      <tr key={mov.id}>
+        <td>
+  {new Date(mov.fecha_movimiento).toLocaleString()}
+</td>
 
-            <tr>
-              <th>2</th>
-              <td>Otto</td>
-              <td>Salida</td>
-              <td>3</td>
-              <td>Venta</td>
-            </tr>
-          </tbody>
+        <td>
+          {mov.inventario?.medicamento?.nombre || "Sin nombre"}
+        </td>
+
+        <td>
+          <span style={{
+            color: mov.tipo === "entrada" ? "green" : "red",
+            fontWeight: "bold"
+          }}>
+            {mov.tipo}
+          </span>
+        </td>
+
+        <td>{mov.cantidad}</td>
+
+        <td>{mov.motivo || "—"}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="5" style={{ textAlign: "center" }}>
+        No hay movimientos registrados
+      </td>
+    </tr>
+  )}
+</tbody>
 
         </table>
+        <TablePagination
+  component="div"
+  count={historial.length}
+  page={page}
+  onPageChange={handleChangePage}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={handleChangeRowsPerPage}
+/>
       </div>
 
     </div>
