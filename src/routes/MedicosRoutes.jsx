@@ -10,7 +10,7 @@ import { Routes, Route,BrowserRouter } from "react-router-dom";
 import Citas from "../pages/Medicos/citas";
 import Agenda from "../pages/Medicos/agenda";
 import Tratamientos_largos from "../pages/Medicos/tratamientos_largos";
-
+import Prueba from "../pages/Medicos/prueba";
 import { useLocation } from "react-router-dom";
 
 export default function MedicosRoute(){
@@ -24,7 +24,7 @@ export default function MedicosRoute(){
     return(
         <Routes>
           <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
-           
+          <Route path="/prueba" element={<Prueba />} />
           
          
          
