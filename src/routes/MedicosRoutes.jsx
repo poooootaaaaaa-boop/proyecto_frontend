@@ -24,7 +24,7 @@ export default function MedicosRoute(){
     return(
         <Routes>
           <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
-          <Route path="/prueba" element={<Prueba />} />
+          <Route path="/prueb" element={<Prueba />} />
           
          
          

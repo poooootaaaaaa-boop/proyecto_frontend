@@ -60,6 +60,10 @@ export default function Sidebar() {
           <i className="bi bi-file-earmark-medical"></i>
           Recetas Médicas
         </Nav.Link>
+        <Nav.Link as={NavLink} to="/farmacia/prueba" style={linkStyle}>
+          <i className="bi bi-file-earmark-medical"></i>
+          Altas y bajas
+        </Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/inventario" style={linkStyle}>
           <i className="bi bi-box-seam"></i>
