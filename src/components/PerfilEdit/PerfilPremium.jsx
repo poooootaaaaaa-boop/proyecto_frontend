@@ -5,11 +5,27 @@ import ModalEdit from "./ModalEdit";
 const PerfilPremium = () => {
   const [activeTab, setActiveTab] = useState("datos");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  useEffect(() => {
-  const datosGuardados = localStorage.getItem("perfilPremium");
-  if (datosGuardados) {
-    setPerfil(JSON.parse(datosGuardados));
-  }
+ useEffect(() => {
+  const obtenerPerfil = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/perfil/1");
+      const data = await res.json();
+
+      setPerfil((prev) => ({
+        ...prev,
+        nombre: data.nombre || "",
+        correo: data.correo || "",
+        telefono: data.telefono || "",
+        fechaNacimiento: data.fechaNacimiento || "",
+        direccion: data.direccion || "",
+      }));
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  obtenerPerfil();
 }, []);
 
 const [showPassword, setShowPassword] = useState({
@@ -36,7 +52,6 @@ const handleSave = () => {
   };
 
   setPerfil(perfilActualizado);
-  localStorage.setItem("perfilPremium", JSON.stringify(perfilActualizado));
 
   setIsModalOpen(true);
 };
