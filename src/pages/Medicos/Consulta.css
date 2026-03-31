@@ -1,0 +1,143 @@
+/* 🌐 BASE */
+.consulta-container {
+  background: #f8fafc;
+  padding: 20px;
+}
+
+/* 🧱 CARDS */
+.consulta-container .bg-white {
+  border-radius: 16px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  transition: all 0.25s ease;
+}
+
+.consulta-container .bg-white:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* 🏷️ TITULOS */
+.consulta-container h5 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* 🧾 LABELS tipo azul como en imagen */
+.consulta-container label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #2563eb;
+  letter-spacing: 0.5px;
+}
+
+/* ✏️ INPUTS */
+.consulta-container .form-control,
+.consulta-container .form-select {
+  border-radius: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 12px;
+  font-size: 14px;
+  background: #f9fafb;
+  transition: all 0.2s ease;
+}
+
+/* FOCUS AZUL PRO */
+.consulta-container .form-control:focus,
+.consulta-container .form-select:focus {
+  background: #fff;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* TEXTAREAS MÁS GRANDES */
+.consulta-container textarea.form-control {
+  min-height: 100px;
+  resize: none;
+}
+
+/* 💊 BLOQUES DE MEDICAMENTO */
+.consulta-container .border {
+  border-radius: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #f9fafb;
+  padding: 12px !important;
+  transition: all 0.2s ease;
+}
+
+.consulta-container .border:hover {
+  background: #f1f5f9;
+  border-color: #cbd5f5;
+}
+
+/* 🧠 EFECTO tipo tarjeta interna */
+.consulta-container .border::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: #2563eb;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  opacity: 0.2;
+}
+
+/* 🔘 BOTONES */
+.consulta-container .btn {
+  border-radius: 12px !important;
+  font-weight: 600;
+  padding: 10px 18px;
+  transition: all 0.2s ease;
+}
+
+/* PRIMARIO (Finalizar) */
+.consulta-container .btn-primary {
+  background: #16a34a;
+  border: none;
+}
+
+.consulta-container .btn-primary:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+/* OUTLINE (Agregar medicamento) */
+.consulta-container .btn-outline-primary {
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  background: transparent;
+}
+
+.consulta-container .btn-outline-primary:hover {
+  background: #2563eb;
+  color: white;
+}
+
+/* CANCELAR */
+.consulta-container .btn-danger {
+  background: #ef4444;
+  border: none;
+}
+
+.consulta-container .btn-danger:hover {
+  background: #dc2626;
+}
+
+/* 📐 ESPACIADO */
+.consulta-container .row > div {
+  margin-bottom: 20px;
+}
+
+/* 💎 EFECTO SECCIONES (como la imagen) */
+.consulta-container .bg-white h5 {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+/* 🧩 RESPONSIVE */
+@media (max-width: 768px) {
+  .consulta-container {
+    padding: 10px;
+  }
+}
