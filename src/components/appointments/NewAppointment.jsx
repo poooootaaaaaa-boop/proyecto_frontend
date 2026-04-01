@@ -17,7 +17,7 @@ dayjs.locale("es");
 
 export default function NewAppointment() {
 
-  const { appointments } = useAppointments();
+  const { appointments, loadAppointmentsByDoctor } = useAppointments();
   const [weekSelection, setWeekSelection] = useState(null);
 
   const navigate = useNavigate();
@@ -30,6 +30,9 @@ export default function NewAppointment() {
   const startDay = startOfMonth.day();
   const daysInMonth = endOfMonth.date();
   const [selectedHour, setSelectedHour] = useState(null);
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const [doctorId, setDoctorId] = useState(null);
+const paciente_id = usuario?.paciente_id;
   const [viewMode, setViewMode] = useState("mes"); // semana | mes
   const days = [];
 
@@ -37,6 +40,32 @@ export default function NewAppointment() {
     setSelectedHour(null);
   }, [viewMode]);
 
+
+useEffect(() => {
+  if (!doctorId) return;
+
+  loadAppointmentsByDoctor(doctorId);
+
+}, [doctorId]);
+
+useEffect(() => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario) return;
+
+  const obtenerDoctor = async () => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/paciente/doctor/${usuario.id}`);
+      const data = await res.json();
+
+      setDoctorId(data.doctor_id);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  obtenerDoctor();
+}, []);
   useEffect(() => {
     if (viewMode === "mes") setWeekSelection(null);
   }, [viewMode]);

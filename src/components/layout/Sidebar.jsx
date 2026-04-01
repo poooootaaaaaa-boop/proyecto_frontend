@@ -19,7 +19,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LogoutModal from "./LogoutModal";
 
 export default function Sidebar() {
@@ -27,8 +27,23 @@ export default function Sidebar() {
   const [openLogout, setOpenLogout] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const location = useLocation();
+  const [usuario, setUsuario] = useState(null);
+const [foto, setFoto] = useState(null);
 
   const isMobile = useMediaQuery("(max-width:900px)");
+
+  useEffect(() => {
+  const userStorage = localStorage.getItem("usuario");
+
+  if (userStorage) {
+    const user = JSON.parse(userStorage);
+    setUsuario(user);
+
+    if (user.foto_url) {
+      setFoto(`http://127.0.0.1:8000/storage/fotos/usuarios/${user.foto_url}`);
+    }
+  }
+}, []);
 
   const sidebarContent = (
 
@@ -45,20 +60,23 @@ export default function Sidebar() {
 
       {/* Avatar y nombre */}
       <Box textAlign="center">
-        <Avatar
-          sx={{
-            width: 80,
-            height: 80,
-            margin: "0 auto",
-            border: "3px solid white"
-          }}
-        />
-        <Typography mt={2} fontWeight="bold">
-          Sofia Cardenas
-        </Typography>
-        <Typography fontSize={14} color="rgba(255,255,255,0.7)">
-          Paciente
-        </Typography>
+<Avatar
+  src={foto || ""}
+  sx={{
+    width: 80,
+    height: 80,
+    margin: "0 auto",
+    border: "3px solid white"
+  }}
+>
+  {!foto && usuario?.nombre?.charAt(0)}
+</Avatar>
+<Typography mt={2} fontWeight="bold">
+  {usuario ? usuario.nombre : "Paciente"}
+</Typography>
+<Typography fontSize={14} color="rgba(255,255,255,0.7)">
+  Paciente
+</Typography>
       </Box>
 
       <Divider sx={{ my: 3, backgroundColor: "rgba(255,255,255,0.3)" }} />

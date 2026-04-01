@@ -5,10 +5,14 @@ import ModalEdit from "./ModalEdit";
 const PerfilPremium = () => {
   const [activeTab, setActiveTab] = useState("datos");
   const [isModalOpen, setIsModalOpen] = useState(false);
- useEffect(() => {
+  const [imagen, setImagen] = useState(null);
+useEffect(() => {
   const obtenerPerfil = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/perfil/1");
+      const usuario = JSON.parse(localStorage.getItem("usuario"));
+      if (!usuario) return;
+
+      const res = await fetch(`http://localhost:8000/api/perfil/${usuario.id}`);
       const data = await res.json();
 
       setPerfil((prev) => ({
@@ -28,48 +32,103 @@ const PerfilPremium = () => {
   obtenerPerfil();
 }, []);
 
+const obtenerNotificaciones = async () => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const res = await fetch(`http://localhost:8000/api/notificaciones/${usuario.id}`);
+  const data = await res.json();
+
+  setPerfil((prev) => ({
+    ...prev,
+    notificaciones: data,
+  }));
+};
+useEffect(() => {
+  obtenerNotificaciones();
+}, []);
+
+const handleToggleNotificacion = async (id) => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  await fetch("http://localhost:8000/api/notificaciones/toggle", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      usuario_id: usuario.id,
+      notificacion_id: id,
+    }),
+  });
+
+  await obtenerNotificaciones(); // refrescar
+};
+
+
+
 const [showPassword, setShowPassword] = useState({
   actual: false,
   nueva: false,
   confirmar: false,
 });
 
-const handleSave = () => {
-  // Validar que las contraseñas coincidan
-  if (perfil.seguridad.nueva !== perfil.seguridad.confirmar) {
-    alert("Las contraseñas no coinciden");
-    return;
+const handleSave = async () => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  const formData = new FormData();
+
+  formData.append("usuario_id", usuario.id);
+  formData.append("nombre", perfil.nombre);
+  formData.append("correo", perfil.correo);
+  formData.append("telefono", perfil.telefono);
+  formData.append("fechaNacimiento", perfil.fechaNacimiento);
+  formData.append("direccion", perfil.direccion);
+
+  if (imagen) {
+    formData.append("imagen", imagen);
   }
 
-  // Actualizar contraseña actual con la nueva
-  const perfilActualizado = {
-    ...perfil,
-    seguridad: {
-      actual: perfil.seguridad.nueva || perfil.seguridad.actual,
-      nueva: "",
-      confirmar: "",
-    },
-  };
+  await fetch("http://localhost:8000/api/perfil/actualizar", {
+    method: "POST",
+    body: formData,
+  });
 
-  setPerfil(perfilActualizado);
+  // contraseña (igual que ya lo tienes)
+  if (perfil.seguridad.nueva) {
+    await fetch("http://localhost:8000/api/perfil/cambiar-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        usuario_id: usuario.id,
+        actual: perfil.seguridad.actual,
+        nueva: perfil.seguridad.nueva,
+      }),
+    });
+  }
 
   setIsModalOpen(true);
 };
+
+const [doctor, setDoctor] = useState(null);
+
+useEffect(() => {
+  const obtenerDoctor = async () => {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    const res = await fetch(`http://localhost:8000/api/perfil/doctor/${usuario.id}`);
+    const data = await res.json();
+
+    setDoctor(data);
+  };
+
+  obtenerDoctor();
+}, []);
 
  const handleChange = (e) => {
   setPerfil({
     ...perfil,
     [e.target.name]: e.target.value,
-  });
-};
-
-const handleCheckbox = (e) => {
-  setPerfil({
-    ...perfil,
-    notificaciones: {
-      ...perfil.notificaciones,
-      [e.target.name]: e.target.checked,
-    },
   });
 };
 
@@ -88,12 +147,7 @@ const handleSeguridad = (e) => {
   telefono: "",
   correo: "sofia.cardenas@example.com",
   direccion: "",
-  notificaciones: {
-    whatsapp: true,
-    laboratorio: true,
-    boletin: false,
-    promociones: false,
-  },
+notificaciones: [],
   seguridad: {
     actual: "",
     nueva: "",
@@ -181,6 +235,11 @@ const handleSeguridad = (e) => {
                     <label>Dirección</label>
                     <input type="text" name="direccion" value={perfil.direccion} onChange={handleChange} placeholder="Calle Ejemplo 123, CDMX" />
                   </div>
+
+                  <input 
+  type="file" 
+  onChange={(e) => setImagen(e.target.files[0])}
+/>
                 </div>
               </>
             )}
@@ -192,25 +251,16 @@ const handleSeguridad = (e) => {
                 </div>
 
                 <div className="preferences-box">
-                  <label>
-                    <input type="checkbox" name="whatsapp" checked={perfil.notificaciones.whatsapp} onChange={handleCheckbox}/>
-                    Recordatorios por WhatsApp
-                  </label>
-
-                  <label>
-                    <input type="checkbox" name="laboratorio" checked={perfil.notificaciones.laboratorio} onChange={handleCheckbox}/>
-                    Resultados de Laboratorio
-                  </label>
-
-                  <label>
-                    <input type="checkbox" name="boletin" checked={perfil.notificaciones.boletin} onChange={handleCheckbox}/>
-                    Boletín Mensual
-                  </label>
-
-                  <label>
-                    <input type="checkbox" name="promociones" checked={perfil.notificaciones.promociones} onChange={handleCheckbox}/>
-                    Promociones Exclusivas Premium
-                  </label>
+{perfil.notificaciones.map((n) => (
+  <label key={n.id}>
+    <input
+      type="checkbox"
+      checked={!!n.habilitado}
+      onChange={() => handleToggleNotificacion(n.id)}
+    />
+    {n.nombre}
+  </label>
+))}
                 </div>
               </>
             )}
@@ -222,12 +272,12 @@ const handleSeguridad = (e) => {
       <label>Contraseña Actual</label>
 
       <div className="password-wrapper">
-        <input
-         type={showPassword.actual ? "text" : "password"}
-         name="actual"
-         value={perfil.seguridad.actual}
-         disabled  
-        />
+<input
+  type={showPassword.actual ? "text" : "password"}
+  name="actual"
+  value={perfil.seguridad.actual}
+  onChange={handleSeguridad}
+/>
 
         <span
           className="material-symbols-outlined eye-icon"
@@ -307,14 +357,14 @@ const handleSeguridad = (e) => {
             <div className="doctor-card">
               <div
                 className="avatar-large"
-                style={{
-                  backgroundImage:
-                    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAcKqEKNmAiba_IH3a251qyLF9pipVNv7o52Hw5Yv_M3x2vcbk51NL-VhmIbBnWQi1bw8Z1OJgyMoC33R8aqF_qSV_SMY-QRihzGenpgU94MXGq30tS1yJEa5gAzY6sirMlmC_6RbpU7TaVkT6kEvTKNfc-lQJB88hMoobQR1Kt8G2fZx53V-c5SzjYWCJNn6DJ33sqeuD23Nfsb3B53Ut-eziSLPzNqYoLExTGGmp-nCjIBodzCTeRiXidTNzI6y4Rhqx8UtJsxDoz")',
-                }}
+style={{
+  backgroundImage: perfil.foto_url
+    ? `url("http://localhost:8000/api/usuario/foto/${perfil.foto_url}")`
+    : `url("https://ui-avatars.com/api/?name=${perfil.nombre}")`
+}}
               />
-
-              <h5>Dra. Elena Ramirez</h5>
-              <p className="specialty">Cardiología</p>
+<h5>{doctor?.nombre}</h5>
+<p className="specialty">{doctor?.especialidad}</p>
               <p className="address">
                 Sede Central: Plaza Médica 123 <br />
                 Ciudad de México

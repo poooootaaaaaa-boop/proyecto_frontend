@@ -1,12 +1,43 @@
 import { createContext, useContext, useState } from "react";
+import dayjs from "dayjs";
 
 const AppointmentContext = createContext();
 
 export function AppointmentProvider({ children }) {
+
   const [appointments, setAppointments] = useState([]);
 
+  // 🔹 Cargar citas desde Laravel
+  const loadAppointments = async (paciente_id) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/citas/paciente/${paciente_id}`);
+      const data = await res.json();
+
+      const citasFormateadas = data.map(c => {
+        const fecha = dayjs(c.fecha_fin);
+
+        return {
+          id: c.id,
+          date: fecha.format("DD MMMM YYYY"),
+          time: fecha.format("hh:mm A"),
+        };
+      });
+
+      setAppointments(citasFormateadas);
+
+    } catch (error) {
+      console.error("Error cargando citas:", error);
+    }
+  };
+
+  // 🔹 Agregar cita (después de confirmar)
   const addAppointment = (appt) => {
     setAppointments((prev) => [...prev, appt]);
+  };
+
+  // 🔹 Recargar después de agendar
+  const reloadAppointments = async (paciente_id) => {
+    await loadAppointments(paciente_id);
   };
 
   const updateAppointment = (updatedAppt) => {
@@ -22,11 +53,35 @@ export function AppointmentProvider({ children }) {
       prev.filter((appt) => appt.id !== id)
     );
   };
+const loadAppointmentsByDoctor = async (doctor_id) => {
+  try {
+    const res = await fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`);
+    const data = await res.json();
 
+    const citasFormateadas = data.map(c => {
+      const fecha = dayjs(c.fecha_fin); // IMPORTANTE
+
+      return {
+        id: c.id,
+        date: fecha.format("DD MMMM YYYY"),
+        time: fecha.format("hh:mm A"),
+      };
+    });
+
+    setAppointments(citasFormateadas);
+
+  } catch (error) {
+    console.error("Error cargando citas del doctor:", error);
+  }
+};
   return (
     <AppointmentContext.Provider
       value={{
         appointments,
+        setAppointments,
+        loadAppointmentsByDoctor,
+        loadAppointments,
+        reloadAppointments,
         addAppointment,
         updateAppointment,
         deleteAppointment,
