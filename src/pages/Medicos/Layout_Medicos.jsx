@@ -14,7 +14,7 @@ import LogoutModal from "../../components/farmacia/LogoutModal";
 import "./Layout.css";
 
 import { Nav, Offcanvas } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect  } from "react";
 import { Link } from "react-router-dom";
 import { useMediaQuery } from "@mui/material";
 
@@ -27,22 +27,55 @@ function Layout_Medicos({ children }) {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [usuario, setUsuario] = useState(null);
+  const [foto, setFoto] = useState(null);
+
+useEffect(() => {
+  const userStorage = localStorage.getItem("usuario");
+
+  if (userStorage) {
+    const user = JSON.parse(userStorage);
+    setUsuario(user);
+
+    if (user.foto_url) {
+      Axios.get(`http://127.0.0.1:8000/api/usuario/foto/${user.foto_url}`, {
+        responseType: "blob"
+      })
+      .then(res => {
+        const imageUrl = URL.createObjectURL(res.data);
+        setFoto(imageUrl);
+      })
+      .catch(err => console.error("Error cargando imagen", err));
+    }
+  }
+}, []);
+
+useEffect(() => {
+  const userStorage = localStorage.getItem("usuario");
+
+  if (userStorage) {
+    setUsuario(JSON.parse(userStorage));
+  }
+}, []);
 
   const sidebarContent = (
     <div className="sidebar">
 
-      <Avatar
-        sx={{
-          width: 70,
-          height: 70,
-          margin: "0 auto",
-          border: "3px solid white"
-        }}
-      />
+    <Avatar
+  src={foto || ""}
+  sx={{
+    width: 70,
+    height: 70,
+    margin: "0 auto",
+    border: "3px solid white"
+  }}
+>
+  {!foto && usuario?.nombre?.charAt(0)}
+</Avatar>
 
-      <Typography align="center" mt={2} fontWeight="bold">
-        Dr. Juan perez
-      </Typography>
+     <Typography align="center" mt={2} fontWeight="bold">
+  {usuario ? `Dr. ${usuario.nombre}` : "Doctor"}
+</Typography>
 
       <div style={{ height: "30px" }}></div>
 
