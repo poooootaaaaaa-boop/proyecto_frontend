@@ -13,7 +13,7 @@ export default function ConfirmAppointment() {
   const location = useLocation();
   const { addAppointment } = useAppointments();
 
-  const { date, time } = location.state || {};
+  const { date, time, doctor } = location.state || {};
   const [openModal, setOpenModal] = useState(false);
 const handleConfirm = async () => {
   try {
@@ -30,17 +30,18 @@ const handleConfirm = async () => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        usuario_id: usuario.id,
-        fecha_fin: fechaCompleta,
-        motivo: "Consulta general"
-      })
+body: JSON.stringify({
+  usuario_id: usuario.id,
+  doctor_id: doctor?.id, // ESTE ES EL CAMBIO CLAVE
+  fecha_fin: fechaCompleta,
+  motivo: "Consulta general"
+})
     });
 
     const data = await response.json();
     console.log(data);
 
-    setOpenModal(true); // 👈 ahora sí se abre el modal
+    setOpenModal(true); // ahora sí se abre el modal
 
   } catch (error) {
     console.error(error);
@@ -82,10 +83,14 @@ return (
           {/* DOCTOR */}
           <Box className="doctor-card">
             <Box className="doctor-image-wrapper">
-              <Avatar
-                src="https://i.pravatar.cc/150?img=12"
-                className="doctor-image"
-              />
+            <Avatar
+  src={
+    doctor?.foto_url
+      ? `http://localhost:8000${doctor.foto_url}`
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor?.nombre || "Doctor")}`
+  }
+  className="doctor-image"
+/>
               <Box className="rating-badge">
                 <span className="material-symbols-outlined star-icon">
                   star
@@ -99,11 +104,11 @@ return (
                 Especialista Asignado
               </Typography>
               <Typography className="doctor-name">
-                DRA. Elena Vargas
-              </Typography>
+  {doctor?.nombre || "Doctor no seleccionado"}
+</Typography>
               <Typography className="doctor-specialty">
-                Medicina General
-              </Typography>
+  {doctor?.especialidad || ""}
+</Typography>
             </Box>
           </Box>
 

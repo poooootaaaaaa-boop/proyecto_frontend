@@ -30,6 +30,31 @@ export function AppointmentProvider({ children }) {
     }
   };
 
+  const loadFutureAppointments = async (paciente_id) => {
+  try {
+    const res = await fetch(`http://localhost:8000/api/citas/paciente/${paciente_id}/futuras`);
+    const data = await res.json();
+
+    const citasFormateadas = data.map(c => {
+      const fecha = dayjs(c.fecha_fin);
+
+      return {
+        id: c.id,
+        doctor: c.doctor?.usuario?.nombre, //  FIX
+    specialty: c.doctor?.especialidad?.nombre,
+        avatar: c.doctor?.usuario?.foto_url, //  FIX
+        date: fecha.format("DD MMMM YYYY"),
+        time: fecha.format("hh:mm A"),
+      };
+    });
+
+    setAppointments(citasFormateadas);
+
+  } catch (error) {
+    console.error("Error cargando citas futuras:", error);
+  }
+};
+
   // 🔹 Agregar cita (después de confirmar)
   const addAppointment = (appt) => {
     setAppointments((prev) => [...prev, appt]);
@@ -81,6 +106,7 @@ const loadAppointmentsByDoctor = async (doctor_id) => {
         setAppointments,
         loadAppointmentsByDoctor,
         loadAppointments,
+        loadFutureAppointments,
         reloadAppointments,
         addAppointment,
         updateAppointment,

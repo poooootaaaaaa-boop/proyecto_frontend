@@ -7,48 +7,58 @@ import {
   Box,
   Chip,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import "./appointments.css";
 
-export default function AppointmentHistory({ appointments = [] }) {
-  // citas pasadas reales
-  const historyAppointments = appointments.filter(
-    (a) => a.status === "completed" || a.status === "past"
-  );
+export default function AppointmentHistory() {
 
-  // fallback 
-  const fallbackHistory = [
-    {
-      doctor: "Dra. María López",
-      specialty: "Cardiología",
-      date: "10 Ene 2026",
-      time: "09:00 AM",
-      location: "Clínica Central",
-      avatar: "",
-    },
-    {
-      doctor: "Dr. Juan Pérez",
-      specialty: "Dermatología",
-      date: "22 Dic 2025",
-      time: "11:30 AM",
-      location: "Hospital Norte",
-      avatar: "",
-    },
-    {
-      doctor: "Dra. Ana Torres",
-      specialty: "Medicina General",
-      date: "05 Dic 2025",
-      time: "04:00 PM",
-      location: "Consultorio Familiar",
-      avatar: "",
-    },
-  ];
+  const [historyAppointments, setHistoryAppointments] = useState([]);
 
-  const dataToShow =
-    historyAppointments.length > 0 ? historyAppointments : fallbackHistory;
+  useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario) return;
+
+    const loadHistoryAppointments = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/citas/paciente/${usuario.paciente_id}/pasadas`
+        );
+        const data = await res.json();
+
+        const citasFormateadas = data.map(c => {
+          const fecha = dayjs(c.fecha_fin);
+
+      return {
+    id: c.id,
+    doctor: c.doctor?.usuario?.nombre, // 👈 FIX
+    specialty: c.doctor?.especialidad?.nombre,
+    avatar: c.doctor?.usuario?.foto_url, // 👈 FIX
+    date: fecha.format("DD MMMM YYYY"),
+    time: fecha.format("hh:mm A"),
+  };
+        });
+
+        setHistoryAppointments(citasFormateadas);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadHistoryAppointments();
+  }, []);
 
   return (
     <>
-      {dataToShow.map((appt, i) => (
+      {historyAppointments.length === 0 && (
+        <Typography sx={{ mt: 3, color: "gray" }}>
+          No tienes historial de citas.
+        </Typography>
+      )}
+
+      {historyAppointments.map((appt, i) => (
         <Grow in key={i} timeout={400 + i * 120}>
           <Card className="appointment-card history-card">
             <CardContent className="card-content-citas">
@@ -60,7 +70,6 @@ export default function AppointmentHistory({ appointments = [] }) {
                     {appt.doctor}
                   </Typography>
 
-                  {/*  BADGE FINALIZADA */}
                   <Chip
                     label="Finalizada"
                     size="small"
@@ -81,12 +90,6 @@ export default function AppointmentHistory({ appointments = [] }) {
                 <Typography className="details">
                   {appt.time}
                 </Typography>
-
-                {appt.location && (
-                  <Typography className="details">
-                    {appt.location}
-                  </Typography>
-                )}
               </div>
             </CardContent>
           </Card>

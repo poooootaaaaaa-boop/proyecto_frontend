@@ -6,12 +6,14 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import isoWeek from "dayjs/plugin/isoWeek";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./weekAppointment.css";
 import { useAppointments } from "../appointments/AppointmentContext";
 
 dayjs.locale("es");
+dayjs.extend(isoWeek);
 
 const HOURS = ["08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM"];
 
@@ -22,7 +24,7 @@ export default function WeekAppointment({ onSelectSlot }) {
   const { appointments } = useAppointments();
 
   // inicio de semana (lunes)
-  const startOfWeek = currentWeek.startOf("week").add(1, "day");
+  const startOfWeek = currentWeek.startOf("isoWeek");
 
   const days = Array.from({ length: 5 }).map((_, i) =>
     startOfWeek.add(i, "day")
