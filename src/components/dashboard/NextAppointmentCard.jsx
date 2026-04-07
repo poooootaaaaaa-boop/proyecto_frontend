@@ -17,12 +17,13 @@ import EventIcon from "@mui/icons-material/Event";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import dayjs from "dayjs";
 
 export default function NextAppointmentCard() {
-
+const [appointmentData, setAppointmentData] = useState(null);
   // SIMULACIÓN DE RESPUESTA BACKEND (JSON)
-  const appointmentData = {
+ /* const appointmentData = {
     id: 1,
     doctor: {
       name: "Dra. Elena Vargas",
@@ -35,9 +36,59 @@ export default function NextAppointmentCard() {
     location: "Consultorio 402",
     reason: "Revisión general y seguimiento de tratamiento.",
     status: "Confirmada",
+  };*/
+
+
+
+useEffect(() => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario) return;
+
+  const loadNextAppointment = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/citas/paciente/${usuario.paciente_id}/futuras`
+      );
+      const data = await res.json();
+
+      if (data.length === 0) return;
+
+      const next = data[0]; //  LA MÁS CERCANA
+
+      const fecha = dayjs(next.fecha_fin);
+
+      setAppointmentData({
+        id: next.id,
+        doctor: {
+          name: next.doctor?.usuario?.nombre,
+          specialty: next.doctor?.especialidad?.nombre,
+          avatar: next.doctor?.usuario?.foto_url,
+        },
+        date: next.fecha_fin,
+        formattedDate: fecha.format("DD [de] MMMM, YYYY"),
+        time: fecha.format("hh:mm A"),
+        location: next.clinica_id ? `Consultorio ${next.clinica_id}` : "N/A",
+        reason: next.motivo,
+        status: next.estado,
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
+  loadNextAppointment();
+}, []);
+
   const [open, setOpen] = useState(false);
+
+  if (!appointmentData) {
+  return (
+    <Card sx={{ p: 3, borderRadius: 4 }}>
+      <Typography>No tienes próximas citas</Typography>
+    </Card>
+  );
+}
 
   return (
     <>

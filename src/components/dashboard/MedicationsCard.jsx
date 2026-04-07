@@ -1,67 +1,144 @@
 import { Card, CardContent, Typography, Box, Chip } from "@mui/material";
+import { useEffect, useState } from "react";
 
 function MedItem({ name, dose, time, bg }) {
   return (
     <Box
       sx={{
-        p: 2,
+        p: 2.5,
         borderRadius: 3,
-        background: bg,
+        background: "#f8fafc",
+        border: "1px solid #e2e8f0",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
+        transition: "all .25s ease",
+
+        "&:hover": {
+          transform: "translateY(-2px)",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+        },
       }}
     >
+      {/* IZQUIERDA */}
       <Box>
-        <Typography fontWeight="bold">{name}</Typography>
-        <Typography fontSize={13} color="text.secondary">
+        <Typography fontWeight={700} fontSize={15}>
+          {name}
+        </Typography>
+
+        <Typography
+          fontSize={13}
+          sx={{ color: "#64748b", mt: 0.5 }}
+        >
           {dose}
         </Typography>
       </Box>
 
-      <Chip label={time} size="small" />
+      {/* DERECHA */}
+      <Chip
+        label={time}
+        size="small"
+        sx={{
+          background: "#e0edff",
+          color: "#2563eb",
+          fontWeight: 600,
+          borderRadius: "999px",
+          px: 1,
+        }}
+      />
     </Box>
   );
 }
 
 export default function MedicationsCard() {
+  const [medicamentos, setMedicamentos] = useState([]);
+
+  useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario) return;
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/consulta/paciente/${usuario.paciente_id}/ultima`
+        );
+
+        const data = await res.json();
+
+        if (!data || !data.receta) return;
+
+        const meds = data.receta.detalles.map(det => ({
+          name: det.medicamento?.nombre,
+          dose: `${det.dosis} — ${det.frecuencia}`,
+          time: det.instrucciones || "Sin indicación",
+          bg: "#eef2ff"
+        }));
+
+        setMedicamentos(meds);
+
+      } catch (error) {
+        console.error("Error cargando medicamentos:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <Card
+<Card
   sx={{
     borderRadius: 4,
     height: "100%",
     display: "flex",
     flexDirection: "column",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
     border: "1px solid #eef2f7",
     transition: "all .25s ease",
 
     "&:hover": {
       transform: "translateY(-4px)",
-      boxShadow: "0 16px 40px rgba(0,0,0,0.10)",
+      boxShadow: "0 18px 40px rgba(0,0,0,0.08)",
     },
   }}
 >
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography fontWeight="bold" mb={2}>
-          Medicamentos Activos
-        </Typography>
+  <CardContent sx={{ flexGrow: 1 }}>
+    
+    {/* HEADER */}
+    <Box display="flex" justifyContent="space-between" mb={2}>
+      <Typography fontWeight={700} fontSize={16}>
+        Medicamentos Activos
+      </Typography>
 
-        <Box display="flex" flexDirection="column" gap={2}>
+      <Chip
+        label={medicamentos.length}
+        size="small"
+        sx={{
+          background: "#eef2ff",
+          color: "#4f46e5",
+          fontWeight: 600,
+        }}
+      />
+    </Box>
+
+    {/* LISTA */}
+    <Box display="flex" flexDirection="column" gap={2}>
+      {medicamentos.length === 0 ? (
+        <Typography color="text.secondary">
+          No hay medicamentos activos
+        </Typography>
+      ) : (
+        medicamentos.map((med, i) => (
           <MedItem
-            name="Vitamina D3"
-            dose="2000 UI — Diaria"
-            time="8:00 AM"
-            bg="#fff7ed"
+            key={i}
+            name={med.name}
+            dose={med.dose}
+            time={med.time}
           />
-          <MedItem
-            name="Magnesio"
-            dose="400mg — Diaria"
-            time="9:30 PM"
-            bg="#eef2ff"
-          />
-        </Box>
-      </CardContent>
-    </Card>
+        ))
+      )}
+    </Box>
+  </CardContent>
+</Card>
   );
 }

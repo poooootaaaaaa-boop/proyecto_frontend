@@ -1,49 +1,78 @@
 import {Card, CardContent, Typography, Box, Chip, Avatar, Button,Paper } from "@mui/material";
 import "./treatments.css";
 import { jsPDF } from "jspdf";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MedicationDetailModal from "./MedicationDetailModal";
 import { useNavigate } from "react-router-dom";
 
 export default function Treatments() {
+const [recetas, setRecetas] = useState([]);
+
+useEffect(() => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario) return;
+
+  const fetchRecetas = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/recetas/paciente/${usuario.paciente_id}`
+      );
+
+      const data = await res.json();
+      setRecetas(data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchRecetas();
+}, []);
 
   const navigate = useNavigate();
-  const downloadPDF = () => {
+const downloadPDF = (receta) => {
   const doc = new jsPDF();
-
+doc.text(`Paciente: ${receta.paciente?.usuario?.nombre}`, 20, 40);
+doc.text(`Doctor: ${receta.doctor?.usuario?.nombre}`, 20, 50);
   doc.setFontSize(18);
   doc.text("Receta Médica", 20, 20);
 
   doc.setFontSize(12);
-  doc.text("Paciente: Sofia Cardenas", 20, 40);
-  doc.text("Médico: Dra. Elena Vargas", 20, 50);
-  doc.text("Especialidad: Medicina General", 20, 60);
+  doc.text(`Doctor: ${receta.doctor?.usuario?.nombre}`, 20, 40);
 
-  doc.text("Medicamento: Metformina 850mg", 20, 80);
-  doc.text("Frecuencia: Cada 12 horas", 20, 90);
+  let y = 60;
 
-  doc.text("Fecha: 12 Mayo 2024", 20, 110);
+  receta.detalles.forEach((det, i) => {
+    doc.text(
+      `${i + 1}. ${det.medicamento?.nombre}`,
+      20,
+      y
+    );
 
-  doc.save("receta_medica.pdf");
+    doc.text(
+      `Dosis: ${det.dosis} | ${det.frecuencia}`,
+      20,
+      y + 8
+    );
+
+    doc.text(
+      `Duración: ${det.duracion}`,
+      20,
+      y + 16
+    );
+
+    y += 30;
+  });
+
+  doc.save(`receta_${receta.id}.pdf`);
 };
 
 const [openModal, setOpenModal] = useState(false);
 const [selectedMedication, setSelectedMedication] = useState(null);
+const ultimaReceta = recetas[0]; // la más reciente si vienen ordenadas
+const medicamentos = ultimaReceta?.detalles || [];
 
-const exampleMedication = {
-  nombre: "Metformina",
-  dosis: "850mg - Tableta Oral",
-  presentacion: "Caja con 30 tabletas",
-  precio: "150 MXN",
-  via: "Oral",
-  duracion: "30 días",
-  descripcion: "Se utiliza para controlar los niveles de azúcar en sangre en pacientes con diabetes tipo 2.",
-  hora_inicio: "08:00 AM",
-  hora_fin: "08:00 PM",
-  total_tabletas: "60 tabletas",
-  doctor: "Dra. Elena Vargas",
-  especialidad: "Medicina General"
-};
   return (
     <div className="treatments-container">
 
@@ -58,91 +87,76 @@ const exampleMedication = {
       {/* CARDS SUPERIORES */}
       <div className="treatment-cards">
 
-        <Card className="treatment-card">
-          <CardContent>
-            <div className="card-header">
-              <div>
-                <Typography className="medicine-name">
-                  Metformina
-                </Typography>
-                <Typography className="medicine-desc">
-                  850mg - Tableta Oral
-                </Typography>
-              </div>
-              <Chip label="En curso" size="small" className="status-chip" />
-            </div>
+{medicamentos.map((det, i) => (
+  <Card className="treatment-card" key={i}>
+    <CardContent>
 
-            <div className="card-info">
-              <div className="info-box">
-                <Typography className="info-label">
-                  FRECUENCIA
-                </Typography>
-                <Typography className="info-value">
-                  CADA 12 HORAS
-                </Typography>
-              </div>
-
-              <div className="info-box">
-                <Typography className="info-label">
-                  Médico
-                </Typography>
-                <Typography className="info-value">
-                  DRA. Elena Vargas
-                </Typography>
-                <Typography className="info-sub">
-                  Medicina General
-                </Typography>
-              </div>
-            </div>
-            <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => {   setSelectedMedication(exampleMedication); setOpenModal(true); }}>
-                  Ver Detalle
-                </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="treatment-card">
-          <CardContent>
-            <div className="card-header">
-              <div>
-                <Typography className="medicine-name">
-                  Paracetamol
-                </Typography>
-                <Typography className="medicine-desc">
-                  2000 UI - CAPSULA
-                </Typography>
-              </div>
-              <Chip label="En curso" size="small" className="status-chip" />
-           </div>
-
-            <div className="card-info">
-              <div className="info-box">
-                <Typography className="info-label">
-                  FRECUENCIA
-                </Typography>
-                <Typography className="info-value">
-                  CADA 12 HORAS
-                </Typography>
-              </div>
-
-              <div className="info-box">
-                <Typography className="info-label">
-                  Médico
-                </Typography>
-                <Typography className="info-value">
-                  DRA. Elena Vargas
-                </Typography>
-                <Typography className="info-sub">
-                  Medicina General
-                </Typography>
-              </div>
-            </div>
-            <Button variant="outlined" size="small" sx={{ mt: 2 }} onClick={() => {   setSelectedMedication(exampleMedication); setOpenModal(true); }}>
-                  Ver Detalle
-                </Button>
-          </CardContent>
-        </Card>
-
+      <div className="card-header">
+        <div>
+          <Typography className="medicine-name">
+            {det.medicamento?.nombre}
+          </Typography>
+          <Typography className="medicine-desc">
+            {det.medicamento?.presentacion}
+          </Typography>
+        </div>
+        <Chip label="En curso" size="small" className="status-chip" />
       </div>
+
+      <div className="card-info">
+        <div className="info-box">
+          <Typography className="info-label">
+            FRECUENCIA
+          </Typography>
+          <Typography className="info-value">
+            {det.frecuencia}
+          </Typography>
+        </div>
+
+        <div className="info-box">
+          <Typography className="info-label">
+            Médico
+          </Typography>
+          <Typography className="info-value">
+            {ultimaReceta?.doctor?.usuario?.nombre}
+          </Typography>
+          <Typography className="info-sub">
+            {ultimaReceta?.doctor?.especialidad?.nombre}
+          </Typography>
+        </div>
+      </div>
+
+      <Button
+        variant="outlined"
+        size="small"
+        sx={{ mt: 2 }}
+onClick={() => {
+  setSelectedMedication({
+    nombre: det.medicamento?.nombre,
+    dosis: det.dosis,
+    presentacion: det.medicamento?.presentacion,
+    precio: det.medicamento?.inventario?.precio_venta || "Sin precio",
+    via: "Oral",
+    duracion: det.duracion,
+    descripcion: det.medicamento?.descripcion_general,
+    hora_inicio: det.frecuencia, // aquí puedes usar frecuencia
+    hora_fin: det.instrucciones, // o instrucciones
+    total_tabletas: det.duracion,
+    doctor: ultimaReceta?.doctor?.usuario?.nombre,
+especialidad: ultimaReceta?.doctor?.especialidad?.nombre
+  });
+
+  setOpenModal(true);
+}}
+      >
+        Ver Detalle
+      </Button>
+
+    </CardContent>
+  </Card>
+))}
+
+</div>
 
       {/* TABLA DE RECETAS */}
       <Paper className="table-container">
@@ -154,24 +168,40 @@ const exampleMedication = {
           <span>ACCIONES</span>
         </div>
 
-        {[1,2,3].map((item) => (
-          <div className="table-row" key={item}>
-            <div>12May 2024</div>
-            <div>
-              <strong>400</strong> units
-            </div>
-            <div className="doctor-cell">
-              <Avatar className="doctor-avatar" />
-              <div>
-                <strong>DRA. Elena Vargas</strong>
-                <p>Medicina General</p>
-              </div>
-            </div>
-            <Button className="pdf-btn" onClick={downloadPDF}>
-              DESCARGAR PDF
-            </Button>
-          </div>
-        ))}
+{recetas.map((receta) => (
+  <div className="table-row" key={receta.id}>
+    
+    <div>
+  {new Date(receta.creado_en).toLocaleDateString()}
+</div>
+
+   <div>
+  {receta.detalles.map((d, i) => (
+    <span key={i}>
+      {d.medicamento?.nombre}
+      {i < receta.detalles.length - 1 ? ", " : ""}
+    </span>
+  ))}
+</div>
+
+    <div className="doctor-cell">
+      <Avatar className="doctor-avatar" />
+      <div>
+        <strong>
+          {receta.doctor?.usuario?.nombre}
+        </strong>
+        <p>Médico</p>
+      </div>
+    </div>
+
+    <Button
+      className="pdf-btn"
+      onClick={() => downloadPDF(receta)}
+    >
+      DESCARGAR PDF
+    </Button>
+  </div>
+))}
 
       </Paper>
 
