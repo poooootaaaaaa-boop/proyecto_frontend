@@ -10,11 +10,10 @@ import { Routes, Route,BrowserRouter } from "react-router-dom";
 import Citas from "../pages/Medicos/citas";
 import Agenda from "../pages/Medicos/agenda";
 import Tratamientos_largos from "../pages/Medicos/tratamientos_largos";
-<<<<<<< HEAD
+
 import Prueba from "../pages/Medicos/prueba";
 import Planes from "../components/registros/Planes";
-=======
->>>>>>> equipo
+
 import { useLocation } from "react-router-dom";
 
 export default function MedicosRoute(){
