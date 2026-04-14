@@ -1,29 +1,58 @@
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./homeFarmacia.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Pagination from "@mui/material/Pagination";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function HomeFarmacia() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [notificacion, setNotificacion] = useState(null);
   const [pagination, setPagination] = useState({});
+  const ultimaRecetaId = useRef(null);
   useEffect(() => {
   fetchRecetas(page);
 }, [page]);
+-
 
-  const fetchRecetas = async (pageNumber = 1) => {
+useEffect(() => {
+  if (notificacion) {
+    const timer = setTimeout(() => {
+      setNotificacion(null);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }
+}, [notificacion]);
+
+const fetchRecetas = async (pageNumber = 1) => {
   try {
-    const res = await fetch(
+    const res = await axios.get(
       `http://localhost:8000/api/dashboard-farmacia?page=${pageNumber}`
     );
 
-    const data = await res.json();
-    console.log(data);
+    const data = res.data;
+    const nuevasRecetas = data.recetas.data || [];
 
-    setRecetas(data.recetas.data || []);
-setPagination(data.recetas);
+    if (nuevasRecetas.length > 0) {
+      const primerId = nuevasRecetas[0].id;
+
+      //  PRIMERA VEZ: solo guardar, NO notificar
+      if (ultimaRecetaId.current === null) {
+        ultimaRecetaId.current = primerId;
+      } 
+      //  NUEVA RECETA
+      else if (primerId !== ultimaRecetaId.current) {
+        setNotificacion("🚨 Nueva receta disponible");
+        ultimaRecetaId.current = primerId;
+      }
+    }
+
+    setRecetas(nuevasRecetas);
+    setPagination(data.recetas);
+
   } catch (error) {
     console.error(error);
   }
@@ -95,7 +124,21 @@ const handleChange = (e) => {
 
       <div className="home-content-modern">
         <Topbar />
-
+        {notificacion && (
+  <div
+    style={{
+      background: "#22c55e",
+      color: "white",
+      padding: "10px",
+      borderRadius: "10px",
+      marginBottom: "10px",
+      textAlign: "center",
+      fontWeight: "bold",
+    }}
+  >
+    {notificacion}
+  </div>
+)}
         {/* HEADER */}
         <div className="home-header-modern">
           <div>
@@ -118,64 +161,81 @@ const handleChange = (e) => {
             </div>
 
             <div className="table-modern">
-              <div className="table-header-modern">
-                <span>Paciente</span>
-                <span>Hora</span>
-                <span>Estado</span>
-                <span>Acciones</span>
-              </div>
+         <div className="table-header-modern">
+  <span>Paciente</span>
+  <span>Doctor</span>
+  <span>Hora</span>
+  <span>Estado</span>
+  <span>Acciones</span>
+</div>
 
-              {recetas.map((receta) => (
-                <div className="table-row-modern" key={receta.id}>
-                  <div className="paciente-cell">
-                    <img src="https://i.pravatar.cc/40" alt="avatar" />
-                    {receta.paciente}
-                  </div>
+{recetas.map((receta) => (
+  <div className="table-row-modern" key={receta.id}>
+    
+    {/* PACIENTE */}
+    <div className="paciente-cell">
+      <img
+        src={
+          receta.foto_paciente
+            ? `http://localhost:8000/api/dashboard-farmacia/imagen/${receta.foto_paciente}`
+            : "https://i.pravatar.cc/40"
+        }
+        alt="paciente"
+      />
+      {receta.paciente}
+    </div>
 
-                  <div>{receta.hora}</div>
+    {/* DOCTOR  */}
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      {receta.doctor || "Sin doctor"}
+    </div>
 
-                  <div>
-                  <span
-  className={`status-badge ${
-    receta.prioridad === "Urgente"
-      ? "urgent"
-      : "normal"
-  }`}
->
-  {receta.prioridad}
-</span>
-                  </div>
+    {/* HORA */}
+    <div>{receta.hora}</div>
 
-                  {/* ICONOS */}
-                  <div style={{ display: "flex", gap: "12px" }}>
-                    <button
-                      onClick={() => openModal(receta)}
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        cursor: "pointer",
-                        fontSize: "18px",
-                        color: "#2563eb",
-                      }}
-                    >
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
+    {/* ESTADO */}
+    <div>
+      <span
+        className={`status-badge ${
+          receta.prioridad === "Urgente"
+            ? "urgent"
+            : "normal"
+        }`}
+      >
+        {receta.prioridad}
+      </span>
+    </div>
 
-                    <button
-                      onClick={() => openDeleteModal(receta)}
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        cursor: "pointer",
-                        fontSize: "18px",
-                        color: "#dc2626",
-                      }}
-                    >
-                      <i className="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              ))}
+    {/* ACCIONES */}
+    <div style={{ display: "flex", gap: "12px" }}>
+      <button
+        onClick={() => openModal(receta)}
+        style={{
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          fontSize: "18px",
+          color: "#2563eb",
+        }}
+      >
+        <i className="bi bi-pencil-square"></i>
+      </button>
+
+      <button
+        onClick={() => openDeleteModal(receta)}
+        style={{
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          fontSize: "18px",
+          color: "#dc2626",
+        }}
+      >
+        <i className="bi bi-trash"></i>
+      </button>
+    </div>
+  </div>
+))}
             </div>
 
             <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>
@@ -256,6 +316,18 @@ const handleChange = (e) => {
   <option value="Urgente">Urgente</option>
   <option value="Normal">Normal</option>
 </select>
+
+<p style={{ marginTop: "10px", fontWeight: "bold" }}>
+  Medicamentos:
+</p>
+
+<ul style={{ marginTop: "10px" }}>
+  {recetaSeleccionada?.medicamento
+    ?.split(",")
+    .map((med, index) => (
+      <li key={index}>{med.trim()}</li>
+    ))}
+</ul>
               </>
             )}
 

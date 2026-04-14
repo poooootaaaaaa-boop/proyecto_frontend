@@ -5,36 +5,17 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import EventIcon from "@mui/icons-material/Event";
 import WarningIcon from "@mui/icons-material/Warning";
 import EditIcon from "@mui/icons-material/Edit";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Axios from "axios";
 import Modal from "react-bootstrap/Modal";
 
 /*function tratamientos_largos({ data, setData }) {*/
-function tratamientos_largos({
-  data = [
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      progreso: 40,
-      tratamientoLargo: "si",
-      fechaTratamiento: "28 Mar 2026",
-      motivo: "Tratamiento dental prolongado"
-    },
-    {
-      id: 2,
-      nombre: "María López",
-      progreso: 70,
-      tratamientoLargo: "si",
-      fechaTratamiento: "30 Mar 2026",
-      motivo: "Rehabilitación física"
-    }
-  ],
-  setData = () => {}
-}){ 
+function tratamientos_largos(){ 
 
 const [tratamientoEditando, setTratamientoEditando] = useState(null);
 const [showModal, setShowModal] = useState(false);
 
-
+const [data, setData] = useState([]);
 
 
 const [showTratamiento, setShowTratamiento] = useState(false);
@@ -54,7 +35,30 @@ const cambiarProgreso = (id, valor) => {
   const actualizado = nuevos.find((t) => t.id === id);
   setTratamientoEditando(actualizado);
 };
+useEffect(() => {
 
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const doctor_id = usuario?.doctor_id || 1;
+
+  Axios.get(`http://127.0.0.1:8000/api/tratamientos-largos/${doctor_id}`)
+    .then((res) => {
+
+      const transformados = res.data.map((c) => ({
+        id: c.id,
+        nombre: `${c.paciente?.usuario?.nombre ?? ""} ${c.paciente?.apellidoP ?? ""}`,
+        progreso: c.estado === "completada" ? 100 : 50, // mejor lógica
+        fechaTratamiento: c.fecha_fin,
+        fecha_inicio: c.fecha_inicio,
+        estado: c.estado,
+        motivo: c.motivo
+      }));
+
+      setData(transformados);
+
+    })
+    .catch((err) => console.error(err));
+
+}, []);
 
 const finalizarTratamiento = () => {
 
@@ -81,10 +85,21 @@ const cancelarTratamiento = () => {
   setTratamientoEditando(null);
 
 };
+const hoy = new Date().toISOString().slice(0, 10);
 
-const tratamientos = data.filter(
-  (item) => item.tratamientoLargo === "si"
-);
+// tratamientos activos
+const tratamientosActivos = data.length;
+
+// próximas citas (futuro)
+
+const proximasCitas = data.filter(t =>
+  t.fecha_inicio?.slice(0, 10) > hoy
+).length;
+// pendientes
+const pendientes = data.filter(t =>
+  t.estado === "pendiente"
+).length;
+const tratamientos = data;
 
 return (
 <Layout_Medicos>
@@ -107,7 +122,7 @@ return (
           <CardContent style={{display:"flex",justifyContent:"space-between"}}>
             <div>
               <Typography style={{color:"#6b7280"}}>Tratamientos activos</Typography>
-              <h2>{tratamientos.length}</h2>
+              <h2>{tratamientosActivos}</h2>
             </div>
             <AssignmentIcon style={{fontSize:"40px",color:"#2563eb"}}/>
           </CardContent>
@@ -119,7 +134,7 @@ return (
           <CardContent style={{display:"flex",justifyContent:"space-between"}}>
            <div>
               <Typography style={{color:"#6b7280"}}>Próximas citas</Typography>
-              <h2>{tratamientos.length}</h2>
+              <h2>{proximasCitas}</h2>
            </div>
             <EventIcon style={{fontSize:"40px",color:"#f59e0b"}}/>
           </CardContent>
@@ -131,7 +146,7 @@ return (
             <CardContent style={{display:"flex",justifyContent:"space-between"}}>
               <div>
                 <Typography style={{color:"#6b7280"}}>Pendientes</Typography>
-                  <h2>2</h2>
+                  <h2>{pendientes}</h2>
               </div>
             <WarningIcon style={{fontSize:"40px",color:"#ef4444"}}/>
           </CardContent>
@@ -215,7 +230,7 @@ return (
 
         {/* CITA */}
         <div className="col-md-2">
-           {p.fechaTratamiento}
+           {new Date(p.fechaTratamiento).toLocaleDateString()}
         </div>
 
         {/* EDITAR */}

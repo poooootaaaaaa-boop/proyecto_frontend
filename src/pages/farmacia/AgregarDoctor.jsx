@@ -12,13 +12,17 @@ export default function AgregarDoctor() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const [doctor, setDoctor] = useState({
-    especialidad_id: "",
-    cedula_profesional: "",
-    anios_exp: "",
-    telefono: "",
-  });
+const [imagen, setImagen] = useState(null);
+const [preview, setPreview] = useState(null);
+const [doctor, setDoctor] = useState({
+  nombre: "",
+  correo: "",
+  password: "",
+  especialidad_id: "",
+  cedula_profesional: "",
+  anios_exp: "",
+  telefono: "",
+});
 
   const handleChange = (e) => {
     setDoctor({
@@ -28,61 +32,79 @@ export default function AgregarDoctor() {
 
     setError("");
   };
+  const handleImagen = (e) => {
+  const file = e.target.files[0];
+  setImagen(file);
+
+  if (file) {
+    setPreview(URL.createObjectURL(file));
+  }
+};
 
   const cerrarModal = () => setShowModal(false);
 
   // VALIDAR CAMPOS
   const abrirModal = () => {
 
-    if (
-      !doctor.especialidad_id ||
-      !doctor.cedula_profesional ||
-      !doctor.anios_exp ||
-      !doctor.telefono
-    ) {
-      setError("Por favor llena todos los campos.");
-      return;
-    }
+ if (
+  !doctor.nombre ||
+  !doctor.correo ||
+  !doctor.password ||
+  !doctor.cedula_profesional
+) {
+  setError("Completa todos los campos obligatorios");
+  return;
+}
 
     setShowModal(true);
   };
 
   // GUARDAR DOCTOR
-  const guardarDoctor = async () => {
+const guardarDoctor = async () => {
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
+  try {
 
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/doctores",
-        {
-          especialidad_id: parseInt(doctor.especialidad_id),
-          cedula_profesional: doctor.cedula_profesional,
-          anios_exp: parseInt(doctor.anios_exp),
-          telefono: doctor.telefono,
-        }
-      );
+    const formData = new FormData();
 
-      console.log("Doctor guardado:", response.data);
+    formData.append("nombre", doctor.nombre);
+    formData.append("correo", doctor.correo);
+    formData.append("password", doctor.password);
+    formData.append("especialidad_id", doctor.especialidad_id);
+    formData.append("cedula_profesional", doctor.cedula_profesional);
+    formData.append("anios_exp", doctor.anios_exp);
+    formData.append("telefono", doctor.telefono);
 
-      cerrarModal();
-      navigate("/farmacia/doctores");
-
-    } catch (err) {
-
-      console.log(err);
-
-      if (err.response) {
-        setError(err.response.data.message || "Error del servidor");
-      } else {
-        setError("No se pudo conectar con el servidor");
-      }
-
-    } finally {
-      setLoading(false);
+    if (imagen) {
+      formData.append("imagen", imagen);
     }
-  };
+
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/doctores",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+
+    cerrarModal();
+    navigate("/farmacia/doctores");
+
+  } catch (err) {
+
+    if (err.response) {
+      setError(err.response.data.message || "Error");
+    } else {
+      setError("Error de conexión");
+    }
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="home-layout">
@@ -147,6 +169,31 @@ export default function AgregarDoctor() {
                     />
                   </Col>
 
+                  <Col md={6}>
+  <Form.Label>Nombre</Form.Label>
+  <Form.Control
+    name="nombre"
+    onChange={handleChange}
+  />
+</Col>
+
+<Col md={6}>
+  <Form.Label>Correo</Form.Label>
+  <Form.Control
+    name="correo"
+    onChange={handleChange}
+  />
+</Col>
+
+<Col md={6}>
+  <Form.Label>Contraseña</Form.Label>
+  <Form.Control
+    type="password"
+    name="password"
+    onChange={handleChange}
+  />
+</Col>
+
                 </Row>
 
               </Card>
@@ -155,24 +202,41 @@ export default function AgregarDoctor() {
 
             <Col md={4}>
 
-              <Card className="card-modern d-flex justify-content-center align-items-center">
+<Card className="card-modern d-flex justify-content-center align-items-center">
 
-                <div
-                  style={{
-                    width: "140px",
-                    height: "140px",
-                    border: "2px dashed #ccc",
-                    borderRadius: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#aaa",
-                  }}
-                >
-                  Foto Doctor
-                </div>
+  <label
+    style={{
+      width: "140px",
+      height: "140px",
+      border: "2px dashed #ccc",
+      borderRadius: "12px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#aaa",
+      cursor: "pointer",
+      overflow: "hidden"
+    }}
+  >
+    {preview ? (
+      <img
+        src={preview}
+        alt="preview"
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      />
+    ) : (
+      "Foto Doctor"
+    )}
 
-              </Card>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImagen}
+      style={{ display: "none" }}
+    />
+  </label>
+
+</Card>
 
             </Col>
 

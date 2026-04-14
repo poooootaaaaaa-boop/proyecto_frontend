@@ -1,37 +1,55 @@
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./dashboardFarmacia.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import Pagination from "@mui/material/Pagination";
 
 export default function RecetasRecibidas() {
-
-  const [recetas, setRecetas] = useState([
-    {
-      id: 1,
-      paciente: "Juan Pérez",
-      medicamento: "Amoxicilina",
-      hora: "10:30",
-      prioridad: "Urgente",
-    },
-    {
-      id: 2,
-      paciente: "María López",
-      medicamento: "Paracetamol",
-      hora: "11:15",
-      prioridad: "Normal",
-    },
-    {
-      id: 3,
-      paciente: "Carlos Ruiz",
-      medicamento: "Ibuprofeno",
-      hora: "12:00",
-      prioridad: "Urgente",
-    },
-  ]);
 
   const [modalEditar, setModalEditar] = useState(false);
   const [modalEliminar, setModalEliminar] = useState(false);
   const [recetaSeleccionada, setRecetaSeleccionada] = useState(null);
+  const [recetas, setRecetas] = useState([]);
+const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+const fetchRecetas = async (page = 1) => {
+  try {
+    const res = await axios.get(
+      `http://localhost:8000/api/recetas/farmacia?page=${page}&farmacia_id=1`
+    );
+
+    setRecetas(res.data.data);
+    setTotalPages(res.data.last_page);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const fetchStats = async () => {
+  try {
+    const res = await axios.get(
+      `http://localhost:8000/api/recetas/stats?farmacia_id=1`
+    );
+
+    setStats(res.data);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+useEffect(() => {
+  fetchRecetas(page);
+  fetchStats();
+}, [page]);
+
+const [stats, setStats] = useState({
+  total: 0,
+  pendientes: 0,
+  entregadas: 0,
+});
 
   const abrirEditar = (receta) => {
     setRecetaSeleccionada({ ...receta });
@@ -58,15 +76,21 @@ export default function RecetasRecibidas() {
     });
   };
 
-  const guardarCambios = () => {
-    setRecetas((prev) =>
-      prev.map((r) =>
+const guardarCambios = () => {
+  if (recetaSeleccionada.estado === "entregada") {
+    setRecetas(prev =>
+      prev.filter(r => r.id !== recetaSeleccionada.id)
+    );
+  } else {
+    setRecetas(prev =>
+      prev.map(r =>
         r.id === recetaSeleccionada.id ? recetaSeleccionada : r
       )
     );
+  }
 
-    cerrarModales();
-  };
+  cerrarModales();
+};
 
   const eliminarReceta = () => {
     setRecetas((prev) =>
@@ -88,24 +112,20 @@ export default function RecetasRecibidas() {
         {/* CARDS */}
         <div className="stats-grid">
 
-          <div className="stat-card-modern">
-            <small>Recetas del día</small>
-            <h3>{recetas.length}</h3>
-          </div>
+<div className="stat-card-modern">
+  <small>Recetas del día</small>
+  <h3>{stats.total}</h3>
+</div>
 
-          <div className="stat-card-modern">
-            <small>Urgentes</small>
-            <h3>
-              {recetas.filter((r) => r.prioridad === "Urgente").length}
-            </h3>
-          </div>
+<div className="stat-card-modern">
+  <small>Pendientes</small>
+  <h3>{stats.pendientes}</h3>
+</div>
 
-          <div className="stat-card-modern">
-            <small>Normales</small>
-            <h3>
-              {recetas.filter((r) => r.prioridad === "Normal").length}
-            </h3>
-          </div>
+<div className="stat-card-modern">
+  <small>Entregadas</small>
+  <h3>{stats.entregadas}</h3>
+</div>
 
         </div>
 
@@ -128,23 +148,34 @@ export default function RecetasRecibidas() {
 
               <div className="table-row-modern" key={receta.id}>
 
-                <div>{receta.paciente}</div>
+                <div>{receta.paciente.usuario.nombre}</div>
 
-                <div>{receta.medicamento}</div>
+<div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+  {receta.detalles.map((d, i) => (
+    <span key={i} className="badge-medicamento">
+      💊 {d.medicamento?.nombre}
+    </span>
+  ))}
+</div>
 
-                <div>{receta.hora}</div>
+               <div>
+  {new Date(receta.creado_en).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}
+</div>
 
-                <div>
-                  <span
-                    className={`status-badge ${
-                      receta.prioridad === "Urgente"
-                        ? "urgent"
-                        : "normal"
-                    }`}
-                  >
-                    {receta.prioridad}
-                  </span>
-                </div>
+             <div>
+  <span
+    className={`status-badge ${
+      receta.estado === "pendiente"
+        ? "urgent"
+        : "normal"
+    }`}
+  >
+    {receta.estado}
+  </span>
+</div>
 
                 <div style={{ display: "flex", gap: "12px" }}>
 
@@ -174,6 +205,13 @@ export default function RecetasRecibidas() {
 
             ))}
 
+            <Pagination
+  count={totalPages}
+  page={page}
+  onChange={(e, value) => setPage(value)}
+  shape="rounded"
+/>
+
           </div>
         </div>
 
@@ -188,33 +226,38 @@ export default function RecetasRecibidas() {
 
             <input
               name="paciente"
-              value={recetaSeleccionada.paciente}
+              value={recetaSeleccionada?.paciente?.usuario?.nombre || ""}disabled
               onChange={handleChange}
               placeholder="Paciente"
             />
 
-            <input
-              name="medicamento"
-              value={recetaSeleccionada.medicamento}
-              onChange={handleChange}
-              placeholder="Medicamento"
-            />
+        <div>
+  {recetaSeleccionada?.detalles?.map((d, i) => (
+    <div key={i}>
+      💊 {d.medicamento?.nombre}
+    </div>
+  ))}
+</div>
+<input
+  type="time"
+  value={
+    recetaSeleccionada?.creado_en
+      ? new Date(recetaSeleccionada.creado_en)
+          .toISOString()
+          .substring(11, 16)
+      : ""
+  }
+  disabled
+/>
 
-            <input
-              type="time"
-              name="hora"
-              value={recetaSeleccionada.hora}
-              onChange={handleChange}
-            />
-
-            <select
-              name="prioridad"
-              value={recetaSeleccionada.prioridad}
-              onChange={handleChange}
-            >
-              <option>Urgente</option>
-              <option>Normal</option>
-            </select>
+<select
+  name="estado"
+  value={recetaSeleccionada.estado}
+  onChange={handleChange}
+>
+  <option value="pendiente">Pendiente</option>
+  <option value="entregada">Entregada</option>
+</select>
 
             <div className="modal-footer-modern">
 

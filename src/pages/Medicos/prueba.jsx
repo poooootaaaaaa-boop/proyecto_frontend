@@ -1,4 +1,4 @@
-import Layout_Medicos from "./Layout_Medicos"
+import Sidebar from "../../components/farmacia/Sidebar";
 import { Link } from "react-router-dom";
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
@@ -146,10 +146,11 @@ const guardarMovimiento = () => {
 
 
   return (
-    <div>
-      <Layout_Medicos>
-         <div >
-      <br /><br />
+  <div style={{ display: "flex" }}>
+    
+    <Sidebar />
+
+    <div style={{ flex: 1, padding: "20px" }}>
 
       <h4 style={{ marginLeft: "40px" }}>
         <strong>Movimientos de Stock</strong>
@@ -363,8 +364,6 @@ const guardarMovimiento = () => {
       </div>
 
     </div>
-
-      </Layout_Medicos>
     </div>
   );
 }

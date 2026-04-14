@@ -14,6 +14,7 @@ export default function Sidebar() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
 
   const linkStyle = ({ isActive }) => ({
     display: "flex",
@@ -43,6 +44,12 @@ export default function Sidebar() {
         <i className="bi bi-hospital"></i>
         CliniConnect
       </div>
+      {/* USUARIO */}
+<div style={{ marginBottom: "25px", paddingLeft: "5px" }}>
+  <div style={{ fontWeight: "600" }}>
+    {usuario?.nombre || "Usuario"}
+  </div>
+</div>
 
       <Nav className="flex-column gap-2">
 
@@ -60,6 +67,10 @@ export default function Sidebar() {
           <i className="bi bi-file-earmark-medical"></i>
           Recetas Médicas
         </Nav.Link>
+<Nav.Link as={NavLink} to="/farmacia/prueba" style={linkStyle}>
+  <i className="bi bi-arrow-left-right"></i>
+  Altas y bajas
+</Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/inventario" style={linkStyle}>
           <i className="bi bi-box-seam"></i>

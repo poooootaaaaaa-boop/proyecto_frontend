@@ -45,7 +45,7 @@ const handleLogin = async () => {
     const user = response.usuario;
 
     // guardar usuario y token
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("usuario", JSON.stringify(user));
     localStorage.setItem("token", response.token);
 
     setError("");

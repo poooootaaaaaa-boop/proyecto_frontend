@@ -1,6 +1,18 @@
 import { Card, CardContent, Typography, Button, Box } from "@mui/material";
+import { useEffect, useState } from "react";
 
 export default function WelcomeCard() {
+  const [userName, setUserName] = useState("");
+
+  const [nombre, setNombre] = useState("");
+
+  useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (usuario) {
+      setNombre(usuario.nombre);
+    }
+  }, []);
+
   return (
     <Card
       sx={{
@@ -32,7 +44,7 @@ export default function WelcomeCard() {
           gutterBottom
           sx={{ fontSize: { xs: 24, md: 30 } }}
         >
-          Bienvenida de nuevo, Sofia
+           Bienvenido de nuevo, {nombre?.split(" ")[0]}
         </Typography>
 
         <Typography

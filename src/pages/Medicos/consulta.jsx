@@ -11,6 +11,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import { Link } from "react-router-dom";
+import './Consulta.css';
 import Axios from "axios";
 function Consulta({data,setData /*dataPacientes*/}){
     const [pacienteId, setPacienteId] = useState("");
@@ -22,6 +23,30 @@ function Consulta({data,setData /*dataPacientes*/}){
     const [notas, setNotas] = useState("");
     const [tratamientoLargo, setTratamientoLargo] = useState("");
     const [fechaTratamiento, setFechaTratamiento] = useState(null);
+const [diagnostico, setDiagnostico] = useState("");
+    const [medicamentos, setMedicamentos] = useState([]);
+const [listaMedicamentos, setListaMedicamentos] = useState([]);
+const [citaSeleccionada, setCitaSeleccionada] = useState("");
+const [citas, setCitas] = useState([]);
+const [tipoConsulta, setTipoConsulta] = useState("");
+const [requiereSeguimiento, setRequiereSeguimiento] = useState(false);
+const [fechaSeguimiento, setFechaSeguimiento] = useState(null);
+const [medicamentoActivo, setMedicamentoActivo] = useState(null);
+
+useEffect(() => {
+  const doctor_id = 1;
+
+  Axios.get(`http://127.0.0.1:8000/api/citas-doctor/${doctor_id}`)
+    .then(res => {
+      // SOLO PENDIENTES
+      const pendientes = res.data.filter(c => c.estado === "pendiente");
+      setCitas(pendientes);
+    });
+}, []);
+useEffect(() => {
+  Axios.get("http://127.0.0.1:8000/api/medicamentos")
+    .then(res => setListaMedicamentos(res.data));
+}, []);
 
     useEffect(() => {
   Axios.get("http://127.0.0.1:8000/api/MostrarPaciente")
@@ -33,226 +58,312 @@ function Consulta({data,setData /*dataPacientes*/}){
     });
 }, []);
 
-      const guardar = () => {
-    // find patient info so we can include name in the stored record
-    const selected = dataPacientes.find(p => String(p.id) === String(pacienteId));
-    const nuevoPaciente = {
-      id: Date.now(),
-      pacienteId,
+    const agregarMedicamento = () => {
+  setMedicamentos([
+    ...medicamentos,
+    {
+      medicamento_id: "",
+      dosis: "",
+      frecuencia: "",
+      duracion: "",
+      instrucciones: ""
+    }
+  ]);
+  setMedicamentoActivo(medicamentos.length); // abre el nuevo automáticamente
+};
+
+
+const actualizarMedicamento = (index, campo, valor) => {
+  const nuevos = [...medicamentos];
+  nuevos[index][campo] = valor;
+  setMedicamentos(nuevos);
+};
+
+
+const finalizarConsulta = async () => {
+  try {
+
+    // 1. GUARDAR CONSULTA
+    await Axios.post("http://127.0.0.1:8000/api/finalizar-consulta", {
+      cita_id: citaSeleccionada,
+      doctor_id: 1,
+      paciente_id: pacienteId,
       motivo,
       sintomas,
-      examen,
+      diagnostico,
       notas,
-      tratamientoLargo,
-      fechaTratamiento:fechaTratamiento?.format("YYYY-MM-DD HH:mm"),
-      progreso: 0,
-      nombre: selected?.nombre || "",
-      apellido: selected?.apellidoP || ""
-    };
-    if (typeof setData === "function") {
-      setData(prev => [...prev, nuevoPaciente]);
-      setMostrarMensaje(true);  
-    } 
-
-        // ✅ BACKEND LARAVEL
-    Axios.post(
-        "http://127.0.0.1:8000/api/AddConsulta",
-        nuevoPaciente
-        /*
-    {
-        pacienteId: pacienteId,
-        motivo,
-        sintomas,
-        examen,
-        notas,
-        fechaTratamiento: fechaTratamiento?.format("YYYY-MM-DD HH:mm")
-    }*/
-)
-    .then((response) => {
-        console.log("Consulta guardada en Laravel:", response.data);
-    })
-    .catch((error) => {
-        console.error("Error guardando consulta:", error);
+      examen,
+      medicamentos
     });
 
-    console.log("Consulta registrada:", nuevoPaciente);
-    
-    /*else {
-      console.error("setData no es una función", setData);
+    // 2. MARCAR COMO COMPLETADA (ESTO SIEMPRE)
+    await Axios.put(`http://127.0.0.1:8000/api/citas/${citaSeleccionada}/estado`, {
+      estado: "completada"
+    });
+
+    // 3. SI HAY SEGUIMIENTO → CREAR NUEVA CITA
+    if (requiereSeguimiento && fechaSeguimiento) {
+
+          const ocupado = citas.some(c =>
+    new Date(c.fecha_fin).getTime() === fechaSeguimiento.toDate().getTime()
+  );
+
+  if (ocupado) {
+    alert("Ese horario ya está ocupado");
+    return;
+  }
+      await Axios.post("http://127.0.0.1:8000/api/citas", {
+        doctor_id: 1,
+        paciente_id: pacienteId,
+        fecha_inicio: fechaSeguimiento.format("YYYY-MM-DD HH:mm:ss"),
+        fecha_fin: fechaSeguimiento.add(30, "minute").format("YYYY-MM-DD HH:mm:ss"),
+        estado: "pendiente",
+        motivo: "SEGUIMIENTO - " + motivo
+      });
     }
-    */
-    setMotivo("");
-    setSintomas("");
-    setExamen("");
-    setNotas("");
-    setTratamientoLargo("");
-    setFechaTratamiento("");
-  };
+
+    // 4. MENSAJE FINAL
+    setMostrarMensaje(true);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   console.log(fechaTratamiento)
 
 
-    return(
-        <div>
-            <Layout_Medicos>
+    return (
+<div>
+<Layout_Medicos>
 
-                {mostrarMensaje ? (
-                
-                    <Mensaje
-                        titulo="¡Consulta Registrada!"
-                        descripcion="La consulta fue agregada correctamente."
-                        botonPrincipal="Volver"
-                        onPrincipal="/Medicos/recetas_medicas"
-                    />
-                
-                            ) : (  
+{mostrarMensaje ? (
 
-                        <div>
-                             <div className="container mt-4" >
-                                 <h3 style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}>Formulario Clinico</h3>
-                                 <Typography style={{fontSize: "17px",color: "gray"}}>Registra el Proceso de la Consulta Actual</Typography>
-                                <div className="bg-white p-4 mb-4" style={{borderRadius:"20px",border:"1px solid #ddd",boxShadow:"0 2px 6px rgba(0,0,0,0.05)"}}>
+    <Mensaje
+        titulo="¡Consulta Registrada!"
+        descripcion="Consulta y receta creadas correctamente."
+        botonPrincipal="Volver"
+        onPrincipal="/Medicos/recetas_medicas"
+    />
 
-                                        <Row className="mt-3">
-                                            
-                                            <br />
-                                            <Col md={6}>
-                                            <Form.Label className="text-dark fw-bold">Nombre del paciente</Form.Label>
-                                            <Form.Select 
-                                                    value={pacienteId}
-                                                    onChange={(e)=>setPacienteId(e.target.value)}
-                                                    >
+) : (
 
-                                                    <option value="">Seleccionar paciente</option>
+<div className="container-fluid mt-3 consulta-container">
 
-                                                    {dataPacientes.map((paciente)=>(
-                                                    <option key={paciente.id} value={paciente.id}>
-                                                        {paciente.nombre} {paciente.apellidoP}
-                                                    </option>
-                                                    ))}
+<Row>
 
-                                                    </Form.Select>
-                                            </Col>
-
-                                            <Col md={6}>
-                                                <Form.Label className="text-dark fw-bold">Motivo de la consulta</Form.Label>
-
-                                                <Form.Control value={motivo} onChange={(e)=>setMotivo(e.target.value)}/>
-                                            </Col>
-
-                                        </Row>
-                                </div>
-
-                                <div className="bg-white p-4 mb-4" style={{borderRadius:"20px",border:"1px solid #ddd",boxShadow:"0 2px 6px rgba(0,0,0,0.05)"}}>
-
-                                    <Row>
-                                        
-                                         <Col md={8}>
-
-                                            <Row>
-                                                <Col md={12}> 
-
-                                                    <Form.Label className="text-dark fw-bold"> Sintomas</Form.Label>
-
-                                                    <Form.Control as="textarea"rows={4} value={sintomas} onChange={(e)=>setSintomas(e.target.value)}/>
-                                                
-                                                </Col>
-                                            </Row>
-
-                                             <Form.Label className="text-dark fw-bold mt-3">
-                                                ¿Requiere tratamiento largo?
-                                            </Form.Label>
-
-                                            <Form.Select 
-                                                value={tratamientoLargo}
-                                                onChange={(e)=>setTratamientoLargo(e.target.value)}
-                                            >
-                                                <option value="">Seleccionar</option>
-                                                <option value="si">Sí</option>
-                                                <option value="no">No</option>
-                                            </Form.Select>
-
-                                            {tratamientoLargo === "si" && (
-                                                <>
-                                                    <Form.Label className="text-dark fw-bold mt-3">
-                                                        Fecha de control
-                                                    </Form.Label>
-                                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                        <StaticDateTimePicker
-                                                        orientation="landscape"
-                                                        value={fechaTratamiento}
-                                                        onChange={(newValue)=>setFechaTratamiento(newValue)}
-                                                        className="calendar-clean"
-                                                        slotProps={{actionBar:{actions:[]}}}
-                                                        />
-                                                        </LocalizationProvider>
-                                                </>
-                                            )}
-
-
-                                            <Row className="mt-3">
-
-                                                 <Col md={12}>
-
-                                                 <Form.Label className="fw-bold" style={{color:"#7c3aed"}}>
-                                                    📝 Notas del médico
-                                                </Form.Label>
-
-                                             <Form.Control as="textarea"rows={8} placeholder="Escriba aquí observaciones adicionales, recomendaciones o notas importantes..." style={{background:"#faf5ff",border:"1px solid #e9d5ff",resize:"none"}}  value={notas} onChange={(e)=>setNotas(e.target.value)}/>
-                                                 
-                                                 
-                                                 </Col>
-
-                                            </Row>
-                                               
-                                         
-                                        </Col>
-
-                                           {/* LADO DERECHO */}
-
-                                        {/* INPUT DE NOTAS */}
-                                         <Col md={4}>
-                                            <Form.Label className="text-dark fw-bold"> Examen físico</Form.Label>
-
-                                            <Form.Control value={examen} onChange={(e)=>setExamen(e.target.value)} type="file"/> 
-
-                                        </Col> 
-
-                                    </Row>
-
-
-
-                                </div>
-
-
-                                <br />
-
-                            </div>
-
-
-                            <Container>
-                                <Row>
+    {/* 🟣 IZQUIERDA - PACIENTE */}
+    <Col md={3}>
+        <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #ddd"}}>
             
+            <h5 className="fw-bold mb-3">Paciente</h5>
 
-                                    <div className="text-end">
-                                        <Button variant="danger" style={{width:"25%", marginRight: "10px" }}as={Link} to="/Medicos/recetas_medicas">Cancelar consulta</Button>
+      <Form.Label>Seleccionar cita</Form.Label>
+<Form.Select
+  value={citaSeleccionada}
+  onChange={(e) => {
+    const cita = citas.find(c => c.id == e.target.value);
+    setCitaSeleccionada(cita.id);
 
-                                        <Button onClick={guardar} style={{width:"25%"}}> Finalizar Consulta</Button>
-                                    
-                                    </div>
+    //  AUTO SET PACIENTE
+    setPacienteId(cita.paciente_id);
+  }}
+>
+  <option value="">Seleccionar</option>
 
-                                </Row>
+{citas.map(c => {
+  const paciente = dataPacientes.find(p => p.id === c.paciente_id);
 
-                            </Container>
-
-
-
-                        </div>
-                            )}
-            </Layout_Medicos>
+  return (
+    <option key={c.id} value={c.id}>
+      Cita #{c.id} - {paciente ? paciente.nombre : "Sin nombre"} - {c.motivo}
+    </option>
+  );
+})}
+</Form.Select>
 
         </div>
+    </Col>
 
-    )
+
+    {/* 🔵 CENTRO - CONSULTA */}
+    <Col md={5}>
+        <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #ddd"}}>
+
+            <h5 className="fw-bold mb-3">Consulta</h5>
+
+            <Form.Label>Motivo</Form.Label>
+            <Form.Control
+                value={motivo}
+                onChange={(e)=>setMotivo(e.target.value)}
+            />
+
+            <Form.Label className="mt-3">Síntomas</Form.Label>
+            <Form.Control
+                as="textarea"
+                rows={3}
+                value={sintomas}
+                onChange={(e)=>setSintomas(e.target.value)}
+            />
+
+            <Form.Label className="mt-3">Diagnóstico</Form.Label>
+            <Form.Control
+                as="textarea"
+                rows={2}
+                value={diagnostico}
+                onChange={(e)=>setDiagnostico(e.target.value)}
+            />
+
+            <Form.Label className="mt-3">Notas</Form.Label>
+            <Form.Control
+                as="textarea"
+                rows={4}
+                value={notas}
+                onChange={(e)=>setNotas(e.target.value)}
+            />
+
+            <Form.Label className="mt-3">Examen</Form.Label>
+            <Form.Control
+                type="text"
+                value={examen}
+                onChange={(e)=>setExamen(e.target.value)}
+            />
+
+            <Form.Check 
+  type="checkbox"
+  label="¿Requiere seguimiento?"
+  checked={requiereSeguimiento}
+  onChange={(e) => setRequiereSeguimiento(e.target.checked)}
+/>
+{requiereSeguimiento && (
+  <div className="mt-3">
+    <Form.Label>Fecha de seguimiento</Form.Label>
+
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <StaticDateTimePicker
+        value={fechaSeguimiento}
+        onChange={(newValue) => setFechaSeguimiento(newValue)}
+        className="calendar-clean"
+        slotProps={{ actionBar: { actions: [] } }}
+      />
+    </LocalizationProvider>
+  </div>
+)}
+        </div>
+    </Col>
+
+
+    {/* 🟢 DERECHA - RECETA */}
+    <Col md={4}>
+        <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #ddd"}}>
+
+            <h5 className="fw-bold mb-3">Receta</h5>
+
+{medicamentos.map((med, index) => (
+  <div key={index} className="mb-2">
+
+    {/* HEADER CLICKABLE */}
+    <div 
+      onClick={() => setMedicamentoActivo(medicamentoActivo === index ? null : index)}
+      style={{
+        cursor: "pointer",
+        background: "#f5f5f5",
+        padding: "10px",
+        borderRadius: "10px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        border: "1px solid #ddd"
+      }}
+    >
+      <span><b>Medicamento {index + 1}</b></span>
+      <span>{medicamentoActivo === index ? "▲" : "▼"}</span>
+    </div>
+
+    {/* CONTENIDO DESPLEGABLE */}
+    {medicamentoActivo === index && (
+      <div className="mt-2 p-2 border rounded">
+
+        <Form.Select
+          className="mb-2"
+          onChange={(e)=>actualizarMedicamento(index,"medicamento_id",e.target.value)}
+        >
+          <option>Medicamento</option>
+          {listaMedicamentos.map((m)=>(
+            <option key={m.id} value={m.id}>
+              {m.nombre}
+            </option>
+          ))}
+        </Form.Select>
+
+        <Form.Control
+          placeholder="Dosis"
+          className="mb-2"
+          onChange={(e)=>actualizarMedicamento(index,"dosis",e.target.value)}
+        />
+
+        <Form.Control
+          placeholder="Frecuencia"
+          className="mb-2"
+          onChange={(e)=>actualizarMedicamento(index,"frecuencia",e.target.value)}
+        />
+
+        <Form.Control
+          placeholder="Duración"
+          className="mb-2"
+          onChange={(e)=>actualizarMedicamento(index,"duracion",e.target.value)}
+        />
+
+        <Form.Control
+          placeholder="Instrucciones"
+          className="mb-2"
+          onChange={(e)=>actualizarMedicamento(index,"instrucciones",e.target.value)}
+        />
+
+      </div>
+    )}
+
+  </div>
+))}
+
+            <Button onClick={agregarMedicamento} variant="outline-primary">
+                + Agregar medicamento
+            </Button>
+
+        </div>
+    </Col>
+
+</Row>
+
+
+{/* 🔥 BOTONES */}
+<Row className="mt-4">
+    <Col className="text-end">
+
+        <Button 
+            variant="danger" 
+            className="me-2"
+            as={Link} 
+            to="/Medicos/recetas_medicas"
+        >
+            Cancelar
+        </Button>
+
+        <Button 
+            onClick={finalizarConsulta}
+        >
+            Finalizar Consulta
+        </Button>
+
+    </Col>
+</Row>
+
+</div>
+
+)}
+
+</Layout_Medicos>
+</div>
+);
 }
 export default Consulta

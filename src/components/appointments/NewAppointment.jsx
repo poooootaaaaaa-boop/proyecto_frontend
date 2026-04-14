@@ -17,7 +17,7 @@ dayjs.locale("es");
 
 export default function NewAppointment() {
 
-  const { appointments } = useAppointments();
+  const { appointments, loadAppointmentsByDoctor } = useAppointments();
   const [weekSelection, setWeekSelection] = useState(null);
 
   const navigate = useNavigate();
@@ -30,13 +30,53 @@ export default function NewAppointment() {
   const startDay = startOfMonth.day();
   const daysInMonth = endOfMonth.date();
   const [selectedHour, setSelectedHour] = useState(null);
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const [doctorId, setDoctorId] = useState(null);
+  const [doctores, setDoctores] = useState([]);
+const [selectedDoctor, setSelectedDoctor] = useState(null);
+const paciente_id = usuario?.paciente_id;
   const [viewMode, setViewMode] = useState("mes"); // semana | mes
+
+  const HOURS = ["08:00 AM","09:00 AM","10:00 AM","11:00 AM"];
   const days = [];
 
     useEffect(() => {
     setSelectedHour(null);
   }, [viewMode]);
 
+
+useEffect(() => {
+  if (!doctorId) return;
+
+  loadAppointmentsByDoctor(doctorId);
+
+}, [doctorId]);
+
+useEffect(() => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario) return;
+
+  const obtenerDoctores = async () => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/paciente/doctores/${usuario.id}`);
+      const data = await res.json();
+
+      setDoctores(data);
+
+      // seleccionar el primero por default
+      if (data.length > 0) {
+        setSelectedDoctor(data[0]);
+        setDoctorId(data[0].id);
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  obtenerDoctores();
+}, []);
   useEffect(() => {
     if (viewMode === "mes") setWeekSelection(null);
   }, [viewMode]);
@@ -63,16 +103,17 @@ const bookedHoursForSelectedDay = appointments
       {/* SIDEBAR */}
       <Box className="apv-sidebar">
         <Box className="apv-doctor-card">
-          <Avatar
-            src="https://randomuser.me/api/portraits/men/32.jpg"
-            className="apv-doctor-avatar"
-          />
-          <Typography className="apv-doctor-name">
-            Dr. Alejandro Ruiz
-          </Typography>
-          <Typography className="apv-doctor-specialty">
-            Cardiología Clínica
-          </Typography>
+       <Avatar
+  src={selectedDoctor?.foto_url || "https://ui-avatars.com/api/?name=Doctor&background=0D8ABC&color=fff"}
+  className="apv-doctor-avatar"
+/>
+<Typography className="apv-doctor-name">
+  {selectedDoctor?.nombre || "Selecciona un doctor"}
+</Typography>
+
+<Typography className="apv-doctor-specialty">
+  {selectedDoctor?.especialidad || ""}
+</Typography>
 
           <Divider sx={{ my: 2 }} />
 
@@ -81,9 +122,10 @@ const bookedHoursForSelectedDay = appointments
               <Typography className="apv-stat-label">
                 Experiencia
               </Typography>
-              <Typography className="apv-stat-value">
-                15 años
-              </Typography>
+             
+<Typography className="apv-stat-value">
+  {selectedDoctor?.anios_exp || 0} años
+</Typography>
             </div>
 
             <div>
@@ -95,6 +137,26 @@ const bookedHoursForSelectedDay = appointments
               </Typography>
             </div>
           </Box>
+
+          <Box sx={{ mb: 2 }}>
+  <Typography fontWeight={600}>Seleccionar Doctor</Typography>
+
+  <select
+    value={selectedDoctor?.id || ""}
+    onChange={(e) => {
+      const doc = doctores.find(d => d.id == e.target.value);
+      setSelectedDoctor(doc);
+      setDoctorId(doc.id);
+    }}
+    style={{ width: "100%", padding: "8px", borderRadius: "8px" }}
+  >
+    {doctores.map(doc => (
+      <option key={doc.id} value={doc.id}>
+        {doc.nombre} - {doc.especialidad}
+      </option>
+    ))}
+  </select>
+</Box>
         </Box>
       </Box>
 
@@ -168,8 +230,18 @@ const bookedHoursForSelectedDay = appointments
     const isSelected = selectedDay === day;
 
     const formattedDate = day
-      ? currentMonth.date(day).format("DD MMMM YYYY")
-      : null;
+  ? currentMonth.date(day).format("DD MMMM YYYY")
+  : null;
+
+// obtener horas ocupadas de ese día
+const bookedHours = appointments
+  .filter(a => a.date === formattedDate)
+  .map(a => a.time);
+
+// verificar si TODAS están ocupadas
+const isFullBooked =
+  formattedDate &&
+  HOURS.every(h => bookedHours.includes(h));
 
     const isBooked =
       formattedDate && bookedDates.includes(formattedDate);
@@ -180,13 +252,13 @@ const bookedHoursForSelectedDay = appointments
         className={`apv-day-cell
           ${!day ? "empty" : ""}
           ${isSelected ? "selected" : ""}
-          ${isBooked ? "booked" : ""}
+          ${isFullBooked ? "booked" : ""}
         `}
-        onClick={() => {
-          if (!day || isBooked) return; //  aquí se bloquea
-          setSelectedDay(day);
-          setSelectedHour(null);
-        }}
+      onClick={() => {
+  if (!day || isFullBooked) return;
+  setSelectedDay(day);
+  setSelectedHour(null);
+}}
       >
         {day && (
           <>
@@ -268,24 +340,31 @@ const bookedHoursForSelectedDay = appointments
     )}
 
     {/*  SOLO EN MODO MES SE VEN LAS HORAS */}
-    {viewMode === "mes" && (
-      <Box className="apv-hours-grid">
-        {["08:00 AM","09:00 AM","10:00 AM","11:00 PM"].map((h) => (
-          <Button
-            key={h}
-            size="small"
-            variant={selectedHour === h ? "contained" : "outlined"}
-            onClick={() => setSelectedHour(h)}
-            sx={{
-              fontWeight: 600,
-              borderRadius: "10px"
-            }}
-          >
-            {h}
-          </Button>
-        ))}
-      </Box>
-    )}
+  {viewMode === "mes" && (
+  <Box className="apv-hours-grid">
+    {HOURS.map((h) => {
+
+      const isBooked = bookedHoursForSelectedDay.includes(h);
+
+      return (
+        <Button
+          key={h}
+          size="small"
+          disabled={isBooked} // BLOQUEA CLICK
+          variant={selectedHour === h ? "contained" : "outlined"}
+          onClick={() => setSelectedHour(h)}
+          sx={{
+            fontWeight: 600,
+            borderRadius: "10px",
+            opacity: isBooked ? 0.5 : 1 // efecto visual
+          }}
+        >
+          {isBooked ? "Ocupado" : h}
+        </Button>
+      );
+    })}
+  </Box>
+)}
 
     <Divider sx={{ my: 3 }} />
 
@@ -316,11 +395,13 @@ const bookedHoursForSelectedDay = appointments
             .date(selectedDay)
             .format("DD MMMM YYYY"),
           time: selectedHour,
+          doctor: selectedDoctor 
         },
       });
     } else {
       navigate("/confirmar-cita", {
         state: weekSelection,
+        doctor: selectedDoctor
       });
     }
   }}

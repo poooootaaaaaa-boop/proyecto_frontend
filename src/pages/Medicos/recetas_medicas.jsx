@@ -44,205 +44,125 @@ useEffect(() => {
     });
 }, []);
 
-/*const handleDownloadFullPDF = (consulta) => {
+const handleDownloadFullPDF = async (consulta) => {
   const doc = new jsPDF();
+/* ================= HEADER ================= */
+doc.setFillColor(15, 76, 129);
+doc.rect(0, 0, 210, 30, "F");
 
-  // ===== HEADER =====
-  doc.setFillColor(25, 118, 210); // azul médico
-  doc.rect(0, 0, 210, 30, "F");
+doc.setTextColor(255, 255, 255);
+doc.setFontSize(18);
+doc.text("RECETA MÉDICA", 20, 18);
 
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.text("HISTORIAL MÉDICO", 20, 18);
+doc.setFontSize(10);
+doc.text("Sistema Profesional Médico", 20, 25);
 
-  // Logo fake (texto por ahora)
-  doc.setFontSize(10);
-  doc.text("Hospital San Gabriel", 150, 18);
+doc.setTextColor(0, 0, 0);
 
-  // Reset color
-  doc.setTextColor(0, 0, 0);
+/* ================= DOCTOR ================= */
+doc.setFontSize(11);
+doc.setFont("helvetica", "bold");
 
-  // ===== INFO PACIENTE =====
+doc.text(
+  `Doctor: ${consulta.doctor?.usuario?.nombre ?? "N/A"}`,
+  20,
+  40
+);
+
+doc.setFont("helvetica", "normal");
+
+doc.text(
+  `Cédula: ${consulta.doctor?.cedula_profesional ?? "N/A"}`,
+  140,
+  40
+);
+
+// línea separadora elegante
+doc.setDrawColor(200, 200, 200);
+doc.line(20, 45, 190, 45);
+
+/* ================= PACIENTE ================= */
+doc.setFont("helvetica", "bold");
+
+doc.text(
+  `Paciente: ${consulta.paciente?.usuario?.nombre ?? ""} ${consulta.paciente?.apellidoP ?? ""}`,
+  20,
+  50
+);
+
+doc.setFont("helvetica", "normal");
+
+doc.text(`ID Consulta: #${consulta.id}`, 20, 58);
+doc.text(`Teléfono: ${consulta.paciente?.usuario?.telefono ?? "N/A"}`, 20, 66);
+doc.text(`Correo: ${consulta.paciente?.usuario?.correo ?? "N/A"}`, 20, 74);
+  /* ================= CONSULTA ================= */
   doc.setFontSize(14);
-  doc.text("Información del Paciente", 20, 45);
-
-  doc.setFontSize(11);
-  doc.text("Nombre: Juan Pérez", 20, 55);
-  doc.text("Edad: 34 años", 20, 62);
-  doc.text("Última actualización: 2024", 20, 69);
-
-  // ===== TRATAMIENTOS =====
-  doc.setFontSize(14);
-  doc.text("Tratamientos Activos", 20, 85);
+  doc.text("Detalle de Consulta", 20, 90);
 
   autoTable(doc, {
-    startY: 90,
-    head: [["Medicamento", "Dosis", "Frecuencia", "Médico"]],
-    body: [
-      ["Metformina", "850mg", "Cada 12 horas", "Dra. Elena Vargas"],
-      ["Vitamina D3", "2000 UI", "Diariamente", "Dr. Ricardo Soto"],
-    ],
-    theme: "striped",
-    headStyles: { fillColor: [25, 118, 210] },
-  });
-
-  // ===== CONSULTAS =====
-  const finalY = doc.lastAutoTable.finalY + 15;
-
-  doc.setFontSize(14);
-  doc.text("Historial de Consultas", 20, finalY);
-
-  autoTable(doc, {
-    startY: finalY + 5,
-    head: [["Fecha", "Motivo", "Especialista", "ID"]],
-    body: [
-      ["15 Ene 2024", "Chequeo Anual", "Dra. Sofía García", "#C-58421"],
-      ["10 Oct 2023", "Dolor lumbar", "Dr. Ricardo Soto", "#C-58400"],
-    ],
-    theme: "grid",
-    headStyles: { fillColor: [56, 142, 60] },
-  });
-
-  // ===== FOOTER =====
-  const pageHeight = doc.internal.pageSize.height;
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text(
-    "Documento generado automáticamente - Sistema Médico",
-    20,
-    pageHeight - 10
-  );
-
-  doc.save("historial_medico_profesional.pdf");
-
-  setOpenFullModal(false);
-  setOpenAlert(true);
-};*/
-
-
-const handleDownloadFullPDF = (consulta) => {
-
-  const doc = new jsPDF();
-
-  /* =========================
-        HEADER MÉDICO
-  ==========================*/
-  doc.setFillColor(15, 76, 129); // azul médico elegante
-  doc.rect(0, 0, 210, 35, "F");
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  doc.text("HISTORIAL CLÍNICO", 20, 20);
-
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.text("Sistema Profesional Médico", 20, 28);
-
-  // línea decorativa
-  doc.setDrawColor(200, 200, 200);
-  doc.line(20, 40, 190, 40);
-
-  doc.setTextColor(0, 0, 0);
-
-  /* =========================
-        TARJETA PACIENTE
-  ==========================*/
-  doc.setFillColor(245, 247, 250);
-  doc.roundedRect(20, 45, 170, 35, 5, 5, "F");
-
-  doc.setFontSize(13);
-  doc.setFont("helvetica", "bold");
-  doc.text("Información del Paciente", 25, 55);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-
-  doc.text(
-    `Nombre: ${consulta.paciente?.nombre ?? ""} ${consulta.paciente?.apellidoP ?? ""}`,
-    25,
-    65
-  );
-
-  doc.text(
-    `ID Consulta: #${consulta.id}`,
-    25,
-    72
-  );
-
-
-  /* =========================
-        SECCIÓN CONSULTA
-  ==========================*/
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text("Detalle de la Consulta Médica", 20, 95);
-
-  autoTable(doc, {
-    startY: 100,
-    head: [["Motivo", "Síntomas", "Notas Médicas"]],
+    startY: 95,
+    head: [["Motivo", "Síntomas", "Diagnóstico"]],
     body: [
       [
         consulta.motivo ?? "N/A",
         consulta.sintomas ?? "N/A",
-        consulta.notas ?? "N/A",
+        consulta.diagnostico ?? "N/A",
       ],
     ],
-    theme: "grid",
-
-    styles: {
-      fontSize: 11,
-      cellPadding: 6,
-      valign: "middle",
-    },
-
-    headStyles: {
-      fillColor: [15, 76, 129],
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "center",
-    },
-
-    alternateRowStyles: {
-      fillColor: [248, 250, 252],
-    },
   });
 
-  /* =========================
-        FIRMA MÉDICA
-  ==========================*/
-  const finalY = doc.lastAutoTable.finalY + 25;
+  /* ================= NOTAS ================= */
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY + 10,
+    head: [["Notas Clínicas"]],
+    body: [[consulta.notas_clinicas ?? "N/A"]],
+  });
 
-  doc.setDrawColor(150);
-  doc.line(130, finalY, 190, finalY);
+  /* ================= RECETA (MEDICAMENTOS) ================= */
+if (consulta.receta && consulta.receta.detalles.length > 0) {
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY + 10,
+    head: [["Medicamento", "Dosis", "Frecuencia", "Duración", "Instrucciones"]],
+    body: consulta.receta.detalles.map(d => [
+      d.medicamento?.nombre ?? "N/A",
+      d.dosis ?? "N/A",
+      d.frecuencia ?? "N/A",
+      d.duracion ?? "N/A",
+      d.instrucciones ?? "N/A",
+    ]),
+  });
+}
 
-  doc.setFontSize(10);
-  doc.text("Firma del Médico", 145, finalY + 5);
+/* ================= FIRMA ================= */
+const finalY = doc.lastAutoTable.finalY + 20;
 
-  /* =========================
-        FOOTER PROFESIONAL
-  ==========================*/
+// línea
+doc.line(130, finalY, 190, finalY);
+
+// nombre doctor
+doc.setFontSize(10);
+doc.text(
+  `${consulta.doctor?.usuario?.nombre ?? "Doctor"}`,
+  135,
+  finalY + 5
+);
+
+// texto firma
+doc.text("Firma del Médico", 140, finalY + 10);
+  /* ================= FOOTER ================= */
   const pageHeight = doc.internal.pageSize.height;
 
-  doc.setDrawColor(220);
   doc.line(20, pageHeight - 20, 190, pageHeight - 20);
-
   doc.setFontSize(9);
-  doc.setTextColor(120);
   doc.text(
-    "Documento generado automáticamente • Sistema Médico Profesional",
+    "Documento generado automáticamente • Sistema Médico",
     20,
     pageHeight - 10
   );
 
-  /* =========================
-        DESCARGA
-  ==========================*/
-  doc.save(
-    `Consulta_${consulta.paciente?.nombre}_${consulta.id}.pdf`
-  );
+  /* ================= DESCARGA ================= */
+  doc.save(`Receta_${consulta.paciente?.usuario?.nombre}_${consulta.id}.pdf`);
 };
-
 
 
 
@@ -302,13 +222,20 @@ const handleDownloadFullPDF = (consulta) => {
                             <CardContent>
                                 <div>
                                     <div style={{ display:"flex", alignItems:"center" }}>
-                                            <div style={{width:"40px", height:"40px", borderRadius:"50%", background:"#dbeafe", display:"flex", alignItems:"center",justifyContent:"center",color:"#1d4ed8",fontWeight:"bold",marginRight:"15px"}}>
-                                                {consulta.paciente?.nombre?.charAt(0)}
-                                                {consulta.paciente?.apellidoP?.charAt(0)}
-                                            </div>
+                                            <img
+  src={consulta.paciente?.usuario?.foto_url || "https://i.imgur.com/0y0y0y0.png"}
+  alt="Paciente"
+  style={{
+    width: "50px",
+    height: "50px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    marginRight: "10px"
+  }}
+/>
 
                                             <Typography style={{ fontWeight:"700", fontSize:"18px" }}>
-                                                {consulta.paciente?.nombre} {consulta.paciente?.apellidoP}
+                                                {consulta.paciente.usuario?.nombre} {consulta.paciente?.apellidoP}
                                             </Typography>
 
                                         </div>

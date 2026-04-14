@@ -2,6 +2,7 @@ import {Box, Card, CardContent,  Typography,  Button,  Avatar,  Tabs,  Tab,  Pap
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { useState } from "react";
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { useNavigate } from "react-router-dom";
 import { useAppointments } from "./AppointmentContext";
 import "./appointments.css";
@@ -12,14 +13,20 @@ import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import HistoryIcon from "@mui/icons-material/History";
 import { Chip } from "@mui/material";
 import ModalCancelarCita from "./ModalCancelarCita";
-
+import { useEffect } from "react";
+dayjs.extend(isSameOrAfter);
 export default function AppointmentList() {
   const [openCancel, setOpenCancel] = useState(false);
 const [selectedAppointment, setSelectedAppointment] = useState(null);
 const [successMessage, setSuccessMessage] = useState(false);
   const [tab, setTab] = useState(0);
   const navigate = useNavigate();
-  const { appointments, updateAppointment, deleteAppointment } = useAppointments();
+  const { 
+  appointments, 
+  loadAppointments,
+  loadFutureAppointments,   // ESTA TE FALTA
+  deleteAppointment 
+} = useAppointments();
   const [selectedDate, setSelectedDate] = useState(null);
   const [openEdit, setOpenEdit] = useState(false);
 const [editingAppointment, setEditingAppointment] = useState(null);
@@ -29,42 +36,27 @@ const handleCancelClick = (appt) => {
     setSelectedAppointment(appt);
     setOpenCancel(true);
   };
-const fakeAppointments = [
-  {
-    id: "fake1",
-    doctor: "Dra. Mariana López",
-    specialty: "Cardiología",
-    date: dayjs().add(1, "day").format("DD MMMM YYYY"),
-    time: "10:30 AM",
-    location: "Clínica Central - Consultorio 204",
-    avatar: "https://randomuser.me/api/portraits/women/45.jpg",
-  },
-  {
-    id: "fake2",
-    doctor: "Dr. Carlos Méndez",
-    specialty: "Dermatología",
-    date: dayjs().add(2, "day").format("DD MMMM YYYY"),
-    time: "04:00 PM",
-    location: "Hospital San Rafael",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    id: "fake3",
-    doctor: "Dra. Ana Torres",
-    specialty: "Pediatría",
-    date: dayjs().add(5, "day").format("DD MMMM YYYY"),
-    time: "09:15 AM",
-    location: "Centro Médico Norte",
-    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-  },
-];
 
+
+useEffect(() => {
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario) return;
+
+  loadFutureAppointments(usuario.paciente_id);
+}, []);
   // filtro del día seleccionado (si hay)
- const filteredAppointments = selectedDate
-  ? appointments.filter((appt) =>
+const today = dayjs().startOf("day");
+
+const upcomingAppointments = appointments.filter((appt) =>
+  dayjs(appt.date, "DD MMMM YYYY").isSameOrAfter(today)
+);
+
+const filteredAppointments = selectedDate
+  ? upcomingAppointments.filter((appt) =>
       dayjs(appt.date, "DD MMMM YYYY").isSame(selectedDate, "day")
     )
-  : appointments;
+  : upcomingAppointments;
 const sortedAppointments = [...filteredAppointments].sort((a, b) => {
   const today = dayjs().startOf("day");
 
@@ -296,7 +288,7 @@ const handleConfirmCancel = () => {
 )}
 
 {tab === 1 && (
-  <AppointmentHistory appointments={appointments} />
+  <AppointmentHistory />
 )}
         </div>
 

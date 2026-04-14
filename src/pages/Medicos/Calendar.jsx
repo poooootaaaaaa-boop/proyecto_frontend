@@ -1,7 +1,7 @@
 import { Box, Typography, Button, Modal } from "@mui/material";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./calendar.css";
 
 dayjs.locale("es");
@@ -14,12 +14,21 @@ export default function Calendar({ citas = [] }) {
   const [selectedDay, setSelectedDay] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [citaSeleccionada, setCitaSeleccionada] = useState(null);
+  const [citasDoctor, setCitasDoctor] = useState([]);
 
   const startOfMonth = currentMonth.startOf("month");
   const endOfMonth = currentMonth.endOf("month");
 
   const startDay = startOfMonth.day();
   const daysInMonth = endOfMonth.date();
+  useEffect(() => {
+  const doctor_id = 1; // luego dinámico
+
+  fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`)
+    .then(res => res.json())
+    .then(data => setCitasDoctor(data))
+    .catch(err => console.error(err));
+}, []);
 
   const days = [];
 
@@ -27,6 +36,22 @@ export default function Calendar({ citas = [] }) {
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
 
   const availableDays = [1,2,6,8,10,14,15,21,22,23,28,30];
+  const getColorByTipo = (motivo) => {
+  if (!motivo) return "gray";
+
+  const tipo = motivo.split(" - ")[0];
+
+  switch (tipo) {
+    case "URGENTE":
+      return "red";
+    case "RUTINA":
+      return "blue";
+    case "SEGUIMIENTO":
+      return "green";
+    default:
+      return "gray";
+  }
+};
 
   return (
 
@@ -76,11 +101,11 @@ export default function Calendar({ citas = [] }) {
             ? currentMonth.date(day).format("YYYY-MM-DD")
             : null;
 
-          const citaDelDia = citas.find(c =>
-            dayjs(c.fechaCita).format("YYYY-MM-DD") === formattedDate
-          );
+const citasDelDia = citasDoctor.filter(c =>
+  dayjs(c.fecha_fin).format("YYYY-MM-DD") === formattedDate
+);
 
-          const isBooked = !!citaDelDia;
+          const isBooked = citasDelDia.length > 0;
 
           return(
 
@@ -90,18 +115,16 @@ export default function Calendar({ citas = [] }) {
                 ${!day ? "empty":""}
                 ${isSelected ? "selected":""}
               `}
-              onClick={()=>{
+onClick={()=>{
+  if(!day) return;
 
-                if(!day) return;
+  setSelectedDay(day);
 
-                setSelectedDay(day);
-
-                if(citaDelDia){
-                  setCitaSeleccionada(citaDelDia);
-                  setOpenModal(true);
-                }
-
-              }}
+  if(citasDelDia.length > 0){
+    setCitaSeleccionada(citasDelDia); //  ahora es array
+    setOpenModal(true);
+  }
+}}
             >
 
               {day && (
@@ -112,7 +135,19 @@ export default function Calendar({ citas = [] }) {
 
                   {/* Punto rojo si hay cita */}
                   {isBooked && (
-                    <span className="calendar-red-dot"></span>
+                    <div style={{display:"flex", gap:"3px", marginTop:"4px"}}>
+  {citasDelDia.slice(0,3).map((cita, i) => (
+    <span
+      key={i}
+      style={{
+        width: "6px",
+        height: "6px",
+        borderRadius: "50%",
+        backgroundColor: getColorByTipo(cita.motivo)
+      }}
+    ></span>
+  ))}
+</div>
                   )}
                 </>
               )}
@@ -127,47 +162,65 @@ export default function Calendar({ citas = [] }) {
 
 
       {/* MODAL DETALLE CITA */}
-      <Modal open={openModal} onClose={()=>setOpenModal(false)}>
-        <Box
-          sx={{
-            position:"absolute",
-            top:"50%",
-            left:"50%",
-            transform:"translate(-50%,-50%)",
-            bgcolor:"white",
-            p:4,
-            borderRadius:"12px",
-            width:350
-          }}
-        >
+<Modal open={openModal} onClose={()=>setOpenModal(false)}>
+  <Box
+    sx={{
+      position:"absolute",
+      top:"50%",
+      left:"50%",
+      transform:"translate(-50%,-50%)",
+      bgcolor:"white",
+      p:4,
+      borderRadius:"12px",
+      width:350,
+      maxHeight:400,
+      overflowY:"auto"
+    }}
+  >
 
-          {citaSeleccionada && (
-            <>
-              <Typography variant="h6" fontWeight={700} mb={2}>
-                Detalle de la cita
-              </Typography>
+    <Typography variant="h6" fontWeight={700} mb={2}>
+      Citas del día
+    </Typography>
 
-              <Typography>
-                Paciente: {citaSeleccionada.nombre} {citaSeleccionada.apellidoP}
-              </Typography>
+    {Array.isArray(citaSeleccionada) && citaSeleccionada.map((cita, i) => {
 
-              <Typography>
-                Motivo: {citaSeleccionada.motivoCita}
-              </Typography>
+      const [tipo, descripcion] = cita.motivo.split(" - ");
 
-              <Typography>
-                Tipo: {citaSeleccionada.tipoCita}
-              </Typography>
+      const getColor = (tipo) => {
+        switch (tipo) {
+          case "URGENTE": return "red";
+          case "RUTINA": return "blue";
+          case "SEGUIMIENTO": return "green";
+          default: return "gray";
+        }
+      };
 
-              <Typography>
-                Fecha: {dayjs(citaSeleccionada.fechaCita).format("DD MMMM YYYY HH:mm")}
-              </Typography>
+      return (
+        <Box key={i} mb={2} p={1} borderBottom="1px solid #eee">
 
-            </>
-          )}
+          <Typography fontWeight={600}>
+            {cita.paciente?.usuario?.nombre}
+          </Typography>
+
+          <Typography style={{color: getColor(tipo)}}>
+            {tipo}
+          </Typography>
+
+          <Typography>
+            {descripcion}
+          </Typography>
+
+          <Typography fontSize="12px">
+            {dayjs(cita.fecha_fin).format("HH:mm")}
+          </Typography>
 
         </Box>
-      </Modal>
+      );
+
+    })}
+
+  </Box>
+</Modal>
 
     </Box>
   );

@@ -175,7 +175,22 @@ font-weight: 600;
 
 
 
+.estado-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
 
+.estado-badge.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-badge.completada {
+  background: #d1fae5;
+  color: #065f46;
+}
 
 
 

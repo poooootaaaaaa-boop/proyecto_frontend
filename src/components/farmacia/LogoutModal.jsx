@@ -6,18 +6,41 @@ import {
   Button,
   Typography
 } from "@mui/material";
-
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function LogoutModal({ open, handleClose }) {
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Aquí puedes limpiar localStorage o token
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      await axios.post(
+        "http://localhost:8000/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    }
+
+  } catch (error) {
+    console.log("Error al cerrar sesión", error);
+  }
+
+  // limpiar frontend SIEMPRE
+  localStorage.removeItem("token");
+  localStorage.removeItem("usuario");
+
+  navigate("/login");
+  window.location.reload();
+};
 
   return (
     <Dialog
