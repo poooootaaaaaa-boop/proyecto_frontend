@@ -36,6 +36,7 @@ function Planes() {
     const comprarPlan = (plan_id) => {
 
         const usuario_id = localStorage.getItem("usuario_id");
+        //localStorage.setItem("users", JSON.stringify(users));
 
         Axios.post("http://127.0.0.1:8000/api/stripe-session", {
             usuario_id: usuario_id,
