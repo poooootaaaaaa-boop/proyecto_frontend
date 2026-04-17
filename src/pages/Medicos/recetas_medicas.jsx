@@ -14,25 +14,24 @@ import { useEffect } from "react";
 
 function recetas_medicas({ data = [], dataPacientes=[]}){
     const [busqueda, setBusqueda] = useState("");
-    const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
+    const [pacientesFiltrados, setPacientesFiltrados] = useState([]);
+    const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
+const [openModal, setOpenModal] = useState(false);
     const [openFullModal, setOpenFullModal] = useState(false);
     const [consultas, setConsultas] = useState([]);
 
 
 const handleBusqueda = (e) => {
-    const valor = e.target.value;
-    setBusqueda(valor);
+  const valor = e.target.value;
+  setBusqueda(valor);
 
-    const resultado = consultas.filter((c) =>
-    c.paciente?.nombre?.toLowerCase().includes(valor.toLowerCase())||
-    c.paciente?.apellidoP?.toLowerCase().includes(valor.toLowerCase())
+  const resultado = listaPacientes.filter((p) =>
+    p.paciente?.usuario?.nombre?.toLowerCase().includes(valor.toLowerCase()) ||
+    p.paciente?.apellidoP?.toLowerCase().includes(valor.toLowerCase())
+  );
 
-    
-);
-
-    setPacientesFiltrados(resultado);
+  setPacientesFiltrados(resultado);
 };
-
 
 useEffect(() => {
   Axios.get("http://127.0.0.1:8000/api/MostrarConsulta")
@@ -43,6 +42,28 @@ useEffect(() => {
       console.error("Error cargando consultas:", error);
     });
 }, []);
+
+const pacientesConRecetas = consultas
+  .filter(c => c.receta && c.receta.detalles.length > 0)
+  .reduce((acc, consulta) => {
+    const id = consulta.paciente?.id;
+
+    if (!acc[id]) {
+      acc[id] = {
+        paciente: consulta.paciente,
+        consultas: []
+      };
+    }
+
+    acc[id].consultas.push(consulta);
+
+    return acc;
+  }, {});
+
+  const listaPacientes = Object.values(pacientesConRecetas).map(p => ({
+  ...p,
+  consultas: p.consultas.sort((a, b) => b.id - a.id)
+}));
 
 const handleDownloadFullPDF = async (consulta) => {
   const doc = new jsPDF();
@@ -165,10 +186,99 @@ doc.text("Firma del Médico", 140, finalY + 10);
 };
 
 
-
     return(
+      
     <Layout_Medicos>
+{openModal && pacienteSeleccionado && (
+  <div style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.6)",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 9999
+  }}>
 
+    <div style={{
+      width: "90%",
+      maxWidth: "800px",
+      background: "#fff",
+      borderRadius: "20px",
+      padding: "20px",
+      maxHeight: "80vh",
+      overflowY: "auto",
+      animation: "fadeIn 0.3s ease"
+    }}>
+
+      {/* HEADER */}
+      <div style={{
+        display:"flex",
+        justifyContent:"space-between",
+        alignItems:"center",
+        marginBottom:"15px"
+      }}>
+        <h5 style={{margin:0}}>
+          {pacienteSeleccionado.paciente.usuario?.nombre} {pacienteSeleccionado.paciente?.apellidoP}
+        </h5>
+
+        <button
+          onClick={() => setOpenModal(false)}
+          style={{
+            border:"none",
+            background:"transparent",
+            fontSize:"20px",
+            cursor:"pointer"
+          }}
+        >
+          ✕
+        </button>
+      </div>
+      <style>
+{`
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+`}
+</style>
+
+      {/* CONTENIDO */}
+      {pacienteSeleccionado.consultas.map((consulta, i) => (
+        <div key={i} style={{
+          border:"1px solid #e5e7eb",
+          borderRadius:"15px",
+          padding:"15px",
+          marginBottom:"10px"
+        }}>
+          
+          <Typography><b>Motivo:</b> {consulta.motivo}</Typography>
+          <Typography><b>Diagnóstico:</b> {consulta.diagnostico}</Typography>
+
+          <Button
+            size="sm"
+            style={{marginTop:"10px"}}
+            onClick={() => handleDownloadFullPDF(consulta)}
+          >
+            <DownloadIcon fontSize="small"/> Descargar PDF
+          </Button>
+
+        </div>
+      ))}
+
+    </div>
+  </div>
+)}
         <br />
         <br />
         <h1 style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}>Gestion de Recetas Medicas</h1>
@@ -214,49 +324,90 @@ doc.text("Firma del Médico", 140, finalY + 10);
          <br />
 
 
-        <div className="container mt-4">
-            <div className="row g-4">
-                {(busqueda ? pacientesFiltrados : consultas).map((consulta, index) => (
-                    <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={index}>
-                        <Card  style={{ borderRadius: "20px", border: "1px solid #e5e7eb",boxShadow: "0 4px 10px rgba(0,0,0,0.05)",padding: "10px"}}>
-                            <CardContent>
-                                <div>
-                                    <div style={{ display:"flex", alignItems:"center" }}>
-                                            <img
-  src={consulta.paciente?.usuario?.foto_url || "https://i.imgur.com/0y0y0y0.png"}
-  alt="Paciente"
-  style={{
-    width: "50px",
-    height: "50px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    marginRight: "10px"
-  }}
-/>
+<div className="container mt-4">
+  <div style={{
+    background: "#fff",
+    borderRadius: "20px",
+    padding: "20px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
+  }}>
 
-                                            <Typography style={{ fontWeight:"700", fontSize:"18px" }}>
-                                                {consulta.paciente.usuario?.nombre} {consulta.paciente?.apellidoP}
-                                            </Typography>
+    <table className="table align-middle">
+      <thead>
+        <tr style={{color:"#6b7280", fontSize:"14px"}}>
+          <th>Paciente</th>
+          <th>Último Motivo</th>
+          <th>Total Consultas</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
 
-                                        </div>
-                                    <Typography style={{ fontSize: "13px", color: "#6b7280", background: "#f3f4f6", padding: "5px 10px", borderRadius: "10px",display: "inline-block" }}>
-                                         Motivo: {consulta.motivo}
-                                    </Typography>
-                                </div>
-                        {/* Botón */}
-                        <div style={{ marginTop: "15px", textAlign: "center" }}>
+      <tbody>
+        {(busqueda ? pacientesFiltrados : listaPacientes).map((p, index) => (
+          <tr key={index} style={{cursor:"pointer"}}>
 
-                            <Button style={{background: "#1d4ed8",border: "none",borderRadius: "25px",padding: "8px 20px",fontWeight: "600"}} onClick={() => handleDownloadFullPDF(consulta)}>
-                                <DownloadIcon /> Descargar PDF
-                            </Button>
+            {/* Paciente */}
+            <td onClick={() => {
+              setPacienteSeleccionado(p);
+              setOpenModal(true);
+            }}>
+              <div style={{display:"flex", alignItems:"center"}}>
+                <img
+                  src={p.paciente?.usuario?.foto_url || "https://i.imgur.com/0y0y0y0.png"}
+                  alt="Paciente"
+                  style={{
+                    width: "45px",
+                    height: "45px",
+                    borderRadius: "50%",
+                    marginRight: "10px"
+                  }}
+                />
 
-                        </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                ))}
-            </div>
-        </div>
+                <div>
+                  <div style={{fontWeight:"600"}}>
+                    {p.paciente.usuario?.nombre} {p.paciente?.apellidoP}
+                  </div>
+                  <div style={{fontSize:"12px", color:"#9ca3af"}}>
+                    ID: {p.paciente?.id}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            {/* Motivo */}
+            <td>{p.consultas[0]?.motivo}</td>
+
+            {/* Total */}
+            <td>
+              <span style={{
+                background:"#e0f2fe",
+                padding:"5px 10px",
+                borderRadius:"10px",
+                fontSize:"13px",
+                fontWeight:"600"
+              }}>
+                {p.consultas.length} consultas
+              </span>
+            </td>
+
+            {/* Acción */}
+            <td>
+              <Button
+                size="sm"
+                style={{borderRadius:"20px"}}
+                onClick={() => handleDownloadFullPDF(p.consultas[0])}
+              >
+                <DownloadIcon fontSize="small"/> PDF
+              </Button>
+            </td>
+
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+  </div>
+</div>
 
 
     </Layout_Medicos>

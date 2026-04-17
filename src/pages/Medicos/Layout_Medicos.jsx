@@ -12,7 +12,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 
 import LogoutModal from "../../components/farmacia/LogoutModal";
-import "./Layout.css";
+//import "./Layout.css";
 
 import { Nav, Offcanvas } from "react-bootstrap";
 import { useState, useEffect  } from "react";
@@ -51,34 +51,73 @@ useEffect(() => {
     setUsuario(JSON.parse(userStorage));
   }
 }, []);
+const buttonStyle = {
+  color: "white",
+  justifyContent: "flex-start",
+  textTransform: "none",
+  borderRadius: "10px",
+  padding: "10px 15px",
+  fontWeight: 500,
+  "&:hover": {
+    backgroundColor: "rgba(255,255,255,0.15)"
+  }
+};
 
-  const sidebarContent = (
-    <div className="sidebar">
+const sidebarContent = (
+  <div
+    style={{
+      width: "250px",
+      background: "linear-gradient(180deg, #1e3a8a, #162c73)",
+      color: "white",
+      display: "flex",
+      flexDirection: "column",
+      padding: "25px 20px",
+      minHeight: "100vh"
+    }}
+  >
 
-    <Avatar
-  src={foto || ""}
-  sx={{
-    width: 70,
-    height: 70,
-    margin: "0 auto",
-    border: "3px solid white"
-  }}
->
-  {!foto && usuario?.nombre?.charAt(0)}
-</Avatar>
+    {/* HEADER */}
+    <div
+      style={{
+        fontSize: "22px",
+        fontWeight: "700",
+        marginBottom: "30px",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px"
+      }}
+    >
+       Panel Médico
+    </div>
 
-     <Typography align="center" mt={2} fontWeight="bold">
-  {usuario ? `Dr. ${usuario.nombre}` : "Doctor"}
-</Typography>
+    {/* USUARIO */}
+    <div style={{ textAlign: "center", marginBottom: "25px" }}>
+      <Avatar
+        src={foto || ""}
+        sx={{
+          width: 70,
+          height: 70,
+          margin: "0 auto",
+          border: "3px solid white"
+        }}
+      >
+        {!foto && usuario?.nombre?.charAt(0)}
+      </Avatar>
 
-      <div style={{ height: "30px" }}></div>
+      <Typography mt={1} fontWeight="bold">
+        {usuario ? `Dr. ${usuario.nombre}` : "Doctor"}
+      </Typography>
+    </div>
+
+    {/* MENU */}
+    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
 
       <Button
         component={Link}
         to="/Medicos/Dashboard_medicos"
         startIcon={<DashboardIcon />}
+        sx={buttonStyle}
         fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
       >
         DASHBOARD
       </Button>
@@ -87,8 +126,8 @@ useEffect(() => {
         component={Link}
         to="/Medicos/lista_paciente"
         startIcon={<PersonIcon />}
+        sx={buttonStyle}
         fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
       >
         PACIENTES
       </Button>
@@ -97,8 +136,8 @@ useEffect(() => {
         component={Link}
         to="/Medicos/recetas_medicas"
         startIcon={<DescriptionIcon />}
+        sx={buttonStyle}
         fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
       >
         RECETAS MEDICAS
       </Button>
@@ -107,8 +146,8 @@ useEffect(() => {
         component={Link}
         to="/Medicos/agendar-cita"
         startIcon={<CalendarTodayIcon />}
+        sx={buttonStyle}
         fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
       >
         CITAS
       </Button>
@@ -117,40 +156,39 @@ useEffect(() => {
         component={Link}
         to="/Medicos/tratamientos_largos"
         startIcon={<ContentPasteIcon />}
+        sx={buttonStyle}
         fullWidth
-        sx={{ color: "white", justifyContent: "flex-start" }}
       >
         TRATAMIENTOS
       </Button>
 
-      <div style={{ marginTop: "auto", }}>
-        <hr style={{ borderColor: "rgba(255,255,255,0.3)" }} />
+    </div>
 
-        <Nav.Link
-          onClick={() => setOpenLogout(true)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            color: "#ffdddd",
-            padding: "10px 15px",
-            borderRadius: "10px",
-            cursor: "pointer",
-            marginBottom: "20px" 
-           
-          }}
-        >
-          Cerrar sesión
-        </Nav.Link>
-      </div>
+    {/* FOOTER ABAJO */}
+    <div style={{ marginTop: "auto" }}>
 
-      <LogoutModal
-        open={openLogout}
-        handleClose={() => setOpenLogout(false)}
-      />
+      <hr style={{ borderColor: "rgba(255,255,255,0.3)" }} />
+
+      <Button
+        onClick={() => setOpenLogout(true)}
+        sx={{
+          ...buttonStyle,
+          color: "#ffdddd"
+        }}
+        fullWidth
+      >
+        CERRAR SESIÓN
+      </Button>
 
     </div>
-  );
+
+    <LogoutModal
+      open={openLogout}
+      handleClose={() => setOpenLogout(false)}
+    />
+
+  </div>
+);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
