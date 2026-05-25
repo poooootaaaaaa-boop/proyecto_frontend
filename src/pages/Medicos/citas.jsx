@@ -20,6 +20,10 @@ import dayjs from "dayjs";
 import "./calendar.css";
 
 function citas({ data, setData }){
+
+    
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+    const doctor_id = usuario?.doctor_id;
     const [tipoCita, setTipoCita] = useState("");
             const colorTipo = {
             rutina:  {background: "#d0e4ff", color: "#0066ff"} ,
@@ -36,23 +40,23 @@ function citas({ data, setData }){
         const [mostrarMensaje,setMostrarMensaje]=useState(false);
         const [pacientes, setPacientes] = useState([]);
 const [pacienteSeleccionado, setPacienteSeleccionado] = useState("");
-        useEffect(() => {
-    const doctor_id = 1; //  cámbialo por el real (login)
+useEffect(() => {
+    if (!doctor_id) return;
 
     fetch(`http://localhost:8000/api/pacientes-doctor/${doctor_id}`)
         .then(res => res.json())
         .then(data => setPacientes(data))
         .catch(err => console.error(err));
-}, []);
+}, [doctor_id]);
 
 useEffect(() => {
-  const doctor_id = 1;
+  if (!doctor_id) return;
 
   fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`)
     .then(res => res.json())
     .then(data => setCitasDoctor(data))
     .catch(err => console.error(err));
-}, []);
+}, [doctor_id]);
         
 
 const esHoraOcupada = (fecha) => {
@@ -64,14 +68,16 @@ const esHoraOcupada = (fecha) => {
 
 const FinalizarCita = async () => {
 
-    const doctor_id = 1; // luego lo haces dinámico
+    if (!doctor_id) {
+        alert("No hay doctor logueado");
+        return;
+    }
 
     const nuevaCita = {
         doctor_id,
         paciente_id: pacienteSeleccionado,
-        fecha_fin: fechaCita?.format("YYYY-MM-DD HH:mm:ss"),
-
-        // AQUÍ LA CLAVE
+        fecha_inicio: fechaCita.format("YYYY-MM-DD HH:mm:ss"),
+        fecha_fin: fechaCita.add(30, "minute").format("YYYY-MM-DD HH:mm:ss"),
         motivo: `${tipoCita.toUpperCase()} - ${motivoCita}`
     };
 

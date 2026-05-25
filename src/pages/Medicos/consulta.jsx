@@ -32,16 +32,28 @@ const [tipoConsulta, setTipoConsulta] = useState("");
 const [requiereSeguimiento, setRequiereSeguimiento] = useState(false);
 const [fechaSeguimiento, setFechaSeguimiento] = useState(null);
 const [medicamentoActivo, setMedicamentoActivo] = useState(null);
-
+const usuario = JSON.parse(localStorage.getItem("usuario"));
 useEffect(() => {
-  const doctor_id = 1;
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario || !usuario.doctor_id) return;
+
+  const doctor_id = usuario.doctor_id;
 
   Axios.get(`http://127.0.0.1:8000/api/citas-doctor/${doctor_id}`)
     .then(res => {
-      // SOLO PENDIENTES
-      const pendientes = res.data.filter(c => c.estado === "pendiente");
-      setCitas(pendientes);
-    });
+
+      const hoy = new Date().toLocaleDateString("sv-SE"); 
+
+      const pendientesHoy = res.data.filter(c => {
+        const fechaCita = c.fecha_fin.split(" ")[0];
+        return c.estado === "pendiente" && fechaCita === hoy;
+      });
+
+      setCitas(pendientesHoy);
+    })
+    .catch(err => console.error(err));
+
 }, []);
 useEffect(() => {
   Axios.get("http://127.0.0.1:8000/api/medicamentos")
@@ -86,7 +98,7 @@ const finalizarConsulta = async () => {
     // 1. GUARDAR CONSULTA
     await Axios.post("http://127.0.0.1:8000/api/finalizar-consulta", {
       cita_id: citaSeleccionada,
-      doctor_id: 1,
+      doctor_id: usuario.doctor_id,
       paciente_id: pacienteId,
       motivo,
       sintomas,
@@ -113,7 +125,7 @@ const finalizarConsulta = async () => {
     return;
   }
       await Axios.post("http://127.0.0.1:8000/api/citas", {
-        doctor_id: 1,
+        doctor_id: usuario.doctor_id,
         paciente_id: pacienteId,
         fecha_inicio: fechaSeguimiento.format("YYYY-MM-DD HH:mm:ss"),
         fecha_fin: fechaSeguimiento.add(30, "minute").format("YYYY-MM-DD HH:mm:ss"),
@@ -175,9 +187,9 @@ const finalizarConsulta = async () => {
   const paciente = dataPacientes.find(p => p.id === c.paciente_id);
 
   return (
-    <option key={c.id} value={c.id}>
-      Cita #{c.id} - {paciente ? paciente.nombre : "Sin nombre"} - {c.motivo}
-    </option>
+<option key={c.id} value={c.id}>
+  {paciente ? paciente.nombre : "Sin nombre"} - {new Date(c.fecha_fin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+</option>
   );
 })}
 </Form.Select>
@@ -286,6 +298,7 @@ const finalizarConsulta = async () => {
 
         <Form.Select
           className="mb-2"
+            value={med.medicamento_id}
           onChange={(e)=>actualizarMedicamento(index,"medicamento_id",e.target.value)}
         >
           <option>Medicamento</option>
@@ -299,24 +312,28 @@ const finalizarConsulta = async () => {
         <Form.Control
           placeholder="Dosis"
           className="mb-2"
+           value={med.dosis}
           onChange={(e)=>actualizarMedicamento(index,"dosis",e.target.value)}
         />
 
         <Form.Control
           placeholder="Frecuencia"
           className="mb-2"
+            value={med.frecuencia}
           onChange={(e)=>actualizarMedicamento(index,"frecuencia",e.target.value)}
         />
 
         <Form.Control
           placeholder="Duración"
           className="mb-2"
+            value={med.duracion}
           onChange={(e)=>actualizarMedicamento(index,"duracion",e.target.value)}
         />
 
         <Form.Control
           placeholder="Instrucciones"
           className="mb-2"
+            value={med.instrucciones}
           onChange={(e)=>actualizarMedicamento(index,"instrucciones",e.target.value)}
         />
 
