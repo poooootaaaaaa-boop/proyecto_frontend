@@ -119,8 +119,26 @@ const guardarMovimiento = () => {
     receta_id: tipoMovimiento === "salida" ? recetaId : null
   };
 
+  const selectedMed = medicamentos.find(
+    (med) => String(med.id) === String(producto)
+  );
+
   Axios.post("http://127.0.0.1:8000/api/guardarMovimientos", dataToSend)
     .then(() => {
+      if (tipoMovimiento === "salida" && selectedMed) {
+        const manifiestoSalida = {
+          medicamento: {
+            id: selectedMed.id,
+            nombre: selectedMed.nombre,
+          },
+          cantidad,
+          motivo,
+        };
+
+        localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
+        window.location.href = "/farmacia/manifesto-residuo";
+        return;
+      }
 
       alert("Guardado correctamente");
 
@@ -140,6 +158,8 @@ const guardarMovimiento = () => {
 
     })
     .catch(err => console.error(err));
+
+    
 };
 
 
