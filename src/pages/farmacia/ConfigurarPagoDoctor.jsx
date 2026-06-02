@@ -133,74 +133,124 @@ const totalPaginas = Math.ceil(
             </Alert>
           )}
 
-          <Card className="card-modern-consultorio p-4 mb-4">
+<Card className="card-modern-consultorio p-4 mb-4">
 
-            <Form.Label>
-              Doctor
-            </Form.Label>
+  <h5 className="mb-4">
+    Seleccionar Doctor
+  </h5>
 
-            <Form.Select
-              value={doctorId}
-              onChange={(e) =>
-                setDoctorId(e.target.value)
+  <Row className="g-3">
+
+    {doctoresPaginados.map((doctor) => (
+
+      <Col md={12} key={doctor.id}>
+
+        <div
+          className={`doctor-card-pago ${
+            doctorId == doctor.id
+              ? "selected"
+              : ""
+          }`}
+          onClick={() =>
+            setDoctorId(doctor.id)
+          }
+        >
+
+          <div className="doctor-photo">
+
+            <img
+              src={
+                doctor.usuario?.foto ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(
+                    doctor.usuario?.nombre
+                  )
               }
-            >
-              <option value="">
-                Seleccionar doctor
-              </option>
+              alt=""
+            />
 
-              {doctoresPaginados.map((doctor) => (
-                <option
-                  key={doctor.id}
-                  value={doctor.id}
-                >
-                  {doctor.usuario?.nombre}
-                </option>
-              ))}
-            </Form.Select>
-            <div className="d-flex justify-content-center mt-4">
+          </div>
 
-  <Pagination>
+          <div className="doctor-info">
 
-    <Pagination.Prev
-      disabled={paginaActual === 1}
-      onClick={() =>
-        setPaginaActual(
-          paginaActual - 1
-        )
-      }
-    />
+            <h5>
+              {doctor.usuario?.nombre}
+            </h5>
 
-    {[...Array(totalPaginas)].map((_, i) => (
+            <p>
+              Especialidad:
+              {" "}
+              {doctor.especialidad?.nombre ||
+                "General"}
+            </p>
 
-      <Pagination.Item
-        key={i}
-        active={paginaActual === i + 1}
-        onClick={() =>
-          setPaginaActual(i + 1)
-        }
-      >
-        {i + 1}
-      </Pagination.Item>
+            <span>
+              ID: {doctor.id}
+            </span>
+
+          </div>
+
+          <div className="doctor-check">
+
+            {doctorId == doctor.id
+              ? "✓"
+              : ""}
+
+          </div>
+
+        </div>
+
+      </Col>
 
     ))}
 
-    <Pagination.Next
-      disabled={
-        paginaActual === totalPaginas
-      }
-      onClick={() =>
-        setPaginaActual(
-          paginaActual + 1
+  </Row>
+
+  <div className="d-flex justify-content-center mt-4">
+
+    <Pagination>
+
+      <Pagination.Prev
+        disabled={paginaActual === 1}
+        onClick={() =>
+          setPaginaActual(
+            paginaActual - 1
+          )
+        }
+      />
+
+      {[...Array(totalPaginas)].map(
+        (_, i) => (
+          <Pagination.Item
+            key={i}
+            active={
+              paginaActual === i + 1
+            }
+            onClick={() =>
+              setPaginaActual(i + 1)
+            }
+          >
+            {i + 1}
+          </Pagination.Item>
         )
-      }
-    />
+      )}
 
-  </Pagination>
+      <Pagination.Next
+        disabled={
+          paginaActual === totalPaginas
+        }
+        onClick={() =>
+          setPaginaActual(
+            paginaActual + 1
+          )
+        }
+      />
 
-</div>
+    </Pagination>
 
-          </Card>
+  </div>
+
+</Card>
           
 
           <Card className="card-modern-consultorio p-4 mb-4">
