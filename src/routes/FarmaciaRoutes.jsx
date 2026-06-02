@@ -11,6 +11,9 @@ import Configuracion from "../pages/farmacia/Configuracion";
 import Doctors from "../pages/farmacia/Doctors";
 import AgregarDoctor from "../pages/farmacia/AgregarDoctor";
 import Stock from "../pages/Medicos/prueba";
+import AgregarConsultorios from "../pages/farmacia/AgregarConsultorio";
+import ConfigurarPagoDoctor from "../pages/farmacia/ConfigurarPagoDoctor";
+import AsignarDoctorConsultorio from "../pages/farmacia/AsignarDoctorConsultorio";
 
 export default function FarmaciaRoutes(){
     return(
@@ -27,6 +30,9 @@ export default function FarmaciaRoutes(){
             <Route path="configuracion" element={<Configuracion/>}/>
             <Route path="doctores" element={<Doctors/>}/>
             <Route path="agregardoctor" element={<AgregarDoctor/>}/>
+            <Route path="agregar-consultorios" element={<AgregarConsultorios/>}/>
+            <Route path="configurar-pago-doctor" element={<ConfigurarPagoDoctor/>}/>
+            <Route path="asignar-doctor-consultorio" element={<AsignarDoctorConsultorio/>}/>
         </Routes>
     );
 }
