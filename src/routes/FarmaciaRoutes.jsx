@@ -11,12 +11,16 @@ import Configuracion from "../pages/farmacia/Configuracion";
 import Doctors from "../pages/farmacia/Doctors";
 import AgregarDoctor from "../pages/farmacia/AgregarDoctor";
 import Stock from "../pages/Medicos/prueba";
+import ManifestoResiduo from "../pages/farmacia/ManifestoResiduo";
+
 
 export default function FarmaciaRoutes(){
     return(
         <Routes>
             <Route path="dashboard" element={<DashboardFarmacia />}/>
             <Route path="prueba" element={<Stock />} />
+            <Route path="manifesto-residuo" element={<ManifestoResiduo />} /> /* nuevo*/
+
             <Route path="Home" element={<HomeFarmacia />}/>
             <Route path="RecetasMedicas" element={<Recetas />}/>
             <Route path="inventario" element={<Inventario />}/>
