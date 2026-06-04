@@ -86,7 +86,24 @@ useEffect(() => {
     setRecetaId("");
   }
 }, [caducado]);
-
+/*
+  const handleCaducadoChange = (e) => {
+    const checked = e.target.checked;
+    setCaducado(checked);
+    Axios.post("http://127.0.0.1:8000/api/medicamentoCaducado", {
+      medicamento_id: producto || null,
+      caducado: checked,
+      cantidad: cantidad || null,
+      motivo: motivo || null,
+    })
+      .then((res) => {
+        console.log('Caducado enviado:', res.data);
+      })
+      .catch((err) => {
+        console.error('Error al enviar caducado:', err);
+      });
+  };
+*/
   const Entrada = () => {
     setTipoMovimiento("entrada");
     setMostrarEntrada(!mostrarEntrada);
@@ -131,6 +148,13 @@ const guardarMovimiento = () => {
   );
 
   if (tipoMovimiento === "salida" && caducado && selectedMed) {
+    
+      Axios.post("http://127.0.0.1:8000/api/medicamentoCaducado", {
+    medicamento_id: producto,
+    cantidad,
+    motivo,
+  })
+  .then(() => {
     const manifiestoSalida = {
       medicamento: {
         id: selectedMed.id,
@@ -142,7 +166,10 @@ const guardarMovimiento = () => {
 
     localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
     window.location.href = "/farmacia/manifesto-residuo";
-    return;
+  })
+  .catch(err => console.error(err));
+
+  return;
   }
 
   Axios.post("http://127.0.0.1:8000/api/guardarMovimientos", dataToSend)
@@ -157,10 +184,13 @@ const guardarMovimiento = () => {
           motivo,
         };
 
+        /*
         localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
         window.location.href = "/farmacia/manifesto-residuo";
         return;
+      */
       }
+        
 
       alert("Guardado correctamente");
 
