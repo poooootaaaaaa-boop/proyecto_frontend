@@ -1,24 +1,11 @@
-import {
-Card,
-Form,
-Button,
-Row,
-Col
-} from "react-bootstrap";
-
 import Sidebar from "../../components/farmacia/Sidebar";
-import Topbar from "../../components/farmacia/Topbar";
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-import "./Consultorios.css";
-import "./dashboardFarmacia.css";
+import "./MedicinasCaducadas.css";
 
 export default function MedicinasCaducadas() {
-
-
-    const [caducados, setCaducados] = useState([]);
+  const [caducados, setCaducados] = useState([]);
 
   useEffect(() => {
     obtenerCaducados();
@@ -26,83 +13,121 @@ export default function MedicinasCaducadas() {
 
   const obtenerCaducados = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/getcaducados");
+      const response = await axios.get(
+        "http://localhost:8000/api/getcaducados"
+      );
+
       setCaducados(response.data.data);
     } catch (error) {
       console.error("Error al obtener datos:", error);
     }
   };
 
-
   return (
-    <div className="home-layout">
+    <div className="caducados-layout">
       <Sidebar />
-      <div
-        className="main-content"
-        style={{
-          width: "100%",
-          padding: "20px",
-          boxSizing: "border-box",
-        }}
-      >
-        <h1>Medicinas Caducadas</h1>
 
-        <div
-          className="card-modern"
-          style={{
-            width: "100%",
-            maxWidth: "1140px",
-            margin: "0 auto",
-          }}
-        >
-          <h5 className="section-title">Lista de Medicinas Caducadas</h5>
+      <div className="caducados-container">
+        {/* HEADER */}
 
-          <div
-            className="table-modern"
-            style={{
-              width: "100%",
-              minWidth: "720px",
-              overflowX: "auto",
-            }}
-          >
-            <div className="table-header-modern">
-              <span>Medicamento</span>
-              <span>Motivo</span>
-              <span>Cantidad</span>
-              <span>Status</span>
-            </div>
+        <div className="page-header">
+          <div>
+            <h2>Medicinas Caducadas</h2>
 
+            <p>
+              Control y seguimiento de medicamentos vencidos
+            </p>
+          </div>
 
-            {caducados.map((item, index) => (
-                <div className="table-row-modern" key={index}>
+          <div className="stats-card">
+            <span>Total</span>
+            <strong>{caducados.length}</strong>
+          </div>
+        </div>
 
-                <div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                <div>
-                <strong>{item.inventario?.medicamento?.nombre}</strong>
-                <br />
-                <small className="muted">
-                    {item.inventario?.medicamento?.sustancia_activa}
-                </small>
-                </div>
-            </div>
+        {/* CARD */}
 
-            <br />
-            <small className="muted">
-                {item.inventario?.medicamento?.categoria}
-            </small>
-            </div>
-                <div>{item.motivo}</div>
-                <div>{item.cantidad}</div>
-                <div>
-                    <span className="badge bg-danger">Caducado</span>
-                </div>
-            </div>
-            ))}
+        <div className="caducados-card">
+          <div className="card-header-custom">
+            <h3>Lista de Medicamentos Caducados</h3>
+          </div>
 
+          <div className="table-wrapper">
+            <table className="modern-table">
+              <thead>
+                <tr>
+                  <th>Medicamento</th>
+                  <th>Motivo</th>
+                  <th>Cantidad</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {caducados.length > 0 ? (
+                  caducados.map((item, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div className="medicamento-info">
+                          <div className="medicine-icon">
+                            💊
+                          </div>
+
+                          <div>
+                            <strong>
+                              {
+                                item.inventario?.medicamento
+                                  ?.nombre
+                              }
+                            </strong>
+
+                            <p>
+                              {
+                                item.inventario?.medicamento
+                                  ?.sustancia_activa
+                              }
+                            </p>
+
+                            <small>
+                              {
+                                item.inventario?.medicamento
+                                  ?.categoria
+                              }
+                            </small>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>{item.motivo}</td>
+
+                      <td>
+                        <span className="cantidad-badge">
+                          {item.cantidad}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="status-badge">
+                          Caducado
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="empty-state"
+                    >
+                      No hay medicamentos caducados registrados
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-    </div>    
+    </div>
   );
 }
