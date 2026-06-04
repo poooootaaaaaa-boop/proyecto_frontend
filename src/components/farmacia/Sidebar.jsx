@@ -76,6 +76,15 @@ export default function Sidebar() {
           <i className="bi bi-box-seam"></i>
           Inventario
         </Nav.Link>
+        
+
+
+        <Nav.Link as={NavLink} to="/farmacia/medicinas-caducadas" style={linkStyle}>
+          <i className="bi bi-hourglass-bottom"></i>
+          Medicamentos Caducados
+        </Nav.Link>
+
+
 
         <Nav.Link as={NavLink} to="/farmacia/Distribuidores" style={linkStyle}>
           <i className="bi bi-truck"></i>
