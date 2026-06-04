@@ -3,12 +3,14 @@ import {
   Box,
   Typography,
   Button,
-  Container
+  Container,
 } from "@mui/material";
+
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+
 import Axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -32,10 +34,13 @@ function Planes() {
   const comprarPlan = (plan_id) => {
     const usuario_id = localStorage.getItem("usuario_id");
 
-    Axios.post("http://127.0.0.1:8000/api/stripe-session", {
-      usuario_id,
-      plan_id,
-    })
+    Axios.post(
+      "http://127.0.0.1:8000/api/stripe-session",
+      {
+        usuario_id,
+        plan_id,
+      }
+    )
       .then(async (response) => {
         const stripe = await stripePromise;
 
@@ -49,32 +54,32 @@ function Planes() {
   };
 
   const getIcon = (index) => {
-    if (index === 0) return <FavoriteIcon fontSize="large" />;
-    if (index === 1) return <StarIcon fontSize="large" />;
+    if (index === 0)
+      return <FavoriteIcon fontSize="large" />;
+
+    if (index === 1)
+      return <StarIcon fontSize="large" />;
+
     return <LocalHospitalIcon fontSize="large" />;
   };
 
   return (
     <Box className="planes-page">
-<Box className="hero-section">
-  <MedicalServicesIcon className="hero-logo" />
+      <Box className="hero-section">
+        <MedicalServicesIcon className="hero-logo" />
 
-  <Typography variant="h3" className="hero-title">
-    Planes Médicos Inteligentes
-  </Typography>
+        <Typography
+          variant="h3"
+          className="hero-title"
+        >
+          Planes Médicos Inteligentes
+        </Typography>
 
-  <Typography
-    variant="body1"
-    className="hero-subtitle"
-  >
-    Cuida tu salud y la de tu familia con cobertura médica moderna,
-    consultas rápidas y atención especializada.
-  </Typography>
-</Box>
+    
+      </Box>
 
       <Container maxWidth="lg">
         <div className="planes-grid">
-
           {planes.map((plan, index) => (
             <div
               key={plan.id}
@@ -95,25 +100,42 @@ function Planes() {
               <h2>{plan.nombre}</h2>
 
               <p className="plan-description">
-                Cobertura médica integral para proteger tu bienestar.
+                Protección médica para ti y tu
+                familia.
               </p>
 
               <div className="price-box">
                 <span className="currency">$</span>
+
                 <span className="price">
-                  {parseFloat(plan.precio).toFixed(0)}
+                  {parseFloat(
+                    plan.precio
+                  ).toFixed(0)}
                 </span>
-                <span className="month">/mes</span>
+
+                <span className="month">
+                  /mes
+                </span>
               </div>
 
               <ul className="features">
-                <li>✔ Consultas ilimitadas</li>
-                <li>✔ Atención prioritaria</li>
-                <li>✔ Historial médico digital</li>
+                <li>
+                  ✔ Consultas ilimitadas
+                </li>
+
+                <li>
+                  ✔ Atención rápida
+                </li>
+
+                <li>
+                  ✔ Historial digital
+                </li>
 
                 <li
                   className={
-                    index === 0 ? "disabled" : ""
+                    index === 0
+                      ? "disabled"
+                      : ""
                   }
                 >
                   {index === 0
@@ -123,7 +145,9 @@ function Planes() {
 
                 <li
                   className={
-                    index < 2 ? "disabled" : ""
+                    index < 2
+                      ? "disabled"
+                      : ""
                   }
                 >
                   {index < 2
@@ -135,7 +159,9 @@ function Planes() {
               <Button
                 fullWidth
                 className="buy-button"
-                onClick={() => comprarPlan(plan.id)}
+                onClick={() =>
+                  comprarPlan(plan.id)
+                }
               >
                 Contratar Plan
               </Button>

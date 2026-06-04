@@ -218,233 +218,243 @@ const guardarMovimiento = () => {
 
 
   return (
-  <div style={{ display: "flex" }}>
-    
+  <div className="movimientos-layout">
     <Sidebar />
 
-    <div style={{ flex: 1, padding: "20px" }}>
+    <div className="movimientos-container">
 
-      <h4 style={{ marginLeft: "40px" }}>
-        <strong>Movimientos de Stock</strong>
-      </h4>
+      {/* HEADER */}
+      <div className="page-header">
+        <div>
+          <h2>Movimientos de Stock</h2>
+          <p>Administra entradas y salidas de medicamentos</p>
+        </div>
+      </div>
 
-      <h6 style={{ color: "#888", marginLeft: "40px" }}>
-        <strong>Registra entradas y salidas de Medicamentos</strong>
-      </h6>
+      {/* CARD FORMULARIO */}
+      <div className="movimiento-card">
 
-      <br />
-
-      {/* CARD */}
-      <div className="card-movimiento">
-
-        {/* BOTONES */}
         <div className="tipo-operacion">
           <button
-            className="btn-entrada"
+            className={`action-btn entrada ${
+              tipoMovimiento === "entrada" ? "active" : ""
+            }`}
             onClick={Entrada}
           >
-            <i className="bi bi-arrow-down-circle-fill"></i>
-            Entrada
+            ⬇ Entrada
           </button>
 
           <button
-            className="btn-salida"
+            className={`action-btn salida ${
+              tipoMovimiento === "salida" ? "active" : ""
+            }`}
             onClick={Salida}
           >
-            <i className="bi bi-arrow-up-circle-fill"></i>
-            Salida
+            ⬆ Salida
           </button>
         </div>
 
-        {/* FORM */}
-        <form className="form-movimiento">
+        <div className="form-grid">
 
-          <input type="hidden" value={tipoMovimiento} />
+          <div className="input-group-custom">
+            <label>Medicamento</label>
 
-          <div className="mb-3">
+            <select
+              className="modern-input"
+              value={producto}
+              onChange={(e) => setProducto(e.target.value)}
+            >
+              <option value="">Selecciona medicamento</option>
 
-        <label className="form-label">Producto</label>
-            <br />
-       <select
-        className="form-control"
-        value={producto}
-        onChange={(e) => setProducto(e.target.value)}
-      >
-        <option value="">Selecciona medicamento</option>
-        {medicamentos.map((med) => (
-          <option key={med.id} value={med.id}>
-            {med.nombre}
-          </option>
-        ))}
-      </select>
-      <br/>
-      <label>Medicamento Caducado</label>
-      <input
-        type="checkbox"
-        checked={caducado}
-        onChange={(e) => setCaducado(e.target.checked)}
-      />
-      <br/> <br />
-{tipoMovimiento === "entrada" && (
-  <>
-    <label>Proveedor</label>
-    <select
-      className="form-control"
-      value={proveedorId}
-      onChange={(e) => setProveedorId(e.target.value)}
-    >
-      <option value="">Selecciona proveedor</option>
-      {proveedores.map((prov) => (
-        <option key={prov.id} value={prov.id}>
-          {prov.nombre}
-        </option>
-      ))}
-    </select>
-  </>
-)}
+              {medicamentos.map((med) => (
+                <option key={med.id} value={med.id}>
+                  {med.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
 
-{tipoMovimiento === "salida" && !caducado && (
-  <>
-    <label>Receta</label>
-    <select
-      className="form-control"
-      value={recetaId}
-      onChange={(e) => setRecetaId(e.target.value)}
-    >
-      <option value="">Selecciona receta</option>
-      {recetas.map((rec) => (
-        <option key={rec.id} value={rec.id}>
-          Paciente: {rec.paciente_nombre}
-        </option>
-      ))}
-    </select>
-  </>
-)}
-            <br />
-
-            <label className="form-label">Cantidad</label>
-            <br />
-            <input
-            type="number"
-            placeholder="Cantidad del producto"
-            className="form-control"
-            value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
-            />
-
-            <br />
-
-            <label className="form-label">Motivo</label>
-            <br />
+          <div className="input-group-custom">
+            <label>Cantidad</label>
 
             <input
-            type="text"
-            placeholder="Motivo del movimiento"
-            className="form-control"
-            value={motivo}
-            onChange={(e) => setMotivo(e.target.value)}
+              type="number"
+              className="modern-input"
+              placeholder="Cantidad"
+              value={cantidad}
+              onChange={(e) => setCantidad(e.target.value)}
+            />
+          </div>
+
+          {tipoMovimiento === "entrada" && (
+            <div className="input-group-custom">
+              <label>Proveedor</label>
+
+              <select
+                className="modern-input"
+                value={proveedorId}
+                onChange={(e) => setProveedorId(e.target.value)}
+              >
+                <option value="">Selecciona proveedor</option>
+
+                {proveedores.map((prov) => (
+                  <option key={prov.id} value={prov.id}>
+                    {prov.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {tipoMovimiento === "salida" && !caducado && (
+            <div className="input-group-custom">
+              <label>Receta</label>
+
+              <select
+                className="modern-input"
+                value={recetaId}
+                onChange={(e) => setRecetaId(e.target.value)}
+              >
+                <option value="">Selecciona receta</option>
+
+                {recetas.map((rec) => (
+                  <option key={rec.id} value={rec.id}>
+                    Paciente: {rec.paciente_nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="input-group-custom full-width">
+            <label>Motivo</label>
+
+            <input
+              type="text"
+              className="modern-input"
+              placeholder="Describe el motivo del movimiento"
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+            />
+          </div>
+
+          <div className="caducado-box full-width">
+            <input
+              type="checkbox"
+              checked={caducado}
+              onChange={(e) => setCaducado(e.target.checked)}
             />
 
-            <br />
+            <span>Medicamento caducado</span>
+          </div>
 
-            {/* BOTONES CONDICIONALES */}
-
+          <div className="full-width">
             {mostrarEntrada && (
               <button
                 type="button"
-                className="btn btn-success"
-                style={{ width: "100%" }}
+                className="submit-btn entrada-btn"
                 onClick={guardarMovimiento}
               >
-                Enviar entrada
+                Registrar Entrada
               </button>
             )}
 
             {mostrarSalida && (
               <button
                 type="button"
-                className="btn btn-danger"
-                style={{ width: "100%" }}
+                className="submit-btn salida-btn"
                 onClick={guardarMovimiento}
               >
-                Enviar salida
+                Registrar Salida
               </button>
             )}
-
           </div>
-        </form>
+
+        </div>
       </div>
 
       {/* TABLA */}
-      <h4 style={{ marginLeft: "40px" }}>
-        <strong>Historial general</strong>
-      </h4>
+      <div className="historial-card">
 
-      <div id="tabla_1">
-        <br /><br />
+        <div className="table-header">
+          <h3>Historial General</h3>
+        </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Producto</th>
-              <th>Tipo</th>
-              <th>Cantidad</th>
-              <th>Motivo</th>
-            </tr>
-          </thead>
+        <div className="table-responsive">
+          <table className="modern-table">
 
-<tbody>
-  {historial.length > 0 ? (
-    historial
-  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  .map((mov) => (
-      <tr key={mov.id}>
-        <td>
-  {new Date(mov.fecha_movimiento).toLocaleString()}
-</td>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
 
-        <td>
-          {mov.inventario?.medicamento?.nombre || "Sin nombre"}
-        </td>
+            <tbody>
+              {historial.length > 0 ? (
+                historial
+                  .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
+                  .map((mov) => (
+                    <tr key={mov.id}>
+                      <td>
+                        {new Date(
+                          mov.fecha_movimiento
+                        ).toLocaleString()}
+                      </td>
 
-        <td>
-          <span style={{
-            color: mov.tipo === "entrada" ? "green" : "red",
-            fontWeight: "bold"
-          }}>
-            {mov.tipo}
-          </span>
-        </td>
+                      <td>
+                        {mov.inventario?.medicamento?.nombre ||
+                          "Sin nombre"}
+                      </td>
 
-        <td>{mov.cantidad}</td>
+                      <td>
+                        <span
+                          className={`badge-tipo ${
+                            mov.tipo === "entrada"
+                              ? "badge-entrada"
+                              : "badge-salida"
+                          }`}
+                        >
+                          {mov.tipo}
+                        </span>
+                      </td>
 
-        <td>{mov.motivo || "—"}</td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="5" style={{ textAlign: "center" }}>
-        No hay movimientos registrados
-      </td>
-    </tr>
-  )}
-</tbody>
+                      <td>{mov.cantidad}</td>
 
-        </table>
+                      <td>{mov.motivo || "—"}</td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="empty-row">
+                    No hay movimientos registrados
+                  </td>
+                </tr>
+              )}
+            </tbody>
+
+          </table>
+        </div>
+
         <TablePagination
-  component="div"
-  count={historial.length}
-  page={page}
-  onPageChange={handleChangePage}
-  rowsPerPage={rowsPerPage}
-  onRowsPerPageChange={handleChangeRowsPerPage}
-/>
-      </div>
+          component="div"
+          count={historial.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
 
+      </div>
     </div>
-    </div>
-  );
+  </div>
+);
 }
 
 export default Prueba;
