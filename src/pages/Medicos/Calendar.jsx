@@ -22,7 +22,10 @@ export default function Calendar({ citas = [] }) {
   const startDay = startOfMonth.day();
   const daysInMonth = endOfMonth.date();
   useEffect(() => {
-  const doctor_id = 1; // luego dinámico
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  if (!usuario || !usuario.doctor_id) return;
+
+  const doctor_id = usuario.doctor_id;  
 
   fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`)
     .then(res => res.json())

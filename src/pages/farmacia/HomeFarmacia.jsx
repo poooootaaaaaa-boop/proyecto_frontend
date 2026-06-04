@@ -15,7 +15,21 @@ export default function HomeFarmacia() {
   useEffect(() => {
   fetchRecetas(page);
 }, [page]);
--
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    fetchRecetas(page);
+  }, 5000); // cada 5 segundos
+
+  return () => clearInterval(interval);
+}, [page]);
+useEffect(() => {
+  if ("Notification" in window) {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }
+}, []);
 
 useEffect(() => {
   if (notificacion) {
@@ -26,12 +40,22 @@ useEffect(() => {
     return () => clearTimeout(timer);
   }
 }, [notificacion]);
+const cambiarEstado = async (id, estado) => {
+  try {
+    await axios.put(`http://localhost:8000/api/recetas/${id}`, {
+      estado,
+    });
 
+    fetchRecetas(page);
+  } catch (err) {
+    console.error(err);
+  }
+};
 const fetchRecetas = async (pageNumber = 1) => {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/dashboard-farmacia?page=${pageNumber}`
-    );
+  `http://localhost:8000/api/farmacia/recetas-hoy?page=${pageNumber}`
+);
 
     const data = res.data;
     const nuevasRecetas = data.recetas.data || [];
@@ -45,9 +69,18 @@ const fetchRecetas = async (pageNumber = 1) => {
       } 
       //  NUEVA RECETA
       else if (primerId !== ultimaRecetaId.current) {
-        setNotificacion("🚨 Nueva receta disponible");
-        ultimaRecetaId.current = primerId;
-      }
+  setNotificacion("🚨 Nueva receta disponible");
+  ultimaRecetaId.current = primerId;
+
+  // 🔔 NOTIFICACIÓN DEL NAVEGADOR
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("Nueva receta 💊", {
+  body: "Tienes una nueva receta pendiente",
+  icon: "https://cdn-icons-png.flaticon.com/512/2966/2966480.png",
+  vibrate: [200, 100, 200],
+});
+  }
+}
     }
 
     setRecetas(nuevasRecetas);
@@ -102,21 +135,43 @@ const handleChange = (e) => {
 };
 
   // 🔹 guardar edición
-  const handleSave = () => {
-    setRecetas((prev) =>
-      prev.map((r) =>
-        r.id === recetaSeleccionada.id ? recetaSeleccionada : r
-      )
+const handleSave = async () => {
+  try {
+    await axios.put(
+      `http://localhost:8000/api/recetas/${recetaSeleccionada.id}`,
+      {
+        estado: recetaSeleccionada.estado,
+      }
     );
 
+    fetchRecetas(page);
     closeModal();
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   //  eliminar receta
   const eliminarReceta = () => {
     setRecetas(recetas.filter((r) => r.id !== recetaSeleccionada.id));
     closeDeleteModal();
   };
+const meds = recetaSeleccionada?.medicamentos
+  ? recetaSeleccionada.medicamentos.split(";;").map(med => {
+      const [nombre, presentacion, requiere_receta, stock, precio] = med.split("|");
+
+      return {
+        nombre,
+        presentacion,
+        requiere_receta: Number(requiere_receta),
+        stock: Number(stock),
+        precio: Number(precio)
+      };
+    })
+  : [];
+
+const total = meds.reduce((acc, m) => acc + m.precio, 0);
+
 
   return (
     <div className="home-layout">
@@ -170,7 +225,12 @@ const handleChange = (e) => {
 </div>
 
 {recetas.map((receta) => (
-  <div className="table-row-modern" key={receta.id}>
+  <div
+  className={`table-row-modern ${
+    receta.estado === "entregado" ? "row-disabled" : ""
+  }`}
+  key={receta.id}
+>
     
     {/* PACIENTE */}
     <div className="paciente-cell">
@@ -195,19 +255,19 @@ const handleChange = (e) => {
 
     {/* ESTADO */}
     <div>
-      <span
-        className={`status-badge ${
-          receta.prioridad === "Urgente"
-            ? "urgent"
-            : "normal"
-        }`}
-      >
-        {receta.prioridad}
-      </span>
+  <span className={`status-badge ${
+  receta.estado === "entregado"
+    ? "success"
+    : receta.estado === "pendiente"
+    ? "warning"
+    : "danger"
+}`}>
+  {receta.estado}
+</span>
     </div>
 
     {/* ACCIONES */}
-    <div style={{ display: "flex", gap: "12px" }}>
+    <div className="acciones-cell">
       <button
         onClick={() => openModal(receta)}
         style={{
@@ -221,18 +281,16 @@ const handleChange = (e) => {
         <i className="bi bi-pencil-square"></i>
       </button>
 
-      <button
-        onClick={() => openDeleteModal(receta)}
-        style={{
-          border: "none",
-          background: "transparent",
-          cursor: "pointer",
-          fontSize: "18px",
-          color: "#dc2626",
-        }}
-      >
-        <i className="bi bi-trash"></i>
-      </button>
+
+{receta.estado === "pendiente" && (
+<button
+  onClick={() => cambiarEstado(receta.id, "entregado")}
+  className="btn-entregar-icon"
+  title="Entregar"
+>
+  <i className="bi bi-check-lg"></i>
+</button>
+)}
     </div>
   </div>
 ))}
@@ -288,57 +346,53 @@ const handleChange = (e) => {
       {/* MODAL EDITAR */}
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-modern">
-            <h4>Editar receta</h4>
+<div className="modal-modern">
+  <h3>Detalle de receta 💊</h3>
 
-            {recetaSeleccionada && (
-              <>
-                <input
-                  type="text"
-                  name="paciente"
-                  value={recetaSeleccionada.paciente}
-                  onChange={handleChange}
-                  placeholder="Paciente"
-                />
+  <p><strong>Paciente:</strong> {recetaSeleccionada.paciente}</p>
+  <p><strong>Doctor:</strong> {recetaSeleccionada.doctor}</p>
+  <p><strong>Hora:</strong> {recetaSeleccionada.hora}</p>
 
-                <input
-                  type="time"
-                  name="hora"
-                  value={recetaSeleccionada.hora}
-                  onChange={handleChange}
-                />
+  <hr />
 
-              <select
-  name="prioridad"
-  value={recetaSeleccionada.prioridad}
-  onChange={handleChange}
->
-  <option value="Urgente">Urgente</option>
-  <option value="Normal">Normal</option>
-</select>
+<h4>Medicamentos</h4>
 
-<p style={{ marginTop: "10px", fontWeight: "bold" }}>
-  Medicamentos:
-</p>
+{meds.map((m, i) => (
+  <details key={i} className="med-card animated">
+    <summary>
+       {m.nombre}
+    </summary>
 
-<ul style={{ marginTop: "10px" }}>
-  {recetaSeleccionada?.medicamento
-    ?.split(",")
-    .map((med, index) => (
-      <li key={index}>{med.trim()}</li>
-    ))}
-</ul>
-              </>
-            )}
+    <div className="med-content">
+      <p><strong>Presentación:</strong> {m.presentacion}</p>
+      <p>Receta: {m.requiere_receta ? "Sí" : "No"}</p>
+      <p>Stock: {m.stock > 0 ? "Disponible" : "Sin stock ❌"}</p>
+      <p>Precio: ${m.precio}</p>
+    </div>
+  </details>
+))}
 
-            <div className="modal-footer-modern">
-              <button onClick={closeModal}>Cancelar</button>
+<hr />
 
-              <button onClick={handleSave}>
-                Guardar cambios
-              </button>
-            </div>
-          </div>
+<h3>Total: ${total}</h3>
+
+  <hr />
+
+  <select
+    name="estado"
+    value={recetaSeleccionada.estado}
+    onChange={handleChange}
+  >
+    <option value="pendiente">Pendiente</option>
+    <option value="entregado">Entregado</option>
+    <option value="no_entregado">No entregado</option>
+  </select>
+
+  <div className="modal-footer-modern">
+    <button onClick={closeModal}>Cerrar</button>
+    <button onClick={handleSave}>Guardar</button>
+  </div>
+</div>
         </div>
       )}
 

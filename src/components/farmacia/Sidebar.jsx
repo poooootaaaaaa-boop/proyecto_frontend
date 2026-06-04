@@ -87,6 +87,21 @@ export default function Sidebar() {
           Doctores
         </Nav.Link>
 
+        <Nav.Link as={NavLink} to="/farmacia/agregar-consultorios" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Consultorios
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/farmacia/configurar-pago-doctor" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Configurar Pago
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/farmacia/asignar-doctor-consultorio" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Asignar Doctor a Consultorio
+        </Nav.Link>
+
       </Nav>
 
       <div style={{ marginTop: "auto" }}>

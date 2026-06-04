@@ -185,3 +185,170 @@
   justify-content: flex-end;
   gap: 10px;
 }
+
+
+.table-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.table-row-modern {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
+  padding: 12px;
+  border-radius: 12px;
+  background: #d2d3d459;
+  align-items: center;
+  transition: 0.2s;
+}
+
+.table-row-modern:hover {
+  transform: scale(1.01);
+  background: #8291a7;
+}
+
+.med-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Header */
+.med-card summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Quitar flechita default */
+.med-card summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Flecha personalizada */
+.med-card summary::after {
+  content: "▼";
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+/* Rotación cuando abre */
+.med-card[open] summary::after {
+  transform: rotate(180deg);
+}
+
+/* Contenido oculto animado */
+.med-content {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+/* Cuando abre */
+.med-card[open] .med-content {
+  max-height: 200px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 10px;
+}
+
+/* Hover bonito */
+.med-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Cuando está abierto */
+.med-card[open] {
+  background: #eef2ff;
+  border-color: #6366f1;
+}
+
+.row-disabled {
+  opacity: 0.5;
+  pointer-events: none; /* 🔥 bloquea clicks */
+  background: #f1f5f9;
+}
+
+
+.btn-entregar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
+  white-space: nowrap; 
+
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
+}
+
+/* Hover */
+.btn-entregar:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.4);
+}
+
+/* Click */
+.btn-entregar:active {
+  transform: scale(0.95);
+}
+
+/* Icono */
+.btn-entregar i {
+  font-size: 14px;
+}
+
+.table-row-modern {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr 1.5fr; /*  controla ancho */
+  align-items: center;
+}
+
+.acciones-cell {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap; /*  evita que se salga */
+  justify-content: flex-start;
+}
+
+
+.btn-entregar-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-entregar-icon:hover {
+  transform: scale(1.1);
+}

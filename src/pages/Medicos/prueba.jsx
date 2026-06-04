@@ -11,6 +11,7 @@ import Axios from "axios";
 import "./prueba.css";
 function Prueba() {
       // ===== ESTADOS (reemplazan document.getElementById) =====
+  const [caducado, setCaducado]= useState(false);
   const [tipoMovimiento, setTipoMovimiento] = useState("");
   const [mostrarEntrada, setMostrarEntrada] = useState(false);
   const [mostrarSalida, setMostrarSalida] = useState(false);
@@ -80,6 +81,29 @@ useEffect(() => {
 
 }, []);
 
+useEffect(() => {
+  if (caducado) {
+    setRecetaId("");
+  }
+}, [caducado]);
+/*
+  const handleCaducadoChange = (e) => {
+    const checked = e.target.checked;
+    setCaducado(checked);
+    Axios.post("http://127.0.0.1:8000/api/medicamentoCaducado", {
+      medicamento_id: producto || null,
+      caducado: checked,
+      cantidad: cantidad || null,
+      motivo: motivo || null,
+    })
+      .then((res) => {
+        console.log('Caducado enviado:', res.data);
+      })
+      .catch((err) => {
+        console.error('Error al enviar caducado:', err);
+      });
+  };
+*/
   const Entrada = () => {
     setTipoMovimiento("entrada");
     setMostrarEntrada(!mostrarEntrada);
@@ -105,7 +129,7 @@ const guardarMovimiento = () => {
     return;
   }
 
-  if (tipoMovimiento === "salida" && !recetaId) {
+  if (tipoMovimiento === "salida" && !recetaId && !caducado) {
     alert("Selecciona receta");
     return;
   }
@@ -119,8 +143,54 @@ const guardarMovimiento = () => {
     receta_id: tipoMovimiento === "salida" ? recetaId : null
   };
 
+  const selectedMed = medicamentos.find(
+    (med) => String(med.id) === String(producto)
+  );
+
+  if (tipoMovimiento === "salida" && caducado && selectedMed) {
+    
+      Axios.post("http://127.0.0.1:8000/api/medicamentoCaducado", {
+    medicamento_id: producto,
+    cantidad,
+    motivo,
+  })
+  .then(() => {
+    const manifiestoSalida = {
+      medicamento: {
+        id: selectedMed.id,
+        nombre: selectedMed.nombre,
+      },
+      cantidad,
+      motivo,
+    };
+
+    localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
+    window.location.href = "/farmacia/manifesto-residuo";
+  })
+  .catch(err => console.error(err));
+
+  return;
+  }
+
   Axios.post("http://127.0.0.1:8000/api/guardarMovimientos", dataToSend)
     .then(() => {
+      if (tipoMovimiento === "salida" && selectedMed) {
+        const manifiestoSalida = {
+          medicamento: {
+            id: selectedMed.id,
+            nombre: selectedMed.nombre,
+          },
+          cantidad,
+          motivo,
+        };
+
+        /*
+        localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
+        window.location.href = "/farmacia/manifesto-residuo";
+        return;
+      */
+      }
+        
 
       alert("Guardado correctamente");
 
@@ -140,6 +210,8 @@ const guardarMovimiento = () => {
 
     })
     .catch(err => console.error(err));
+
+    
 };
 
 
@@ -191,21 +263,28 @@ const guardarMovimiento = () => {
 
           <div className="mb-3">
 
-            <label className="form-label">Producto</label>
+        <label className="form-label">Producto</label>
             <br />
        <select
-  className="form-control"
-  value={producto}
-  onChange={(e) => setProducto(e.target.value)}
->
-  <option value="">Selecciona medicamento</option>
-  {medicamentos.map((med) => (
-    <option key={med.id} value={med.id}>
-      {med.nombre}
-    </option>
-  ))}
-</select>
-            
+        className="form-control"
+        value={producto}
+        onChange={(e) => setProducto(e.target.value)}
+      >
+        <option value="">Selecciona medicamento</option>
+        {medicamentos.map((med) => (
+          <option key={med.id} value={med.id}>
+            {med.nombre}
+          </option>
+        ))}
+      </select>
+      <br/>
+      <label>Medicamento Caducado</label>
+      <input
+        type="checkbox"
+        checked={caducado}
+        onChange={(e) => setCaducado(e.target.checked)}
+      />
+      <br/> <br />
 {tipoMovimiento === "entrada" && (
   <>
     <label>Proveedor</label>
@@ -224,7 +303,7 @@ const guardarMovimiento = () => {
   </>
 )}
 
-{tipoMovimiento === "salida" && (
+{tipoMovimiento === "salida" && !caducado && (
   <>
     <label>Receta</label>
     <select

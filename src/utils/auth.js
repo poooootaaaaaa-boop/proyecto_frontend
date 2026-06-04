@@ -9,6 +9,7 @@ export const saveUser = (user) => {
   users.push(user);
 
   localStorage.setItem("users", JSON.stringify(users));
+
 };
 
 export const loginUser = (email, password) => {

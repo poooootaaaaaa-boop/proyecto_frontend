@@ -8,7 +8,7 @@ import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
-import "./Inventario.css";
+import "./INVENTARIO.css";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 

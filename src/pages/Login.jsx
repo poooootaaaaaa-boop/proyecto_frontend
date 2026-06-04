@@ -32,11 +32,8 @@ export default function Login() {
       role: "paciente",
     },
   ];
-
 const handleLogin = async () => {
-
   try {
-    //  LOGIN CON BACKEND
     const response = await loginUser({
       correo: email,
       password: password,
@@ -44,24 +41,29 @@ const handleLogin = async () => {
 
     const user = response.usuario;
 
-    // guardar usuario y token
+    console.log(user); // para confirmar
+
     localStorage.setItem("usuario", JSON.stringify(user));
     localStorage.setItem("token", response.token);
 
     setError("");
 
-    //  REDIRECCIÓN POR ROL (IMPORTANTE)
-    if (user.rol_id === 3) {
-      navigate("/Medicos/Dashboard_medicos");
-    } else if (user.rol_id === 4) {
-      navigate("/Farmacia/dashboard");
+    const roleRoutes = {
+      "Doctor": "/Medicos/Dashboard_medicos",
+      "Clinica/Farmacia": "/Farmacia/dashboard",
+      "Paciente": "/dashboard_paciente",
+    };
+
+    const route = roleRoutes[user.rol];
+
+    if (route) {
+      navigate(route);
     } else {
-      navigate("/dashboard_paciente");
+      navigate("/");
     }
 
   } catch (err) {
-
-    //  FALLBACK (tu lógica actual)
+    // fallback demo
     const savedUsers =
       JSON.parse(localStorage.getItem("registeredUsers")) || [];
 
@@ -73,16 +75,13 @@ const handleLogin = async () => {
 
     if (foundUser) {
       setError("");
-
       localStorage.setItem("user", JSON.stringify(foundUser));
-
       navigate(foundUser.route);
     } else {
       setError("Credenciales incorrectas");
     }
   }
 };
-
 
   return (
     <div className="login-container">

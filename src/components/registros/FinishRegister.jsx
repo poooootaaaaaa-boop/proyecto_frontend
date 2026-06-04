@@ -129,6 +129,10 @@ if (roleMap[registerData.role] === 4) {
 
     const user = response.usuario;
 
+    //  GUARDA EL ID
+    //localStorage.setItem("usuario_id", user.id);
+
+
 // redirigir según rol
 const rol = roleMap[registerData.role];
 

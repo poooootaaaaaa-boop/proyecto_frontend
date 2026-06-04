@@ -14,6 +14,9 @@ import { Link } from "react-router-dom";
 import Axios from "axios";
 
 function Alta_pacientes({ data, setData }){
+    
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+    const doctor_id = usuario?.doctor_id;
 
         const[nombre, setNombre]=useState("");
         const[apellidoP, setApellidoP]=useState("");
@@ -35,7 +38,8 @@ function Alta_pacientes({ data, setData }){
         
 
         const finalizar = () => {
-            const altaPaciente = {
+const altaPaciente = {
+  doctor_id, // 🔥 CLAVE
   nombre,
   apellidoP,
   apellidoM,
