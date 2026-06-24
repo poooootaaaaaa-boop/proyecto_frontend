@@ -325,7 +325,7 @@ export default function ManifiestoResiduos() {
             ...newResiduo(),
             nombre: data.medicamento.nombre,
             cantidad: data.cantidad || "",
-            tipo: "Medicamento",
+            tipo: "",
           },
         ]);
       }
@@ -425,7 +425,7 @@ export default function ManifiestoResiduos() {
               <thead>
                 <tr>
                   <th rowSpan={2} style={{ width: "22%" }}>Nombre del Residuo</th>
-                  <th colSpan={9}>Clasificación</th>
+                  <th colSpan={7}>Clasificación</th>
                   <th rowSpan={2} style={{ width: "8%" }}>Tipo<br />Envase</th>
                   <th rowSpan={2} style={{ width: "10%" }}>Capacidad<br />(kg o ton)</th>
                   <th rowSpan={2} style={{ width: "8%" }}>Cantidad</th>

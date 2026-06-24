@@ -15,6 +15,7 @@ import AgregarConsultorios from "../pages/farmacia/AgregarConsultorio";
 import ConfigurarPagoDoctor from "../pages/farmacia/ConfigurarPagoDoctor";
 import AsignarDoctorConsultorio from "../pages/farmacia/AsignarDoctorConsultorio";
 import ManifestoResiduo from "../pages/farmacia/ManifestoResiduo";
+import MedicinasCaducacadas from "../pages/farmacia/MedicinasCaducacadas";
 
 
 
@@ -24,6 +25,7 @@ export default function FarmaciaRoutes(){
             <Route path="dashboard" element={<DashboardFarmacia />}/>
             <Route path="prueba" element={<Stock />} />
             <Route path="manifesto-residuo" element={<ManifestoResiduo />} /> /* nuevo*/
+            <Route path="medicinas-caducadas" element={<MedicinasCaducacadas />} /> /* nuevo*/
 
             <Route path="Home" element={<HomeFarmacia />}/>
             <Route path="RecetasMedicas" element={<Recetas />}/>
