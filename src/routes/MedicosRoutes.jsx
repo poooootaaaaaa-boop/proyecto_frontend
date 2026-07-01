@@ -10,10 +10,9 @@ import { Routes, Route,BrowserRouter } from "react-router-dom";
 import Citas from "../pages/Medicos/citas";
 import Agenda from "../pages/Medicos/agenda";
 import Tratamientos_largos from "../pages/Medicos/tratamientos_largos";
-
 import Prueba from "../pages/Medicos/prueba";
 import Planes from "../components/registros/Planes";
-
+import DocumentoOrden from "../pages/Medicos/documento-orden";
 import { useLocation } from "react-router-dom";
 
 export default function MedicosRoute(){
@@ -26,6 +25,7 @@ export default function MedicosRoute(){
 
     return(
         <Routes>
+          <Route path="documento-orden" element={<DocumentoOrden />} />
           <Route path="/angelito-cachondo" element={<Layout_Medicos />} />
           
          
@@ -65,9 +65,6 @@ export default function MedicosRoute(){
         <Route path="/Medicos/citas" element={<Citas/>} />
         <Route path="/Medicos/consulta" element={<Consulta/>} />
         <Route path="/Medicos/alta_pacientes" element={<Alta_pacientes/>} />
-        
-        
-
         <Route path="planes" element={<Planes />} />
 
 

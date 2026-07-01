@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import Axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function AgregarDistribuidor() {
 
@@ -91,7 +92,7 @@ export default function AgregarDistribuidor() {
         };
 
         Axios.post(
-          "http://127.0.0.1:8000/api/distribuidores",
+          `${API_URL}/distribuidores`,
           dataToSend
         )
           .then((response) => {

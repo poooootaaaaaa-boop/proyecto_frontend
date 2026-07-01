@@ -13,6 +13,8 @@ import Mensaje from "./mensaje";
 import { Link } from "react-router-dom";
 import Axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Alta_pacientes({ data, setData }){
     
     const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
@@ -62,7 +64,7 @@ const altaPaciente = {
             
              //  BACKEND LARAVEL (NUEVO)
             Axios.post(
-                "http://127.0.0.1:8000/api/AltaPaciente",
+                `${API_URL}/AltaPaciente`,
                 altaPaciente
             )
             .then((response) => {

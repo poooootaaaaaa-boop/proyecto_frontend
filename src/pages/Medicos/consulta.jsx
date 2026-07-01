@@ -13,6 +13,8 @@ import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import { Link } from "react-router-dom";
 import './Consulta.css';
 import Axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Consulta({data,setData /*dataPacientes*/}){
     const [pacienteId, setPacienteId] = useState("");
     const [dataPacientes, setDataPacientes] = useState([]);
@@ -40,7 +42,7 @@ useEffect(() => {
 
   const doctor_id = usuario.doctor_id;
 
-  Axios.get(`http://127.0.0.1:8000/api/citas-doctor/${doctor_id}`)
+  Axios.get(`${API_URL}/citas-doctor/${doctor_id}`)
     .then(res => {
 
       const hoy = new Date().toLocaleDateString("sv-SE"); 
@@ -56,12 +58,12 @@ useEffect(() => {
 
 }, []);
 useEffect(() => {
-  Axios.get("http://127.0.0.1:8000/api/medicamentos")
+  Axios.get(`${API_URL}/medicamentos`)
     .then(res => setListaMedicamentos(res.data));
 }, []);
 
     useEffect(() => {
-  Axios.get("http://127.0.0.1:8000/api/MostrarPaciente")
+  Axios.get(`${API_URL}/MostrarPaciente`)
     .then((response) => {
       setDataPacientes(response.data.paciente);
     })
@@ -96,7 +98,7 @@ const finalizarConsulta = async () => {
   try {
 
     // 1. GUARDAR CONSULTA
-    await Axios.post("http://127.0.0.1:8000/api/finalizar-consulta", {
+    await Axios.post(`${API_URL}/finalizar-consulta`, {
       cita_id: citaSeleccionada,
       doctor_id: usuario.doctor_id,
       paciente_id: pacienteId,
@@ -109,7 +111,7 @@ const finalizarConsulta = async () => {
     });
 
     // 2. MARCAR COMO COMPLETADA (ESTO SIEMPRE)
-    await Axios.put(`http://127.0.0.1:8000/api/citas/${citaSeleccionada}/estado`, {
+    await Axios.put(`${API_URL}/citas/${citaSeleccionada}/estado`, {
       estado: "completada"
     });
 
@@ -124,7 +126,7 @@ const finalizarConsulta = async () => {
     alert("Ese horario ya está ocupado");
     return;
   }
-      await Axios.post("http://127.0.0.1:8000/api/citas", {
+      await Axios.post(`${API_URL}/citas`, {
         doctor_id: usuario.doctor_id,
         paciente_id: pacienteId,
         fecha_inicio: fechaSeguimiento.format("YYYY-MM-DD HH:mm:ss"),

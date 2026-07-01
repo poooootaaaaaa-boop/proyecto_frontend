@@ -2,7 +2,10 @@ import { Box, Typography, Button, Modal } from "@mui/material";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { useState, useEffect } from "react";
+import axios from "axios";
 import "./calendar.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 dayjs.locale("es");
 
@@ -27,11 +30,11 @@ export default function Calendar({ citas = [] }) {
 
   const doctor_id = usuario.doctor_id;  
 
-  fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`)
-    .then(res => res.json())
-    .then(data => setCitasDoctor(data))
-    .catch(err => console.error(err));
-}, []);
+   axios
+      .get(`${API_URL}/citas-doctor/${doctor_id}`)
+      .then(res => setCitasDoctor(res.data))
+      .catch(err => console.error(err));
+  }, []);
 
   const days = [];
 

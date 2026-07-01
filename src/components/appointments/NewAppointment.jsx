@@ -14,6 +14,7 @@ import WeekAppointment from "./WeekAppointment";
 import { useAppointments } from "../appointments/AppointmentContext";
 
 dayjs.locale("es");
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function NewAppointment() {
 
@@ -59,7 +60,7 @@ useEffect(() => {
 
   const obtenerDoctores = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/paciente/doctores/${usuario.id}`);
+      const res = await fetch(`${API_URL}/paciente/doctores/${usuario.id}`);
       const data = await res.json();
 
       setDoctores(data);

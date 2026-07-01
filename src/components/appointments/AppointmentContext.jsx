@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 
 const AppointmentContext = createContext();
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export function AppointmentProvider({ children }) {
 
   const [appointments, setAppointments] = useState([]);
@@ -10,7 +12,7 @@ export function AppointmentProvider({ children }) {
   // 🔹 Cargar citas desde Laravel
   const loadAppointments = async (paciente_id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/citas/paciente/${paciente_id}`);
+      const res = await fetch(`${API_URL}/citas/paciente/${paciente_id}`);
       const data = await res.json();
 
       const citasFormateadas = data.map(c => {
@@ -32,7 +34,7 @@ export function AppointmentProvider({ children }) {
 
   const loadFutureAppointments = async (paciente_id) => {
   try {
-    const res = await fetch(`http://localhost:8000/api/citas/paciente/${paciente_id}/futuras`);
+    const res = await fetch(`${API_URL}/citas/paciente/${paciente_id}/futuras`);
     const data = await res.json();
 
     const citasFormateadas = data.map(c => {
@@ -80,7 +82,7 @@ export function AppointmentProvider({ children }) {
   };
 const loadAppointmentsByDoctor = async (doctor_id) => {
   try {
-    const res = await fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`);
+    const res = await fetch(`${API_URL}/citas-doctor/${doctor_id}`);
     const data = await res.json();
 
     const citasFormateadas = data.map(c => {

@@ -4,7 +4,7 @@ import { jsPDF } from "jspdf";
 import { useState, useEffect } from "react";
 import MedicationDetailModal from "./MedicationDetailModal";
 import { useNavigate } from "react-router-dom";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function Treatments() {
 const [recetas, setRecetas] = useState([]);
 
@@ -16,7 +16,7 @@ useEffect(() => {
   const fetchRecetas = async () => {
     try {
       const res = await fetch(
-        `http://localhost:8000/api/recetas/paciente/${usuario.paciente_id}`
+        `${API_URL}/recetas/paciente/${usuario.paciente_id}`
       );
 
       const data = await res.json();

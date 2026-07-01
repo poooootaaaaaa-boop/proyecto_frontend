@@ -1,6 +1,8 @@
 import { Card, CardContent, Typography, Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function MedItem({ name, dose, time, bg }) {
   return (
     <Box
@@ -61,7 +63,7 @@ export default function MedicationsCard() {
     const fetchData = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/consulta/paciente/${usuario.paciente_id}/ultima`
+          `${API_URL}/consulta/paciente/${usuario.paciente_id}/ultima`
         );
 
         const data = await res.json();

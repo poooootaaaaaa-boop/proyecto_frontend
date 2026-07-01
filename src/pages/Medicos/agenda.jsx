@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import Calendar from "./Calendar";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+const API_URL = import.meta.env.VITE_API_URL;
 function agenda({data=[]}){ 
 
 const citasFijas = [

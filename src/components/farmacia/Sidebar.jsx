@@ -76,6 +76,15 @@ export default function Sidebar() {
           <i className="bi bi-box-seam"></i>
           Inventario
         </Nav.Link>
+        
+
+
+        <Nav.Link as={NavLink} to="/farmacia/medicinas-caducadas" style={linkStyle}>
+          <i className="bi bi-hourglass-bottom"></i>
+          Medicamentos Caducados
+        </Nav.Link>
+
+
 
         <Nav.Link as={NavLink} to="/farmacia/Distribuidores" style={linkStyle}>
           <i className="bi bi-truck"></i>
@@ -85,6 +94,21 @@ export default function Sidebar() {
         <Nav.Link as={NavLink} to="/farmacia/doctores" style={linkStyle}>
           <i className="bi bi-person-badge"></i>
           Doctores
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/farmacia/agregar-consultorios" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Consultorios
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/farmacia/configurar-pago-doctor" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Configurar Pago
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/farmacia/asignar-doctor-consultorio" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Asignar Doctor a Consultorio
         </Nav.Link>
 
       </Nav>

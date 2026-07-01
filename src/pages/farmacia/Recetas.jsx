@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function RecetasRecibidas() {
 
   const [modalEditar, setModalEditar] = useState(false);
@@ -16,8 +18,8 @@ const [totalPages, setTotalPages] = useState(1);
 const fetchRecetas = async (page = 1) => {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/recetas/farmacia?page=${page}&farmacia_id=1`
-    );
+  `${API_URL}/recetas/farmacia?page=${page}&farmacia_id=1`
+);
 
     setRecetas(res.data.data);
     setTotalPages(res.data.last_page);
@@ -30,8 +32,8 @@ const fetchRecetas = async (page = 1) => {
 const fetchStats = async () => {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/recetas/stats?farmacia_id=1`
-    );
+  `${API_URL}/recetas/stats?farmacia_id=1`
+);
 
     setStats(res.data);
 
