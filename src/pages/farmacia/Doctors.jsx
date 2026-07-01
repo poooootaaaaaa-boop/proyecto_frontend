@@ -7,6 +7,8 @@ import { NavLink } from "react-router-dom";
 import { PencilSquare, Trash, PlusCircle } from "react-bootstrap-icons";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Doctors() {
 
   const [search, setSearch] = useState("");
@@ -25,7 +27,7 @@ export default function Doctors() {
   //  GET
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/doctores");
+      const res = await axios.get(`${API_URL}/doctores`);
       setDoctors(res.data);
     } catch (err) {
       console.log(err);
@@ -70,7 +72,7 @@ export default function Doctors() {
   const updateDoctor = async () => {
     try {
       await axios.put(
-        `http://127.0.0.1:8000/api/doctores/${selectedDoctor.id}`,
+        `${API_URL}/doctores/${selectedDoctor.id}`,
         selectedDoctor
       );
       fetchDoctors();
@@ -89,7 +91,7 @@ export default function Doctors() {
   const deleteDoctor = async () => {
     try {
       await axios.delete(
-        `http://127.0.0.1:8000/api/doctores/${doctorToDelete.id}`
+        `${API_URL}/doctores/${doctorToDelete.id}`
       );
       fetchDoctors();
       setShowDeleteModal(false);
