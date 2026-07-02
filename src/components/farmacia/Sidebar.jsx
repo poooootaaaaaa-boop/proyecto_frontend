@@ -95,6 +95,15 @@ export default function Sidebar() {
           <i className="bi bi-person-badge"></i>
           Doctores
         </Nav.Link>
+      
+
+
+
+        
+       <Nav.Link as={NavLink} to="/clinica/asistencias" style={linkStyle}>
+  <i className="bi bi-person-check"></i>
+  Asistencias
+</Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/agregar-consultorios" style={linkStyle}>
           <i className="bi bi-person-badge"></i>

@@ -12,6 +12,7 @@ import Agenda from "../pages/Medicos/agenda";
 import Tratamientos_largos from "../pages/Medicos/tratamientos_largos";
 import Prueba from "../pages/Medicos/prueba";
 import Planes from "../components/registros/Planes";
+import DoctorAttendance from "../pages/Medicos/DoctorAttendance";
 
 import { useLocation } from "react-router-dom";
 
@@ -73,9 +74,10 @@ export default function MedicosRoute(){
        
         
        
-
+////
         
         
+        <Route path="/altas" element={<DoctorAttendance/>} />
     
 
 

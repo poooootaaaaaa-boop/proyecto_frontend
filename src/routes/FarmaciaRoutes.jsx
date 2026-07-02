@@ -40,6 +40,7 @@ export default function FarmaciaRoutes(){
             <Route path="agregar-consultorios" element={<AgregarConsultorios/>}/>
             <Route path="configurar-pago-doctor" element={<ConfigurarPagoDoctor/>}/>
             <Route path="asignar-doctor-consultorio" element={<AsignarDoctorConsultorio/>}/>
+            
         </Routes>
     );
 }

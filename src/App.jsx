@@ -8,7 +8,10 @@ import NewAppointment from "./components/appointments/NewAppointment";
 import ConfirmAppointment from "./components/appointments/ConfirmAppointment";
 import { AppointmentProvider } from "./components/appointments/AppointmentContext";
 import SelectProfile from "./components/registros/SelectProfile";
-
+// 1. IMPORTACIONES AL INICIO DEL ARCHIVO (Asegúrate de que las rutas coincidan con tus carpetas reales)
+import Doctors from "./pages/farmacia/Doctors"; // <-- AGREGA ESTA LÍNEA (Ajusta la ruta de tu carpeta)
+import ClinicAttendance from "./pages/farmacia/ClinicAttendance";
+import DoctorAttendance from "./pages/Medicos/DoctorAttendance";
 
 // Tus rutas y componentes del stash
 import Layout_Medicos from "./pages/Medicos/Layout_Medicos";
@@ -71,6 +74,14 @@ export default function App() {
         <Route path="/tratamientos" element={<Treatments />} />
         <Route path="/farmacia/*" element={<FarmaciaRoutes />} />
         <Route path="/Medicos/*" element={<MedicosRoute />} />
+            {/* Módulo de Doctores (Gestión, edición y marcaje rápido) */}
+
+        {/* Módulo de Clínica (Historial global y filtros de fechas) */}
+        <Route path="/clinica/asistencias" element={<ClinicAttendance />} />
+
+        {/* Módulo de Autogestión del Doctor (Reloj y marcaje personal) */}
+        <Route path="/doctor/asistencia" element={<DoctorAttendance />} />
+
       </Routes>
     </AppointmentProvider>
   );
