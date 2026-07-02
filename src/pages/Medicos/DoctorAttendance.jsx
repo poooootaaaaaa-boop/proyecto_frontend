@@ -5,6 +5,8 @@ import { Card, Button, Table, Form, Row, Col, Spinner, Alert } from "react-boots
 import { BoxArrowInRight, BoxArrowLeft, Clock, CalendarCheck } from "react-bootstrap-icons";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function DoctorAttendance() {
   // ID del doctor (En producción lo extraerás de tu AuthContext o LocalStorage)
   const [doctorId] = useState(1); 
@@ -24,7 +26,7 @@ export default function DoctorAttendance() {
   const fetchHistorialPersonal = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/doctores/${doctorId}/asistencias`, {
+      const res = await axios.get(`${API_URL}/doctores/${doctorId}/asistencias`, {
         params: { fecha: filtroFecha }
       });
       setHistorialPersonal(res.data.historial);
@@ -42,7 +44,7 @@ export default function DoctorAttendance() {
 
   const marcarAsistencia = async (tipo) => {
     try {
-      await axios.post("http://127.0.0.1:8000/api/asistencias", {
+      await axios.post(`${API_URL}/asistencias`, {
         doctor_id: doctorId,
         tipo: tipo
       });

@@ -49,7 +49,7 @@ export default function Doctors() {
 
   const fetchEspecialidades = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/especialidades");
+      const res = await axios.get(`${API_URL}/especialidades`);
       setEspecialidades(res.data);
     } catch (err) {
       console.log(err);
@@ -64,7 +64,7 @@ export default function Doctors() {
   // Registrar Entrada o Salida rápida desde el listado
   const registrarAsistencia = async (doctorId, tipo) => {
     try {
-      await axios.post("http://127.0.0.1:8000/api/asistencias", {
+      await axios.post(`${API_URL}/asistencias`, {
         doctor_id: doctorId,
         tipo: tipo
       });

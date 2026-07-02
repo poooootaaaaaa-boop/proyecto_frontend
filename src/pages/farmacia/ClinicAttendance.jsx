@@ -5,6 +5,8 @@ import { Card, Table, Form, Row, Col, Badge, Spinner } from "react-bootstrap";
 import { CalendarRange, ClockHistory, ShieldCheck, HourglassSplit } from "react-bootstrap-icons";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function ClinicAttendance() {
   const [asistencias, setAsistencias] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
@@ -19,7 +21,7 @@ export default function ClinicAttendance() {
   const fetchAsistenciasGlobales = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/clinic/asistencias", {
+      const res = await axios.get(`${API_URL}/clinic/asistencias`, {
         params: {
           fecha_inicio: fechaInicio,
           fecha_fin: fechaFin,
@@ -35,7 +37,7 @@ export default function ClinicAttendance() {
 
   const fetchEspecialidades = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/especialidades");
+      const res = await axios.get(`${API_URL}/especialidades`);
       setEspecialidades(res.data);
     } catch (err) {
       console.log(err);
