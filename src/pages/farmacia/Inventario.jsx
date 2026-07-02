@@ -12,7 +12,7 @@ import "./INVENTARIO.css";
 import axios from "axios";
 import Pagination from "@mui/material/Pagination";
 
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function Inventario() {
 
 const [medicamentos, setMedicamentos] = useState([]);
@@ -25,9 +25,7 @@ const obtenerCategorias = async () => {
 
   try {
 
-    const res = await axios.get(
-      "http://localhost:8000/api/categorias"
-    );
+   const res = await axios.get(`${API_URL}/categorias`);
 
     setCategorias(res.data);
 
@@ -90,9 +88,7 @@ const totalPaginas = Math.ceil(
 const obtenerMedicamentos = async () => {
   try {
 
-    const res = await axios.get(
-      "http://localhost:8000/api/medicamentos"
-    );
+    const res = await axios.get(`${API_URL}/medicamentos`);
 
     setMedicamentos(res.data);
     setPaginaActual(1);
@@ -138,10 +134,7 @@ const guardarCambios = async () => {
       datos.append("imagen", imagenNueva);
     }
 
-    await axios.post(
-      "http://localhost:8000/api/medicamentos/operaciones",
-      datos
-    );
+   await axios.post(`${API_URL}/medicamentos/operaciones`, datos);
 
     obtenerMedicamentos();
     cerrarModales();
@@ -167,7 +160,7 @@ const eliminarMedicamento = async () => {
     datos.append("id", medSeleccionado.id);
 
     await axios.post(
-      "http://localhost:8000/api/medicamentos/operaciones",
+      `${API_URL}/medicamentos/operaciones`,
       datos
     );
 

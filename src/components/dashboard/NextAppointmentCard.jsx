@@ -20,6 +20,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function NextAppointmentCard() {
 const [appointmentData, setAppointmentData] = useState(null);
   // SIMULACIÓN DE RESPUESTA BACKEND (JSON)
@@ -47,7 +49,7 @@ useEffect(() => {
   const loadNextAppointment = async () => {
     try {
       const res = await fetch(
-        `http://localhost:8000/api/citas/paciente/${usuario.paciente_id}/futuras`
+        `${API_URL}/citas/paciente/${usuario.paciente_id}/futuras`
       );
       const data = await res.json();
 

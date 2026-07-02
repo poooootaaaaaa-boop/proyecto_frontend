@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./PerfilPremium.css";
 import ModalEdit from "./ModalEdit";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const PerfilPremium = () => {
   const [activeTab, setActiveTab] = useState("datos");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,7 +14,7 @@ useEffect(() => {
       const usuario = JSON.parse(localStorage.getItem("usuario"));
       if (!usuario) return;
 
-      const res = await fetch(`http://localhost:8000/api/perfil/${usuario.id}`);
+      const res = await fetch(`${API_URL}/perfil/${usuario.id}`);
       const data = await res.json();
 
       setPerfil((prev) => ({
@@ -34,7 +36,7 @@ useEffect(() => {
 
 const obtenerNotificaciones = async () => {
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  const res = await fetch(`http://localhost:8000/api/notificaciones/${usuario.id}`);
+  const res = await fetch(`${API_URL}/notificaciones/${usuario.id}`);
   const data = await res.json();
 
   setPerfil((prev) => ({
@@ -49,7 +51,7 @@ useEffect(() => {
 const handleToggleNotificacion = async (id) => {
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  await fetch("http://localhost:8000/api/notificaciones/toggle", {
+  await fetch(`${API_URL}/notificaciones/toggle`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -87,14 +89,14 @@ const handleSave = async () => {
     formData.append("imagen", imagen);
   }
 
-  await fetch("http://localhost:8000/api/perfil/actualizar", {
+  await fetch(`${API_URL}/perfil/actualizar`, {
     method: "POST",
     body: formData,
   });
 
   // contraseña (igual que ya lo tienes)
   if (perfil.seguridad.nueva) {
-    await fetch("http://localhost:8000/api/perfil/cambiar-password", {
+    await fetch(`${API_URL}/perfil/cambiar-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -116,7 +118,7 @@ useEffect(() => {
   const obtenerDoctor = async () => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    const res = await fetch(`http://localhost:8000/api/perfil/doctor/${usuario.id}`);
+    const res = await fetch(`${API_URL}/perfil/doctor/${usuario.id}`);
     const data = await res.json();
 
     setDoctor(data);

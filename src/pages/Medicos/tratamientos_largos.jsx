@@ -9,6 +9,8 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 import Modal from "react-bootstrap/Modal";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 /*function tratamientos_largos({ data, setData }) {*/
 function tratamientos_largos(){ 
 
@@ -40,7 +42,7 @@ useEffect(() => {
   const usuario = JSON.parse(localStorage.getItem("usuario"));
   const doctor_id = usuario?.doctor_id || 1;
 
-  Axios.get(`http://127.0.0.1:8000/api/tratamientos-largos/${doctor_id}`)
+  Axios.get(`${API_URL}/tratamientos-largos/${doctor_id}`)
     .then((res) => {
 
       const transformados = res.data.map((c) => ({

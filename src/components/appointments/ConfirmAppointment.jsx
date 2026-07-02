@@ -8,6 +8,8 @@ import SuccessModal from "./SuccessModal";
 import { useState } from "react";
 import dayjs from "dayjs";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function ConfirmAppointment() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +27,7 @@ const handleConfirm = async () => {
       "DD MMMM YYYY hh:mm A"
     ).format("YYYY-MM-DD HH:mm:ss");
 
-    const response = await fetch("http://localhost:8000/api/citas/paciente", {
+    const response = await fetch(`${API_URL}/citas/paciente`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -86,7 +88,7 @@ return (
             <Avatar
   src={
     doctor?.foto_url
-      ? `http://localhost:8000${doctor.foto_url}`
+      ? `${API_URL}${doctor.foto_url}`
       : `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor?.nombre || "Doctor")}`
   }
   className="doctor-image"

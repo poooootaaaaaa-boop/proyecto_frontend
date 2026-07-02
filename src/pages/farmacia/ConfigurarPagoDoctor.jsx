@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import "./Consultorios.css";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function ConfigurarPagoDoctor() {
 
@@ -57,11 +58,11 @@ const totalPaginas = Math.ceil(
   const cargarDatos = async () => {
 
     const doctores = await axios.get(
-      "http://127.0.0.1:8000/api/doctores-completo"
+      `${API_URL}/doctores-completo`
     );
 
     const tipos = await axios.get(
-      "http://127.0.0.1:8000/api/tipos-pago"
+      `${API_URL}/tipos-pago`
     );
 
     setDoctores(doctores.data);
@@ -71,7 +72,7 @@ const totalPaginas = Math.ceil(
   const guardarPago = async () => {
 
     await axios.post(
-      "http://127.0.0.1:8000/api/pagos-doctores",
+      `${API_URL}/pagos-doctores`,
       {
         doctor_id: doctorId,
         tipo_pago_id: tipoSeleccionado,
@@ -89,7 +90,7 @@ const totalPaginas = Math.ceil(
     if (!nuevoTipo) return;
 
     await axios.post(
-      "http://127.0.0.1:8000/api/tipos-pago",
+      `${API_URL}/tipos-pago`,
       {
         nombre: nuevoTipo
       }
@@ -103,7 +104,7 @@ const totalPaginas = Math.ceil(
   const eliminarTipo = async (id) => {
 
     await axios.delete(
-      `http://127.0.0.1:8000/api/tipos-pago/${id}`
+      `${API_URL}/tipos-pago/${id}`
     );
 
     cargarDatos();

@@ -13,6 +13,7 @@ export default function LogoutModal({ open, handleClose }) {
 
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
 
 const handleLogout = async () => {
   try {
@@ -20,7 +21,7 @@ const handleLogout = async () => {
 
     if (token) {
       await axios.post(
-        "http://localhost:8000/api/logout",
+        `${API_URL}/logout`,
         {},
         {
           headers: {

@@ -23,6 +23,8 @@ import TablePagination from '@mui/material/TablePagination';
 import MedicationIcon from '@mui/icons-material/Medication';
 import Axios from "axios";
 import { useState, useEffect } from "react";
+
+const API_URL = import.meta.env.VITE_API_URL;
 function Dashboard_medicos(/*{citas consultas=[]}*/) {
 
   const [citas, setCitas] = useState([]);
@@ -40,7 +42,7 @@ useEffect(() => {
   }
 }, []);
   useEffect(() => {
-  Axios.get("http://127.0.0.1:8000/api/MostrarConsulta")
+  Axios.get(`${API_URL}/MostrarConsulta`)
     .then((res) => {
       setConsultas(res.data);
     })
@@ -52,7 +54,7 @@ useEffect(() => {
 useEffect(() => {
   const doctor_id = 1;
 
-  Axios.get(`http://127.0.0.1:8000/api/citas-doctor/${doctor_id}`)
+  Axios.get(`${API_URL}/citas-doctor/${doctor_id}`)
     .then(res => setCitas(res.data))
     .catch(err => console.error(err));
 }, []);

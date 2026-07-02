@@ -4,7 +4,7 @@ import Topbar from "../../components/farmacia/Topbar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function AgregarDoctor() {
 
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ const guardarDoctor = async () => {
     }
 
     const response = await axios.post(
-      "http://127.0.0.1:8000/api/doctores",
+      `${API_URL}/doctores`,
       formData,
       {
         headers: {

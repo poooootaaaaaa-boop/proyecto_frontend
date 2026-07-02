@@ -11,6 +11,8 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "./appointments.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function AppointmentHistory() {
 
   const [historyAppointments, setHistoryAppointments] = useState([]);
@@ -23,7 +25,7 @@ export default function AppointmentHistory() {
     const loadHistoryAppointments = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/api/citas/paciente/${usuario.paciente_id}/pasadas`
+          `${API_URL}/citas/paciente/${usuario.paciente_id}/pasadas`
         );
         const data = await res.json();
 

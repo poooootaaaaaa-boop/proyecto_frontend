@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap');
 
@@ -362,7 +362,7 @@ export default function ManifiestoResiduos() {
   const [observaciones, setObservaciones] = useState("");
   const [firmaDest, setFirmaDest] = useState("");
   const [fechaDest, setFechaDest] = useState("");
-
+ const navigate = useNavigate();
   function updateResiduo(id, field, value) {
     setResiduos((prev) =>
       prev.map((r) =>
@@ -569,6 +569,13 @@ export default function ManifiestoResiduos() {
         <button className="mrp-print-btn" onClick={() => window.print()}>
           🖨 Imprimir / Guardar PDF
         </button>
+
+            <button
+      className="mrp-print-btn"
+      onClick={() => navigate(-1)}
+    >
+      ⬅ Regresar
+    </button>
       </div>
     </>
   );

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import Pagination from "@mui/material/Pagination";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function HomeFarmacia() {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ useEffect(() => {
 }, [notificacion]);
 const cambiarEstado = async (id, estado) => {
   try {
-    await axios.put(`http://localhost:8000/api/recetas/${id}`, {
+    await axios.put(`${API_URL}/recetas/${id}`, {
       estado,
     });
 
@@ -54,7 +55,7 @@ const cambiarEstado = async (id, estado) => {
 const fetchRecetas = async (pageNumber = 1) => {
   try {
     const res = await axios.get(
-  `http://localhost:8000/api/farmacia/recetas-hoy?page=${pageNumber}`
+  `${API_URL}/farmacia/recetas-hoy?page=${pageNumber}`
 );
 
     const data = res.data;
@@ -138,7 +139,7 @@ const handleChange = (e) => {
 const handleSave = async () => {
   try {
     await axios.put(
-      `http://localhost:8000/api/recetas/${recetaSeleccionada.id}`,
+      `${API_URL}/recetas/${recetaSeleccionada.id}`,
       {
         estado: recetaSeleccionada.estado,
       }
@@ -237,7 +238,7 @@ const total = meds.reduce((acc, m) => acc + m.precio, 0);
       <img
         src={
           receta.foto_paciente
-            ? `http://localhost:8000/api/dashboard-farmacia/imagen/${receta.foto_paciente}`
+            ? `${API_URL}/dashboard-farmacia/imagen/${receta.foto_paciente}`
             : "https://i.pravatar.cc/40"
         }
         alt="paciente"

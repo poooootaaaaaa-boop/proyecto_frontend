@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import Layout_Medicos from "./Layout_Medicos";
 import { useEffect, useState } from "react";
 import Axios from "axios";
-
+const API_URL = import.meta.env.VITE_API_URL;
 function Historial() {
 
   const location = useLocation();
@@ -12,7 +12,7 @@ function Historial() {
 
   useEffect(() => {
     if (paciente?.id) {
-      Axios.get(`http://127.0.0.1:8000/api/consultas/${paciente.id}`)
+      Axios.get(`${API_URL}/consultas/${paciente.id}`)
         .then((response) => {
           setConsultasPaciente(response.data.consultas);
         })

@@ -12,6 +12,7 @@ import StarIcon from "@mui/icons-material/Star";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 
 import Axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 import { loadStripe } from "@stripe/stripe-js";
 
 import "./planes.css";
@@ -22,7 +23,7 @@ function Planes() {
   const [planes, setPlanes] = useState([]);
 
   useEffect(() => {
-    Axios.get("http://127.0.0.1:8000/api/Getplanes")
+    Axios.get(`${API_URL}/Getplanes`)
       .then((response) => {
         setPlanes(response.data || []);
       })
@@ -35,7 +36,7 @@ function Planes() {
     const usuario_id = localStorage.getItem("usuario_id");
 
     Axios.post(
-      "http://127.0.0.1:8000/api/stripe-session",
+      `${API_URL}/stripe-session`,
       {
         usuario_id,
         plan_id,

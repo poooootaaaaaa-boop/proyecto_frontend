@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import Axios from "axios";
 import { useEffect } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function recetas_medicas({ data = [], dataPacientes=[]}){
     const [busqueda, setBusqueda] = useState("");
     const [pacientesFiltrados, setPacientesFiltrados] = useState([]);
@@ -34,7 +36,7 @@ const handleBusqueda = (e) => {
 };
 
 useEffect(() => {
-  Axios.get("http://127.0.0.1:8000/api/MostrarConsulta")
+  Axios.get(`${API_URL}/MostrarConsulta`)
     .then((res) => {
       setConsultas(res.data);
     })

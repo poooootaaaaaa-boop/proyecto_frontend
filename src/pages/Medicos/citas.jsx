@@ -17,7 +17,10 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import Mensaje from "./mensaje";
 import dayjs from "dayjs";
+import axios from "axios";
 import "./calendar.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function citas({ data, setData }){
 
@@ -43,20 +46,21 @@ const [pacienteSeleccionado, setPacienteSeleccionado] = useState("");
 useEffect(() => {
     if (!doctor_id) return;
 
-    fetch(`http://localhost:8000/api/pacientes-doctor/${doctor_id}`)
-        .then(res => res.json())
-        .then(data => setPacientes(data))
+    axios
+        .get(`${API_URL}/pacientes-doctor/${doctor_id}`)
+        .then(res => setPacientes(res.data))
         .catch(err => console.error(err));
 }, [doctor_id]);
 
 useEffect(() => {
   if (!doctor_id) return;
 
-  fetch(`http://localhost:8000/api/citas-doctor/${doctor_id}`)
-    .then(res => res.json())
-    .then(data => setCitasDoctor(data))
+  axios
+    .get(`${API_URL}/citas-doctor/${doctor_id}`)
+    .then(res => setCitasDoctor(res.data))
     .catch(err => console.error(err));
 }, [doctor_id]);
+
         
 
 const esHoraOcupada = (fecha) => {
@@ -82,16 +86,14 @@ const FinalizarCita = async () => {
     };
 
     try {
-       const res = await fetch("http://localhost:8000/api/citas", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    },
-    body: JSON.stringify(nuevaCita)
-});
+        const res = await axios.post(`${API_URL}/citas`, nuevaCita, {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        });
 
-        const data = await res.json();
+        const data = await res.data;
         console.log(data);
 
         setMostrarMensaje(true);

@@ -13,6 +13,8 @@ import "./doctorInfo.css";
 import { saveRegisterData,clearRegisterData  } from "../../utils/registerStorage";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function DoctorInfo() {
   const [form, setForm] = useState({
     specialty: "",
@@ -37,7 +39,7 @@ export default function DoctorInfo() {
   useEffect(() => {
     const fetchEspecialidades = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/especialidades");
+        const res = await axios.get(`${API_URL}/especialidades`);
         setEspecialidades(res.data);
       } catch (error) {
         console.error("Error cargando especialidades");

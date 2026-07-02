@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import "./MedicinasCaducadas.css";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function MedicinasCaducadas() {
   const [caducados, setCaducados] = useState([]);
@@ -14,7 +15,7 @@ export default function MedicinasCaducadas() {
   const obtenerCaducados = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/getcaducados"
+        `${API_URL}/getcaducados`
       );
 
       setCaducados(response.data.data);

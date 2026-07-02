@@ -13,6 +13,8 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 import Pagination from 'react-bootstrap/Pagination';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 function lista_paciente(/*{data=[]}*/) { 
       
@@ -62,7 +64,7 @@ function lista_paciente(/*{data=[]}*/) {
 
 useEffect(() => {
 
-  Axios.get("http://127.0.0.1:8000/api/MostrarPaciente")
+  Axios.get(`${API_URL}/MostrarPaciente`)
     .then((response) => {
 
       const pacientes = response.data.paciente || [];

@@ -19,6 +19,8 @@ import { useState, useEffect  } from "react";
 import { Link } from "react-router-dom";
 import { useMediaQuery } from "@mui/material";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Layout_Medicos({ children }) {
 
   const [openLogout, setOpenLogout] = useState(false);
@@ -39,7 +41,7 @@ useEffect(() => {
     setUsuario(user);
 
  if (user.foto_url) {
-  setFoto(`http://127.0.0.1:8000/storage/fotos/usuarios/${user.foto_url}`);
+  setFoto(`${API_URL}/storage/fotos/usuarios/${user.foto_url}`);
 }
   }
 }, []);
