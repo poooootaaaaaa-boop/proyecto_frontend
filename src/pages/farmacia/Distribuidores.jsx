@@ -77,7 +77,7 @@ export default function Distribuidores() {
 
   useEffect(() => {
 
-  Axios.get(`${API_URL}/api/MostrarDistribuidor`)
+  Axios.get(`${API_URL}/MostrarDistribuidor`)
     .then((response) => {
 
      setDistribuidores(response.data.distribuidor || []);
@@ -121,7 +121,7 @@ export default function Distribuidores() {
 const guardarEdicion = () => {
 
   Axios.put(
-    `${API_URL}/api/UpdateDistribuidor/${distribuidorEdit.id}`,
+    `${API_URL}/UpdateDistribuidor/${distribuidorEdit.id}`,
      formData
   )
   .then((response) => {
@@ -165,7 +165,7 @@ const guardarEdicion = () => {
   const eliminarDistribuidor = () => {
 
   Axios.delete(
-       `${API_URL}/api/DeleteDistribuidor/${distribuidorDelete.id}`
+       `${API_URL}/DeleteDistribuidor/${distribuidorDelete.id}`
   )
   .then(() => {
 
