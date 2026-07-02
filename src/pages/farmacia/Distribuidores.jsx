@@ -13,6 +13,8 @@ import { NavLink } from "react-router-dom";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import Axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Distribuidores() {
 
   const [distribuidores, setDistribuidores] = useState([]);
@@ -75,7 +77,7 @@ export default function Distribuidores() {
 
   useEffect(() => {
 
-  Axios.get("http://127.0.0.1:8000/api/MostrarDistribuidor")
+  Axios.get(`${API_URL}/api/MostrarDistribuidor`)
     .then((response) => {
 
      setDistribuidores(response.data.distribuidor || []);
@@ -119,7 +121,7 @@ export default function Distribuidores() {
 const guardarEdicion = () => {
 
   Axios.put(
-    `http://127.0.0.1:8000/api/UpdateDistribuidor/${distribuidorEdit.id}`,
+    `${API_URL}/api/UpdateDistribuidor/${distribuidorEdit.id}`,
      formData
   )
   .then((response) => {
@@ -163,7 +165,7 @@ const guardarEdicion = () => {
   const eliminarDistribuidor = () => {
 
   Axios.delete(
-       `http://127.0.0.1:8000/api/DeleteDistribuidor/${distribuidorDelete.id}`
+       `${API_URL}/api/DeleteDistribuidor/${distribuidorDelete.id}`
   )
   .then(() => {
 
