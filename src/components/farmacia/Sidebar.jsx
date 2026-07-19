@@ -120,6 +120,11 @@ export default function Sidebar() {
           Asignar Doctor a Consultorio
         </Nav.Link>
 
+        <Nav.Link as={NavLink} to="/farmacia/prueba-consentimiento-firma" style={linkStyle}>
+          <i className="bi bi-person-badge"></i>
+          Acepto
+        </Nav.Link>
+
       </Nav>
 
       <div style={{ marginTop: "auto" }}>
