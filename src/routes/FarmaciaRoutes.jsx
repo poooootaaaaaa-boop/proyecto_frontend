@@ -16,8 +16,13 @@ import ConfigurarPagoDoctor from "../pages/farmacia/ConfigurarPagoDoctor";
 import AsignarDoctorConsultorio from "../pages/farmacia/AsignarDoctorConsultorio";
 import ManifestoResiduo from "../pages/farmacia/ManifestoResiduo";
 import MedicinasCaducacadas from "../pages/farmacia/MedicinasCaducacadas";
+<<<<<<< HEAD
 
 import ReporteHabitacion from "../pages/farmacia/ReporteHabitacion";
+=======
+import PruebaConsentimientoFirma from "../pages/farmacia/PruebaConsentimientoFirma";
+
+>>>>>>> equipo
 
 export default function FarmaciaRoutes(){
     return(
@@ -41,6 +46,7 @@ export default function FarmaciaRoutes(){
             <Route path="agregar-consultorios" element={<AgregarConsultorios/>}/>
             <Route path="configurar-pago-doctor" element={<ConfigurarPagoDoctor/>}/>
             <Route path="asignar-doctor-consultorio" element={<AsignarDoctorConsultorio/>}/>
+            <Route path="prueba-consentimiento-firma" element={<PruebaConsentimientoFirma />} />
             
         </Routes>
     );
