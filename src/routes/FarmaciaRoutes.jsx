@@ -16,13 +16,12 @@ import ConfigurarPagoDoctor from "../pages/farmacia/ConfigurarPagoDoctor";
 import AsignarDoctorConsultorio from "../pages/farmacia/AsignarDoctorConsultorio";
 import ManifestoResiduo from "../pages/farmacia/ManifestoResiduo";
 import MedicinasCaducacadas from "../pages/farmacia/MedicinasCaducacadas";
-<<<<<<< HEAD
+
 
 import ReporteHabitacion from "../pages/farmacia/ReporteHabitacion";
-=======
+
 import PruebaConsentimientoFirma from "../pages/farmacia/PruebaConsentimientoFirma";
 
->>>>>>> equipo
 
 export default function FarmaciaRoutes(){
     return(
