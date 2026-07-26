@@ -17,11 +17,12 @@ import AsignarDoctorConsultorio from "../pages/farmacia/AsignarDoctorConsultorio
 import ManifestoResiduo from "../pages/farmacia/ManifestoResiduo";
 import MedicinasCaducacadas from "../pages/farmacia/MedicinasCaducacadas";
 
-
+import ReporteHabitacion from "../pages/farmacia/ReporteHabitacion";
 
 export default function FarmaciaRoutes(){
     return(
         <Routes>
+            <Route path="reporte-habitacion" element={<ReporteHabitacion />} /> /* nuevo*/
             <Route path="dashboard" element={<DashboardFarmacia />}/>
             <Route path="prueba" element={<Stock />} />
             <Route path="manifesto-residuo" element={<ManifestoResiduo />} /> /* nuevo*/
