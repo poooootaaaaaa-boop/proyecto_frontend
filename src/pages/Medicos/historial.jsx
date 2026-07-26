@@ -13,12 +13,14 @@ function Historial() {
   useEffect(() => {
     if (paciente?.id) {
       Axios.get(`${API_URL}/consultas/${paciente.id}`)
-        .then((response) => {
-          setConsultasPaciente(response.data.consultas);
-        })
-        .catch((error) => {
-          console.error("Error cargando consultas:", error);
-        });
+  .then((response) => {
+    console.log(response.data);
+    setConsultasPaciente(response.data);
+  })
+  .catch((error) => {
+    console.error(error);
+    setConsultasPaciente([]);
+  });
     }
   }, [paciente]);
 
@@ -62,9 +64,9 @@ function Historial() {
 
               <h5 className="text-primary mb-3">NOTAS RÁPIDAS</h5>
 
-              {consultasPaciente.filter(c => c.notas).length > 0 ? (
+              {consultasPaciente.filter(c => c.notas_clinicas).length > 0 ? (
                 consultasPaciente
-                  .filter(c => c.notas)
+                  .filter(c => c.notas_clinicas)
                   .map((c) => (
                     <div key={c.id}
                       style={{
@@ -76,7 +78,7 @@ function Historial() {
                         boxShadow: "0 2px 6px rgba(0,0,0,0.05)"
                       }}>
 
-                      <p style={{ marginBottom: "6px" }}>{c.notas}</p>
+                      <p style={{ marginBottom: "6px" }}>{c.notas_clinicas}</p>
 
                       <small style={{ color: "#64748b" }}>
                         {new Date(c.created_at).toLocaleDateString()}
