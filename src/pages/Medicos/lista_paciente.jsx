@@ -1,250 +1,200 @@
-import Layout_Medicos from "./Layout_Medicos"
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
-import SearchIcon from '@mui/icons-material/Search';
-import Button from 'react-bootstrap/Button';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { Typography} from "@mui/material";
-import "./Tablas.css";
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import Datagrid from "./Datagrid";
-import { useState, useEffect } from "react";
 import Axios from "axios";
-import Pagination from 'react-bootstrap/Pagination';
+import Layout_Medicos from "./Layout_Medicos";
+
+// MUI Components
+import { Avatar, TablePagination } from "@mui/material";
+
+// Iconos
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import PersonAddAlt1RoundedIcon from "@mui/icons-material/PersonAddAlt1Rounded";
+import FolderSharedRoundedIcon from "@mui/icons-material/FolderSharedRounded";
+import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
+import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+
+import "./Lista_pacientes.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+function ListaPaciente() {
+  const [data, setData] = useState([]);
+  const [pacientesFiltrados, setPacientesFiltrados] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
 
-function lista_paciente(/*{data=[]}*/) { 
-      
-    
-    const buscarPaciente = () => {
-    console.log("Buscando paciente")
-  }
+  // Paginación
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  /*
-    const [busqueda, setBusqueda] = useState("");
-    const [pacientesFiltrados, setPacientesFiltrados] = useState(data);
-    const [data, setData] = useState([]);
-
-*/
-    const [busqueda, setBusqueda] = useState("");
-    const [data, setData] = useState([]); // ✅ primero
-    const [pacientesFiltrados, setPacientesFiltrados] = useState([]); 
-
-    //Nuevo
-    const [paginaActual, setPaginaActual] = useState(1);
-    const pacientesPorPagina = 5;
-
-
-    const listaActual = busqueda ? pacientesFiltrados : data;
-
-    const indiceUltimo = paginaActual * pacientesPorPagina;
-    const indicePrimero = indiceUltimo - pacientesPorPagina;
-
-    const pacientesMostrados = listaActual.slice(
-    indicePrimero,
-    indiceUltimo
-    );
-    
-
+  useEffect(() => {
+    Axios.get(`${API_URL}/MostrarPaciente`)
+      .then((response) => {
+        const pacientes = response.data.paciente || response.data || [];
+        setData(pacientes);
+        setPacientesFiltrados(pacientes);
+      })
+      .catch((error) => {
+        console.error("Error cargando pacientes:", error);
+      });
+  }, []);
 
   const handleBusqueda = (e) => {
     const valor = e.target.value;
     setBusqueda(valor);
+    setPage(0); // Reinicia a la primera página al buscar
 
-    const resultado = data.filter((p) =>
-        p.nombre.toLowerCase().includes(valor.toLowerCase())
-    );
+    const resultado = data.filter((p) => {
+      const nombreCompleto = `${p.nombre || ""} ${p.apellidoP || ""} ${p.apellidoM || ""}`.toLowerCase();
+      const dniExpediente = (p.dni || p.expediente || p.id || "").toString().toLowerCase();
+      const termino = valor.toLowerCase();
 
-    setPacientesFiltrados(resultado);
-};
-
-
-useEffect(() => {
-
-  Axios.get(`${API_URL}/MostrarPaciente`)
-    .then((response) => {
-
-      const pacientes = response.data.paciente || [];
-
-      setData(pacientes);
-      setPacientesFiltrados(pacientes); 
-
-    })
-    .catch((error) => {
-      console.error("Error cargando pacientes:", error);
+      return nombreCompleto.includes(termino) || dniExpediente.includes(termino);
     });
 
-}, []);
+    setPacientesFiltrados(resultado);
+  };
 
+  const listaActual = busqueda ? pacientesFiltrados : data;
 
-  // navigation handled via Link component in the table rows
-    return (
-        <div>
-            <Layout_Medicos>
-                <br />
-                <h1 style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}>Lista de pacientes</h1>
-                <Typography className="medicine-name" style={{color:"gray"}}>Consulte y descargue las recetas médicas de sus pacientes.</Typography>
-                <br />
-                <br />
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
-                    <div className="container mt-3">
+  const getInitials = (name = "") => name.charAt(0).toUpperCase();
 
-                        <div className="bg-white p-4" style={{borderRadius:"20px",border:"1px solid #e5e7eb",boxShadow:"0 2px 10px rgba(0,0,0,0.05)"}}>
+  return (
+    <Layout_Medicos>
+      <div className="dashboard-wrapper-main">
+        
+        {/* Cabecera de la Vista */}
+        <header className="dashboard-header">
+          <div className="header-info">
+            <div className="doctor-badge">
+              <PeopleAltRoundedIcon fontSize="small" />
+              <span>Directorio Médico</span>
+            </div>
+            <h1 className="welcome-title">Lista de Pacientes</h1>
+            <p className="welcome-subtitle">
+              Consulte expedientes clínicos y gestione la información general de sus pacientes.
+            </p>
+          </div>
+          <Link to="/Medicos/alta_pacientes" className="btn-primary-action">
+            <PersonAddAlt1RoundedIcon />
+            <span>+ Nuevo Paciente</span>
+          </Link>
+        </header>
 
-                                <div className="row justify-content-center">
+        {/* Sección de Filtro y Búsqueda */}
+        <div className="filter-card">
+          <div className="search-input-wrapper">
+            <SearchRoundedIcon className="search-icon" />
+            <input
+              type="text"
+              className="custom-search-input"
+              placeholder="Buscar por nombre, apellidos, expediente o DNI..."
+              value={busqueda}
+              onChange={handleBusqueda}
+            />
+          </div>
+        </div>
 
-                                    <div className="col-lg-10">
+        {/* Tabla Principal */}
+        <div className="table-card">
+          <div className="table-header">
+            <div>
+              <h2 className="table-title">Pacientes Registrados</h2>
+              <p className="table-subtitle">Resultados en sistema</p>
+            </div>
+            <span className="count-badge">{listaActual.length} Pacientes</span>
+          </div>
 
-                                        <div style={{position:"relative"}}>
+          <div className="table-responsive">
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Última Cita</th>
+                  <th style={{ textAlign: "right" }}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listaActual.length > 0 ? (
+                  listaActual
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((paciente, index) => {
+                      const nombreCompleto = `${paciente.nombre || "Paciente"} ${paciente.apellidoP || ""}`.trim();
 
-                                            <Form.Control type="text"placeholder="Buscar por nombre, DNI o expediente..."style={{height:"55px",borderRadius:"30px",background:"#f3f4f6",border:"none",paddingLeft:"20px",paddingRight:"60px"}} value={busqueda} onChange={handleBusqueda}/>
+                      return (
+                        <tr key={paciente.id || index}>
+                          <td className="patient-cell">
+                            <div className="patient-info">
+                              <Avatar className="patient-avatar">
+                                {getInitials(paciente.nombre)}
+                              </Avatar>
+                              <div className="patient-name-container">
+                                <span className="patient-name">{nombreCompleto}</span>
+                                <span className="patient-sub">
+                                  {paciente.expediente ? `Exp: #${paciente.expediente}` : "Paciente registrado"}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
 
+                          <td className="time-cell">
+                            <div className="last-appointment">
+                              <CalendarTodayRoundedIcon fontSize="small" className="calendar-icon" />
+                              <span>{paciente.ultimaCita || "Sin cita previa"}</span>
+                            </div>
+                          </td>
 
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <div  className="row mt-4 align-items-center">
-
-                                        <div className="col-12 text-end">
-
-                                            <Button style={{background:"#1d4ed8",border:"none",borderRadius:"30px",padding:"12px 25px",fontWeight:"600"}} as={Link} to="/Medicos/alta_pacientes">+ Nuevo Paciente</Button>
-
-                                        </div>
-
-                                 </div>
-
-
-                        </div>
-
-                    </div>
-
-                <br />
-                <br />
-                
-
-        <div style={{width:"1200px",margin:"0 auto",marginTop:"20px",background:"white",borderRadius:"20px",border:"1px solid #e5e7eb",boxShadow:"0 2px 10px rgba(0,0,0,0.05)",overflow:"hidden"}}>
-
-            <Table borderless hover>
-
-                    <thead style={{background:"#f3f4f6"}}>
-
-                        <tr>
-
-                            <th style={{padding:"20px",color:"#94a3b8",fontSize:"12px"}}>PACIENTE</th>
-
-                            <th style={{padding:"20px",color:"#94a3b8",fontSize:"12px"}}>ULTIMA CITA</th>
-
-                            <th style={{ padding:"20px",color:"#94a3b8",fontSize:"12px",textAlign:"right"}}>ACCIONES</th>
-
+                          <td style={{ textAlign: "right" }}>
+                            <Link
+                              to="/Medicos/historial"
+                              state={{ paciente }}
+                              className="btn-expedient-action"
+                            >
+                              <VisibilityRoundedIcon fontSize="small" />
+                              <span>Ver Expediente</span>
+                            </Link>
+                          </td>
                         </tr>
+                      );
+                    })
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="empty-state-cell">
+                      <div className="empty-state">
+                        <FolderSharedRoundedIcon className="empty-icon" />
+                        <p>No se encontraron pacientes que coincidan con la búsqueda.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-                    </thead>
-
-
-                    <tbody>
-
-                            {pacientesMostrados.map((paciente, index) => (
-
-                            <tr key={index} style={{borderTop:"1px solid #f1f5f9"}}>
-
-
-                            <td style={{padding:"20px"}}>
-
-                                <div style={{display:"flex",alignItems:"center"}}>
-
-
-                                    <div style={{width:"40px",height:"40px",borderRadius:"50%",background:"#dbeafe",display:"flex",alignItems:"center",justifyContent:"center",color:"#1d4ed8",fontWeight:"bold",marginRight:"15px"}}>
-
-                                        {paciente.nombre?.charAt(0)}
-                                        
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <div style={{fontWeight:"600"}}>{paciente.nombre} </div>
-
-                                        <div style={{fontSize:"12px",color:"#94a3b8" }}> Paciente registrado </div>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                                <td style={{padding:"20px"}}> <span style={{color:"#475569"}}>Sin cita</span></td>
-
-
-                                <td style={{padding:"20px",textAlign:"right"}}> 
-                                <Button
-                                    style={{background:"#e0e7ff",color:"#eaeaea",border:"none",borderRadius:"20px",padding:"8px 18px",fontWeight:"500"}}
-                                    as={Link}
-                                    to="/Medicos/historial"
-                                    state={{ paciente }}
-                                    
-                                    
-                                >
-                                    Ver Expediente
-                                </Button>
-
-                                </td>
-
-
-                            </tr>
-
-                        ))}
-
-                    </tbody>
-            </Table>
-
+          <TablePagination
+            component="div"
+            count={listaActual.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+            labelRowsPerPage="Filas por página:"
+          />
         </div>
 
-         <div className="d-flex justify-content-center mt-4 mb-4">
-  <Pagination>
-
-    <Pagination.Prev
-      onClick={() => setPaginaActual(paginaActual - 1)}
-      disabled={paginaActual === 1}
-    />
-
-    {[...Array(Math.ceil(listaActual.length / pacientesPorPagina))].map(
-      (_, index) => (
-        <Pagination.Item
-          key={index}
-          active={index + 1 === paginaActual}
-          onClick={() => setPaginaActual(index + 1)}
-        >
-          {index + 1}
-        </Pagination.Item>
-      )
-    )}
-
-    <Pagination.Next
-      onClick={() => setPaginaActual(paginaActual + 1)}
-      disabled={
-        paginaActual ===
-        Math.ceil(listaActual.length / pacientesPorPagina)
-      }
-    />
-
-  </Pagination>
-</div>
-
-
-
-            </Layout_Medicos>
-
-            
-        </div>
-    )
+      </div>
+    </Layout_Medicos>
+  );
 }
 
-export default lista_paciente;
+export default ListaPaciente;
