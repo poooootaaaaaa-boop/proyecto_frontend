@@ -1,0 +1,101 @@
+/* Layout Principal */
+.distribuidores-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.distribuidores-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.distribuidores-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Tarjetas y Sombras */
+.card-modern {
+  background: #ffffff;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+}
+
+/* Items de Lista */
+.distribuidor-item {
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  background: #ffffff;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 0.75rem;
+}
+
+.distribuidor-item:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Avatares */
+.avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+}
+
+.avatar-circle-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Búsqueda */
+.search-input {
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+/* Modal */
+.modal-modern .modal-content {
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-modern .modal-header {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-modern .modal-footer {
+  border-top: 1px solid #f1f5f9;
+  padding: 1rem 1.5rem;
+}
