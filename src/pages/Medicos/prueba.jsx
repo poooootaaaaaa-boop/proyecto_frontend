@@ -1,29 +1,73 @@
-import Sidebar from "../../components/farmacia/Sidebar";
-import { Link } from "react-router-dom";
-import Form from 'react-bootstrap/Form';
-import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { Typography} from "@mui/material";
-import TablePagination from '@mui/material/TablePagination';
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Axios from "axios";
-import "./prueba.css";
 import { useNavigate } from "react-router-dom";
-import SlimSelect from 'slim-select';
-import 'slim-select/styles';
+import TablePagination from "@mui/material/TablePagination";
+import SlimSelect from "slim-select";
+import "slim-select/styles";
+
+import Sidebar from "../../components/farmacia/Sidebar";
+import "./prueba.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// Encapsulamiento seguro para SlimSelect
+const SlimSelectField = ({ options, value, onChange, placeholder = "Selecciona una opción" }) => {
+  const selectRef = useRef(null);
+  const slimInstanceRef = useRef(null);
+
+  useEffect(() => {
+    if (selectRef.current) {
+      slimInstanceRef.current = new SlimSelect({
+        select: selectRef.current,
+        settings: {
+          placeholderText: placeholder,
+          searchText: "No se encontraron resultados",
+          searchPlaceholder: "Buscar...",
+        },
+        events: {
+          afterChange: (newVal) => {
+            const selectedVal = newVal[0] ? newVal[0].value : "";
+            if (selectedVal !== value) {
+              onChange(selectedVal);
+            }
+          },
+        },
+      });
+    }
+
+    return () => {
+      if (slimInstanceRef.current) {
+        slimInstanceRef.current.destroy();
+      }
+    };
+  }, [options]);
+
+  useEffect(() => {
+    if (slimInstanceRef.current) {
+      slimInstanceRef.current.setSelected(value || "");
+    }
+  }, [value]);
+
+  return (
+    <select ref={selectRef} defaultValue={value} className="modern-input">
+      <option value="">{placeholder}</option>
+      {options.map((opt) => (
+        <option key={opt.id} value={opt.id}>
+          {opt.nombre}
+        </option>
+      ))}
+    </select>
+  );
+};
+
 function Prueba() {
-      // ===== ESTADOS (reemplazan document.getElementById) =====
-  const [caducado, setCaducado]= useState(false);
-  const [tipoMovimiento, setTipoMovimiento] = useState("");
-  const [mostrarEntrada, setMostrarEntrada] = useState(false);
-  const [mostrarSalida, setMostrarSalida] = useState(false);
+  const [caducado, setCaducado] = useState(false);
+  const [tipoMovimiento, setTipoMovimiento] = useState("entrada");
   const [producto, setProducto] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [motivo, setMotivo] = useState("");
+
+  const [carrito, setCarrito] = useState([]);
   const [medicamentos, setMedicamentos] = useState([]);
   const [proveedores, setProveedores] = useState([]);
   const [recetas, setRecetas] = useState([]);
@@ -31,1031 +75,547 @@ function Prueba() {
   const [recetaId, setRecetaId] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const handleChangePage = (event, newPage) => {
-  setPage(newPage);
-};
-const handleChangeRowsPerPage = (event) => {
-  setRowsPerPage(parseInt(event.target.value, 10));
-  setPage(0);
-};
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [historial, setHistorial] = useState([]);
 
-
-  
-   const [mostrarModal, setMostrarModal] = useState(false);
   const navigate = useNavigate();
-  
+
   const [orden, setOrden] = useState({
-  proveedor_id: "",
-  proveedor_nombre: "",
-  fecha: "",
-  medicamentos: [
-    {
-      medicamento_id: "",
-      nombre: "",
-      nombrePersonalizado: "",
-      unidades: "",
-      descripcion: "",
-      precio: ""
-    }
-    ]
+    proveedor_id: "",
+    proveedor_nombre: "",
+    fecha: "",
+    medicamentos: [
+      {
+        medicamento_id: "",
+        nombre: "",
+        nombrePersonalizado: "",
+        unidades: "",
+        descripcion: "",
+        precio: "",
+      },
+    ],
   });
 
+  useEffect(() => {
+    Axios.get(`${API_URL}/medicamentosselct`)
+      .then((res) => setMedicamentos(res.data))
+      .catch((err) => console.error(err));
 
+    Axios.get(`${API_URL}/proveedores`)
+      .then((res) => setProveedores(res.data))
+      .catch((err) => console.error(err));
 
-    useEffect(() => {
-    obtenerProveedores();
+    Axios.get(`${API_URL}/recetas`)
+      .then((res) => setRecetas(res.data))
+      .catch((err) => console.error(err));
+
+    Axios.get(`${API_URL}/movimientos`)
+      .then((res) => setHistorial(res.data))
+      .catch((err) => console.error(err));
   }, []);
 
-  const obtenerProveedores = async () => {
-  try {
-    const response = await Axios.get(
-      `${API_URL}/proveedores`
-    );
+  useEffect(() => {
+    if (caducado) setRecetaId("");
+  }, [caducado]);
 
-    setProveedores(response.data);
-  } catch (error) {
-    console.error(error);
-  }
-};
+  const agregarAlCarrito = () => {
+    if (!producto) return alert("Selecciona un medicamento");
+    if (!cantidad || Number(cantidad) <= 0) return alert("Ingresa una cantidad válida");
 
-  const agregarMedicamento = () => {
-    setOrden({
-      ...orden,
+    const medSel = medicamentos.find((m) => String(m.id) === String(producto));
+    if (!medSel) return alert("Medicamento no encontrado");
+
+    setCarrito((prev) => {
+      const existe = prev.find((item) => String(item.medicamento_id) === String(producto));
+      if (existe) {
+        return prev.map((item) =>
+          String(item.medicamento_id) === String(producto)
+            ? { ...item, cantidad: Number(item.cantidad) + Number(cantidad) }
+            : item
+        );
+      }
+      return [
+        ...prev,
+        { medicamento_id: producto, nombre: medSel.nombre, cantidad: Number(cantidad) },
+      ];
+    });
+
+    setProducto("");
+    setCantidad("");
+  };
+
+  const eliminarDelCarrito = (index) => {
+    setCarrito((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const guardarMovimiento = () => {
+    if (!tipoMovimiento) return alert("Selecciona Entrada o Salida");
+    if (carrito.length === 0) return alert("Agrega medicamentos al carrito");
+    if (tipoMovimiento === "entrada" && !proveedorId) return alert("Selecciona un proveedor");
+    if (tipoMovimiento === "salida" && !recetaId && !caducado) return alert("Selecciona una receta");
+
+    const dataToSend = {
+      tipo: tipoMovimiento,
+      motivo,
+      proveedor_id: tipoMovimiento === "entrada" ? proveedorId : null,
+      receta_id: tipoMovimiento === "salida" ? recetaId : null,
+      caducado,
+      medicamentos: carrito,
+    };
+
+    Axios.post(`${API_URL}/guardarMovimientos`, dataToSend)
+      .then(() => {
+        alert("Movimiento registrado con éxito");
+        Axios.get(`${API_URL}/movimientos`).then((res) => setHistorial(res.data));
+        setProducto("");
+        setCantidad("");
+        setMotivo("");
+        setProveedorId("");
+        setRecetaId("");
+        setCaducado(false);
+        setCarrito([]);
+      })
+      .catch((err) => {
+        alert(err.response?.data?.message || "Error al guardar el movimiento");
+      });
+  };
+
+  const agregarMedicamentoOrden = () => {
+    setOrden((prev) => ({
+      ...prev,
       medicamentos: [
-        ...orden.medicamentos,
+        ...prev.medicamentos,
         {
           medicamento_id: "",
+          nombre: "",
           nombrePersonalizado: "",
           unidades: "",
           descripcion: "",
-          precio: ""
+          precio: "",
         },
       ],
-    });
+    }));
   };
 
-  const eliminarMedicamento = (index) => {
+  const eliminarMedicamentoOrden = (index) => {
     if (orden.medicamentos.length === 1) return;
-
-    const nuevos = [...orden.medicamentos];
-    nuevos.splice(index, 1);
-
-    setOrden({
-      ...orden,
-      medicamentos: nuevos,
-    });
+    setOrden((prev) => ({
+      ...prev,
+      medicamentos: prev.medicamentos.filter((_, i) => i !== index),
+    }));
   };
 
-  const cambiarMedicamento = (index, campo, valor) => {
-    const nuevos = [...orden.medicamentos];
+  const cambiarMedicamentoOrden = (index, campo, valor) => {
+    setOrden((prev) => {
+      const nuevos = [...prev.medicamentos];
+      nuevos[index] = { ...nuevos[index], [campo]: valor };
 
-    nuevos[index][campo] = valor;
+      if (campo === "medicamento_id") {
+        if (valor !== "otro") {
+          const med = medicamentos.find((m) => String(m.id) === String(valor));
+          nuevos[index].nombre = med?.nombre || "";
+          nuevos[index].nombrePersonalizado = "";
+        } else {
+          nuevos[index].nombre = "";
+        }
+      }
 
-    setOrden({
-      ...orden,
-      medicamentos: nuevos,
+      return { ...prev, medicamentos: nuevos };
     });
   };
 
   const guardarOrden = async () => {
     try {
-      console.log(orden);
-
-      await Axios.post(
-        `${API_URL}/ordenes-compra`,
-        orden
-      );
-
-      //nuevo
-            navigate("/medicos/documento-orden", {
-      state: {
-        orden
-      }
-    });
-      //
-
-      alert("Orden creada correctamente");
-
+      await Axios.post(`${API_URL}/ordenes-compra`, orden);
+      navigate("/medicos/documento-orden", { state: { orden } });
+      alert("Orden de compra generada exitosamente");
       setMostrarModal(false);
-
-      setOrden({
-        proveedor_id: "",
-        proveedor_nombre: "",
-        fecha: "",
-        medicamentos: [
-          {
-            medicamento_id: "",
-             nombre: "",
-            nombrePersonalizado: "",
-            unidades: "",
-            descripcion: "",
-            precio: ""
-          },
-        ],
-      });
     } catch (error) {
-      console.error(error);
-      alert("Error al guardar");
+      alert("Error al intentar guardar la orden");
     }
   };
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*
-  useEffect(() => {
-  Axios.get("http://127.0.0.1:8000/api/medicamentos")
-    .then((response) => {
-      setMedicamentos(response.data);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}, []);
-  */
-
-
-    /*
-    <select
-  className="form-control"
-  value={producto}
-  onChange={(e) => setProducto(e.target.value)}
->
-  <option value="">Selecciona un medicamento</option>
-
-  {medicamentos.map((med) => (
-    <option key={med.id} value={med.id}>
-      {med.nombre}
-    </option>
-  ))}
-
-</select>
-    */
-  // ===== FUNCIONES =====
-
-  const [historial, setHistorial] = useState([]);
-
-useEffect(() => {
-  Axios.get(`${API_URL}/medicamentosselct`)
-    .then(res => setMedicamentos(res.data));
-
-  Axios.get(`${API_URL}/proveedores`)
-    .then(res => setProveedores(res.data));
-
-  Axios.get(`${API_URL}/recetas`)
-    .then(res => setRecetas(res.data));
-
-  Axios.get(`${API_URL}/movimientos`)
-    .then(res => setHistorial(res.data));
-
-}, []);
-
-useEffect(() => {
-  if (caducado) {
-    setRecetaId("");
-  }
-}, [caducado]);
-/*
-  const handleCaducadoChange = (e) => {
-    const checked = e.target.checked;
-    setCaducado(checked);
-    Axios.post("http://127.0.0.1:8000/api/medicamentoCaducado", {
-      medicamento_id: producto || null,
-      caducado: checked,
-      cantidad: cantidad || null,
-      motivo: motivo || null,
-    })
-      .then((res) => {
-        console.log('Caducado enviado:', res.data);
-      })
-      .catch((err) => {
-        console.error('Error al enviar caducado:', err);
-      });
-  };
-*/
-  const Entrada = () => {
-    setTipoMovimiento("entrada");
-    setMostrarEntrada(!mostrarEntrada);
-    setMostrarSalida(false);
-  };
-
-  const Salida = () => {
-    setTipoMovimiento("salida");
-    setMostrarSalida(!mostrarSalida);
-    setMostrarEntrada(false);
-  };
-
-
-const guardarMovimiento = () => {
-
-  if (!tipoMovimiento) {
-    alert("Selecciona Entrada o Salida");
-    return;
-  }
-
-  if (tipoMovimiento === "entrada" && !proveedorId) {
-    alert("Selecciona proveedor");
-    return;
-  }
-
-  if (tipoMovimiento === "salida" && !recetaId && !caducado) {
-    alert("Selecciona receta");
-    return;
-  }
-
-  const dataToSend = {
-    tipo: tipoMovimiento,
-    medicamento_id: producto,
-    cantidad,
-    motivo,
-    proveedor_id: tipoMovimiento === "entrada" ? proveedorId : null,
-    receta_id: tipoMovimiento === "salida" ? recetaId : null
-  };
-
-  const selectedMed = medicamentos.find(
-    (med) => String(med.id) === String(producto)
-  );
-
-  if (tipoMovimiento === "salida" && caducado && selectedMed) {
-    
-      Axios.post(`${API_URL}/medicamentoCaducado`, {
-    medicamento_id: producto,
-    cantidad,
-    motivo,
-  })
-  .then(() => {
-    const manifiestoSalida = {
-      medicamento: {
-        id: selectedMed.id,
-        nombre: selectedMed.nombre,
-      },
-      cantidad,
-      motivo,
-    };
-
-    localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
-    window.location.href = "/farmacia/manifesto-residuo";
-  })
-  .catch(err => console.error(err));
-
-  return;
-  }
-
-  Axios.post(`${API_URL}/guardarMovimientos`, dataToSend)
-    .then(() => {
-      if (tipoMovimiento === "salida" && selectedMed) {
-        const manifiestoSalida = {
-          medicamento: {
-            id: selectedMed.id,
-            nombre: selectedMed.nombre,
-          },
-          cantidad,
-          motivo,
-        };
-
-        /*
-        localStorage.setItem("manifiestoSalida", JSON.stringify(manifiestoSalida));
-        window.location.href = "/farmacia/manifesto-residuo";
-        return;
-      */
-      }
-        
-
-      alert("Guardado correctamente");
-
-      //  refrescar tabla automáticamente
-      Axios.get(`${API_URL}/movimientos`)
-        .then(res => setHistorial(res.data));
-
-      // limpiar
-      setProducto("");
-      setCantidad("");
-      setMotivo("");
-      setProveedorId("");
-      setRecetaId("");
-      setTipoMovimiento("");
-      setMostrarEntrada(false);
-      setMostrarSalida(false);
-
-    })
-    .catch(err => console.error(err));
-
-    
-};
-
-const selectMedicamentoRef = useRef(null);
-
-useEffect(() => {
-  let ss;
-  if (selectMedicamentoRef.current && medicamentos.length > 0) {
-    ss = new SlimSelect({
-      select: selectMedicamentoRef.current,
-      settings: {
-        placeholderText: 'Selecciona medicamento',
-        searchText: 'No se encontraron medicamentos',
-        searchPlaceholder: 'Escribe para buscar...',
-        customClass: 'modern-input',
-      },
-      // 👇 ¡ESTO ES LO NUEVO! Captura el cambio y actualiza tu estado "producto"
-      events: {
-        afterChange: (newVal) => {
-          // newVal es un arreglo con las opciones seleccionadas. 
-          // Tomamos el "value" (el ID) de la primera opción. If vacío, ponemos ""
-          const idSeleccionado = newVal[0] ? newVal[0].value : "";
-          setProducto(idSeleccionado);
-        }
-      }
-    });
-  }
-
-  return () => {
-    if (ss) ss.destroy();
-  };
-}, [medicamentos]);
-  // ==========================================
-
-
-
-const MedicamentoRef = useRef([]);
-useEffect(() => {
-  const slimInstances = [];
-
-  MedicamentoRef.current.forEach((select, index) => {
-    if (!select) return;
-
-    const ss = new SlimSelect({
-      select,
-      settings: {
-        placeholderText: "Selecciona medicamento",
-        searchText: "No se encontraron medicamentos",
-        searchPlaceholder: "Escribe para buscar...",
-        customClass: "modern-input",
-      },
-      events: {
-        afterChange: (newVal) => {
-          const id = newVal[0] ? newVal[0].value : "";
-
-          cambiarMedicamento(index, "medicamento_id", id);
-
-          if (id !== "otro") {
-            const medicamentoSeleccionado = medicamentos.find(
-              (item) => item.id == id
-            );
-
-            cambiarMedicamento(
-              index,
-              "nombre",
-              medicamentoSeleccionado?.nombre || ""
-            );
-
-            cambiarMedicamento(
-              index,
-              "nombrePersonalizado",
-              ""
-            );
-          }
-        },
-      },
-    });
-
-    slimInstances.push(ss);
-  });
-
-  return () => {
-    slimInstances.forEach((ss) => ss.destroy());
-  };
-}, [medicamentos, orden.medicamentos.length]);
-
-
-
-
-
 
   return (
-  <div className="movimientos-layout">
-    <Sidebar />
+    <div className="movimientos-layout">
+      <Sidebar />
 
-    <div className="movimientos-container">
-
-      {/* HEADER */}
-      <div className="page-header">
-        <div>
-          <h2>Movimientos de Stock</h2>
-          <p>Administra entradas y salidas de medicamentos</p>
-        </div>
-      </div>
-
-      {/* CARD FORMULARIO */}
-      <div className="movimiento-card">
-
-        <div className="tipo-operacion">
-          <button
-            className={`action-btn entrada ${
-              tipoMovimiento === "entrada" ? "active" : ""
-            }`}
-            onClick={Entrada}
-          >
-            ⬇ Entrada
-          </button>
-
-          <button
-            className={`action-btn salida ${
-              tipoMovimiento === "salida" ? "active" : ""
-            }`}
-            onClick={Salida}
-          >
-            ⬆ Salida
+      <div className="movimientos-container">
+        {/* ENCABEZADO */}
+        <div className="page-header">
+          <div>
+            <h2>Gestión de Inventario</h2>
+            <p>Monitorea las entradas, salidas y genera órdenes de compra</p>
+          </div>
+          <button className="btn-primary" onClick={() => setMostrarModal(true)}>
+            + Generar Orden de Compra
           </button>
         </div>
 
-        <div className="form-grid">
-
-          <div className="input-group-custom">
-            <label>Medicamento</label>
-
-            <select
-              ref={selectMedicamentoRef}
-              value={producto}
-              //onChange={(e) => setProducto(e.target.value)}
+        {/* REGISTRO DE MOVIMIENTO */}
+        <div className="movimiento-card">
+          <div className="tipo-operacion">
+            <button
+              className={`toggle-btn entrada ${tipoMovimiento === "entrada" ? "active" : ""}`}
+              onClick={() => setTipoMovimiento("entrada")}
             >
-              <option value="">Selecciona medicamento</option>
-
-              {medicamentos.map((med) => (
-                <option key={med.id} value={med.id}>
-                  {med.nombre}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="input-group-custom">
-            <label>Cantidad</label>
-
-            <input
-              type="number"
-              className="modern-input"
-              placeholder="Cantidad"
-              value={cantidad}
-              onChange={(e) => setCantidad(e.target.value)}
-            />
-          </div>
-
-          {tipoMovimiento === "entrada" && (
-            <div className="input-group-custom">
-              <label>Proveedor</label>
-
-              <select
-                className="modern-input"
-                value={proveedorId}
-                onChange={(e) => setProveedorId(e.target.value)}
-              >
-                <option value="">Selecciona proveedor</option>
-
-                {proveedores.map((prov) => (
-                  <option key={prov.id} value={prov.id}>
-                    {prov.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {tipoMovimiento === "salida" && !caducado && (
-            <div className="input-group-custom">
-              <label>Receta</label>
-
-              <select
-                className="modern-input"
-                value={recetaId}
-                onChange={(e) => setRecetaId(e.target.value)}
-              >
-                <option value="">Selecciona receta</option>
-
-                {recetas.map((rec) => (
-                  <option key={rec.id} value={rec.id}>
-                    Paciente: {rec.paciente_nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="input-group-custom full-width">
-            <label>Motivo</label>
-
-            <input
-              type="text"
-              className="modern-input"
-              placeholder="Describe el motivo del movimiento"
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-            />
-          </div>
-
-          <div className="caducado-box full-width">
-            <input
-              type="checkbox"
-              checked={caducado}
-              onChange={(e) => setCaducado(e.target.checked)}
-            />
-
-            <span>Medicamento caducado</span>
-          </div>
-
-          <div className="full-width">
-            {mostrarEntrada && (
-              <button
-                type="button"
-                className="submit-btn entrada-btn"
-                onClick={guardarMovimiento}
-              >
-                Registrar Entrada
-              </button>
-            )}
-
-            {mostrarSalida && (
-              <button
-                type="button"
-                className="submit-btn salida-btn"
-                onClick={guardarMovimiento}
-              >
-                Registrar Salida
-              </button>
-            )}
-          </div>
-
-        </div>
-      </div>
-
-      {/* TABLA */}
-      <div className="historial-card">
-
-        <div className="table-header">
-          <h3>Historial General</h3>
-        </div>
-
-        <div className="table-responsive">
-          <table className="modern-table">
-
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Producto</th>
-                <th>Tipo</th>
-                <th>Cantidad</th>
-                <th>Motivo</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {historial.length > 0 ? (
-                historial
-                  .slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )
-                  .map((mov) => (
-                    <tr key={mov.id}>
-                      <td>
-                        {new Date(
-                          mov.fecha_movimiento
-                        ).toLocaleString()}
-                      </td>
-
-                      <td>
-                        {mov.inventario?.medicamento?.nombre ||
-                          "Sin nombre"}
-                      </td>
-
-                      <td>
-                        <span
-                          className={`badge-tipo ${
-                            mov.tipo === "entrada"
-                              ? "badge-entrada"
-                              : "badge-salida"
-                          }`}
-                        >
-                          {mov.tipo}
-                        </span>
-                      </td>
-
-                      <td>{mov.cantidad}</td>
-
-                      <td>{mov.motivo || "—"}</td>
-                    </tr>
-                  ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="empty-row">
-                    No hay movimientos registrados
-                  </td>
-                </tr>
-              )}
-            </tbody>
-
-          </table>
-        </div>
-
-        <TablePagination
-          component="div"
-          count={historial.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-
-      </div>
-    </div>
-
-    
-
-    
-
-
-
-
-    <div style={{ padding: "20px" }}>
-      <button
-        onClick={() => setMostrarModal(true)}
-        style={{
-          padding: "10px 20px",
-          cursor: "pointer",
-          backgroundColor: "blue",
-          color:"white"
-        }}
-        className="action-btn"
-      >
-        Generar Orden
-      </button>
-
-      {mostrarModal && (
-        <div
-          style={{
-  position: "fixed",
-  inset: 0,
-  background: "rgba(15,23,42,.45)",
-  backdropFilter: "blur(5px)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 9999
-          }}
-        >
-          <div
-            style={{
-              width: "900px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              background: "#fff",
-              padding: "25px",
-              borderRadius: "10px",
-            }}
-          >
-            <h2>Nueva Orden de Compra</h2>
-
-      <div style={{ marginBottom: "15px" }}>
-        <label>Proveedor</label>
-
-        <select
-        className="modern-input"
-          value={orden.proveedor_id}
-          onChange={(e) => {
-  const id = e.target.value;
-
-  const proveedorSeleccionado = proveedores.find(
-    (p) => p.id == id
-  );
-    console.log(proveedorSeleccionado);
-
-  setOrden({
-    ...orden,
-    proveedor_id: id,
-    proveedor_nombre: proveedorSeleccionado?.nombre || "",
-    proveedor_rfc: proveedorSeleccionado?.rfc || "",
-    proveedor_direccion: proveedorSeleccionado?.direccion || "",
-    proveedor_telefono: proveedorSeleccionado?.telefono || "",
-    proveedor_contacto: proveedorSeleccionado?.contacto || ""
-  });
-}}
-          /*onChange={(e) =>
-            setOrden({
-              ...orden,
-              proveedor_id: e.target.value
-            })
-          }*/
-          style={{
-            width: "100%",
-            padding: "10px"
-          }}
-        >
-          <option value="">
-            Seleccione un proveedor
-          </option>
-
-          {proveedores.map((proveedor) => (
-            <option
-              key={proveedor.id}
-              value={proveedor.id}
+              ⬇ Entrada de Stock
+            </button>
+            <button
+              className={`toggle-btn salida ${tipoMovimiento === "salida" ? "active" : ""}`}
+              onClick={() => setTipoMovimiento("salida")}
             >
-              {proveedor.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
+              ⬆ Salida de Stock
+            </button>
+          </div>
 
-
-
-            <div style={{ marginBottom: "20px" }}>
-              <label>Fecha</label>
-
-              <input
-              className="modern-input"
-                type="date"
-                value={orden.fecha}
-                onChange={(e) =>
-                  setOrden({
-                    ...orden,
-                    fecha: e.target.value,
-                  })
-                }
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                }}
+          <div className="form-grid">
+            <div className="input-group-custom">
+              <label>Medicamento</label>
+              <SlimSelectField
+                options={medicamentos}
+                value={producto}
+                onChange={(val) => setProducto(val)}
+                placeholder="Selecciona medicamento"
               />
             </div>
 
-            <hr />
-             
-            <h3>Medicamentos solicitados</h3>
+            <div className="input-group-custom">
+              <label>Cantidad</label>
+              <input
+                type="number"
+                className="modern-input"
+                placeholder="0"
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
+              />
+            </div>
+
+            <div className="input-group-custom">
+              <button type="button" className="btn-secondary" onClick={agregarAlCarrito}>
+                + Aañadir a Lista
+              </button>
+            </div>
+
+            {tipoMovimiento === "entrada" && (
+              <div className="input-group-custom">
+                <label>Proveedor</label>
+                <select
+                  className="modern-input"
+                  value={proveedorId}
+                  onChange={(e) => setProveedorId(e.target.value)}
+                >
+                  <option value="">Selecciona proveedor</option>
+                  {proveedores.map((prov) => (
+                    <option key={prov.id} value={prov.id}>
+                      {prov.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {tipoMovimiento === "salida" && !caducado && (
+              <div className="input-group-custom">
+                <label>Receta Asociada</label>
+                <select
+                  className="modern-input"
+                  value={recetaId}
+                  onChange={(e) => setRecetaId(e.target.value)}
+                >
+                  <option value="">Selecciona receta</option>
+                  {recetas.map((rec) => (
+                    <option key={rec.id} value={rec.id}>
+                      Paciente: {rec.paciente_nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="input-group-custom full-width">
+              <label>Motivo u Observación</label>
+              <input
+                type="text"
+                className="modern-input"
+                placeholder="Ej. Reabastecimiento mensual / Mermas / Ajuste"
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
+              />
+            </div>
+
+            {tipoMovimiento === "salida" && (
+              <div className="caducado-box full-width">
+                <input
+                  type="checkbox"
+                  id="caducado"
+                  checked={caducado}
+                  onChange={(e) => setCaducado(e.target.checked)}
+                />
+                <label htmlFor="caducado">Marcar producto como caducado / dañado</label>
+              </div>
+            )}
+
+            {carrito.length > 0 && (
+              <div className="full-width carrito-section">
+                <h4>Items a Procesar ({carrito.length})</h4>
+                <table className="modern-table">
+                  <thead>
+                    <tr>
+                      <th>Medicamento</th>
+                      <th>Cantidad</th>
+                      <th style={{ textAlign: "right" }}>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {carrito.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.nombre}</td>
+                        <td>{item.cantidad} unidades</td>
+                        <td style={{ textAlign: "right" }}>
+                          <button
+                            type="button"
+                            className="btn-danger-soft"
+                            onClick={() => eliminarDelCarrito(index)}
+                          >
+                            Quitar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <div className="full-width" style={{ marginTop: "1rem" }}>
+              <button type="button" className="btn-primary" onClick={guardarMovimiento}>
+                Confirmar Registro de {tipoMovimiento === "entrada" ? "Entrada" : "Salida"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* HISTORIAL GENERAL */}
+        <div className="historial-card">
+          <h3>Historial de Movimientos</h3>
+          <div className="table-responsive">
+            <table className="modern-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Producto</th>
+                  <th>Tipo</th>
+                  <th>Cantidad</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historial.length > 0 ? (
+                  historial
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((mov) => (
+                      <tr key={mov.id}>
+                        <td>{new Date(mov.fecha_movimiento).toLocaleString()}</td>
+                        <td>{mov.inventario?.medicamento?.nombre || "N/A"}</td>
+                        <td>
+                          <span
+                            className={`badge-tipo ${
+                              mov.tipo === "entrada" ? "badge-entrada" : "badge-salida"
+                            }`}
+                          >
+                            {mov.tipo}
+                          </span>
+                        </td>
+                        <td>{mov.cantidad}</td>
+                        <td>{mov.motivo || "—"}</td>
+                      </tr>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" style={{ textAlign: "center", color: "#94a3b8" }}>
+                      No se encontraron registros de movimiento
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <TablePagination
+            component="div"
+            count={historial.length}
+            page={page}
+            onPageChange={(e, p) => setPage(p)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10));
+              setPage(0);
+            }}
+          />
+        </div>
+      </div>
+
+      {/* MODAL ORDEN DE COMPRA */}
+      {mostrarModal && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <div className="modal-header">
+              <h3>Generar Nueva Orden de Compra</h3>
+              <button
+                type="button"
+                className="btn-danger-soft"
+                onClick={() => setMostrarModal(false)}
+              >
+                ✕ Cerrar
+              </button>
+            </div>
+
+            <div className="form-grid" style={{ marginBottom: "1.5rem" }}>
+              <div className="input-group-custom">
+                <label>Proveedor</label>
+                <select
+                  className="modern-input"
+                  value={orden.proveedor_id}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    const p = proveedores.find((prov) => String(prov.id) === String(id));
+                    setOrden({
+                      ...orden,
+                      proveedor_id: id,
+                      proveedor_nombre: p?.nombre || "",
+                      proveedor_rfc: p?.rfc || "",
+                      proveedor_direccion: p?.direccion || "",
+                      proveedor_telefono: p?.telefono || "",
+                      proveedor_contacto: p?.contacto || "",
+                    });
+                  }}
+                >
+                  <option value="">Selecciona Proveedor</option>
+                  {proveedores.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group-custom">
+                <label>Fecha de Solicitud</label>
+                <input
+                  type="date"
+                  className="modern-input"
+                  value={orden.fecha}
+                  onChange={(e) => setOrden({ ...orden, fecha: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <h4 style={{ marginBottom: "1rem" }}>Listado de Productos</h4>
 
             {orden.medicamentos.map((med, index) => (
-              <div
-                key={index}
-                style={{
-                  border: "1px solid #ddd",
-                  padding: "15px",
-                  marginBottom: "15px",
-                  borderRadius: "8px",
-                }}
-              >
-                <h4>Medicamento #{index + 1}</h4>
-
-                <div style={{ marginBottom: "10px" }}>
-                  <label>Medicamento</label>
-
-                  <select
-                    ref={(el) => (MedicamentoRef.current[index] = el)}
-                    className="modern-input"
-                    value={med.medicamento_id}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                    }}
-                  >
-                    <option value="">
-                      Seleccione un medicamento
-                    </option>
-
-                    {medicamentos.map((item) => (
-                      <option
-                        key={item.id}
-                        value={item.id}
-                      >
-                        {item.nombre}
-                      </option>
-                    ))}
-
-                    <option value="otro">
-                      Otro medicamento
-                    </option>
-                  </select>
+              <div className="med-card-item" key={index}>
+                <div className="med-card-header">
+                  <h5>Producto #{index + 1}</h5>
+                  {orden.medicamentos.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn-danger-soft"
+                      onClick={() => eliminarMedicamentoOrden(index)}
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </div>
 
-                {med.medicamento_id === "otro" && (
-                  <div style={{ marginBottom: "10px" }}>
-                    <label>
-                      Nombre del medicamento
-                    </label>
-
-                    <input
-                    className="modern-input"
-                      type="text"
-                      placeholder="Escriba el medicamento"
-                      value={med.nombrePersonalizado}
-                      onChange={(e) =>
-                        cambiarMedicamento(
-                          index,
-                          "nombrePersonalizado",
-                          e.target.value
-                        )
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "10px",
-                      }}
+                <div className="form-grid">
+                  <div className="input-group-custom">
+                    <label>Medicamento</label>
+                    <SlimSelectField
+                      options={[...medicamentos, { id: "otro", nombre: "Otro (Especificar)" }]}
+                      value={med.medicamento_id}
+                      onChange={(val) => cambiarMedicamentoOrden(index, "medicamento_id", val)}
+                      placeholder="Seleccionar..."
                     />
                   </div>
-                )}
 
-                <div style={{ marginBottom: "10px" }}>
-                  <label>Unidades</label>
+                  {med.medicamento_id === "otro" && (
+                    <div className="input-group-custom">
+                      <label>Nombre del Medicamento</label>
+                      <input
+                        type="text"
+                        className="modern-input"
+                        placeholder="Nombre comercial/genérico"
+                        value={med.nombrePersonalizado}
+                        onChange={(e) =>
+                          cambiarMedicamentoOrden(index, "nombrePersonalizado", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
 
-                  <input
-                  className="modern-input"
-                    type="number"
-                    min="1"
-                    value={med.unidades}
-                    onChange={(e) =>
-                      cambiarMedicamento(
-                        index,
-                        "unidades",
-                        e.target.value
-                      )
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                    }}
-                  />
+                  <div className="input-group-custom">
+                    <label>Unidades</label>
+                    <input
+                      type="number"
+                      className="modern-input"
+                      min="1"
+                      value={med.unidades}
+                      onChange={(e) => cambiarMedicamentoOrden(index, "unidades", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="input-group-custom">
+                    <label>Precio Estimado ($)</label>
+                    <input
+                      type="number"
+                      className="modern-input"
+                      min="0"
+                      step="0.01"
+                      value={med.precio}
+                      onChange={(e) => cambiarMedicamentoOrden(index, "precio", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="input-group-custom full-width">
+                    <label>Notas / Descripción</label>
+                    <textarea
+                      className="modern-input"
+                      rows="2"
+                      placeholder="Presentación, concentración o detalles adicionales"
+                      value={med.descripcion}
+                      onChange={(e) => cambiarMedicamentoOrden(index, "descripcion", e.target.value)}
+                    />
+                  </div>
                 </div>
-
-                <div style={{ marginBottom: "10px" }}>
-                  <label>Descripción</label>
-
-                  <textarea
-                  className="modern-input"
-                    rows="3"
-                    value={med.descripcion}
-                    onChange={(e) =>
-                      cambiarMedicamento(
-                        index,
-                        "descripcion",
-                        e.target.value
-                      )
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: "10px" }}>
-                  <label>Precio</label>
-
-                  <input
-                    className="modern-input"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={med.precio}
-                    onChange={(e) =>
-                      cambiarMedicamento(
-                        index,
-                        "precio",
-                        e.target.value
-                      )
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                    }}
-                  />
-                </div>
-
-                <button
-                 className="action-btn"
-                         style={{
-                          backgroundColor: "red",
-                          color:"white"
-                        }}
-                  type="button"
-                  onClick={() =>
-                    eliminarMedicamento(index)
-                  }
-                >
-                  Eliminar
-                </button>
               </div>
             ))}
 
             <button
-             className="action-btn"
-                     style={{
-          backgroundColor: "blue",
-          color:"white"
-        }}
               type="button"
-              onClick={agregarMedicamento}
+              className="btn-secondary"
+              onClick={agregarMedicamentoOrden}
+              style={{ width: "100%", marginBottom: "1.5rem" }}
             >
-              + Agregar medicamento
+              + Agregar otro medicamento a la lista
             </button>
 
-            <hr style={{ margin: "20px 0"}} />
-            
-
-            <button
-              onClick={guardarOrden}
-              style={{
-                marginRight: "10px",
-                backgroundColor: "green",
-                color:"white"
-              }}
-              className="action-btn"
-            >
-              Guardar Orden
-            </button>
-
-            <button
-              onClick={() =>
-                setMostrarModal(false)
-              }
-              className="action-btn"
-
-                      style={{
-          backgroundColor: "red",
-          color:"white"
-        }}
-            >
-              Cancelar
-            </button>
+            <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setMostrarModal(false)}
+              >
+                Cancelar
+              </button>
+              <button type="button" className="btn-primary" onClick={guardarOrden}>
+                Guardar y Emitir Orden
+              </button>
+            </div>
           </div>
         </div>
       )}
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-);
+  );
 }
 
 export default Prueba;
-

@@ -13,6 +13,15 @@
   --brand-hover: #1d4ed8;
   --brand-light: #eff6ff;
 
+  --status-routine-bg: #eff6ff;
+  --status-routine-text: #2563eb;
+
+  --status-follow-bg: #ecfdf5;
+  --status-follow-text: #059669;
+
+  --status-urgent-bg: #fef2f2;
+  --status-urgent-text: #dc2626;
+
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 8px;
@@ -20,7 +29,7 @@
   --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
 }
 
-.consulta-page-wrapper {
+.create-appointment-wrapper {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-app);
   padding: 24px;
@@ -29,7 +38,7 @@
 }
 
 /* Header */
-.consulta-header-card {
+.appointment-header-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -87,7 +96,7 @@
 }
 
 /* Grid Layout de 2 Columnas */
-.consulta-grid-layout {
+.appointment-grid-layout {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 24px;
@@ -95,12 +104,12 @@
 }
 
 @media (max-width: 992px) {
-  .consulta-grid-layout {
+  .appointment-grid-layout {
     grid-template-columns: 1fr;
   }
 }
 
-.main-column, .side-column {
+.form-column, .summary-column {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -140,204 +149,196 @@
   margin: 2px 0 0 0;
 }
 
-/* Form Inputs */
-.form-grid-2col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* Autocomplete e Inputs */
+.patient-option-item {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  padding: 8px 12px;
 }
 
-.field-group {
-  display: flex;
-  flex-direction: column;
+.patient-option-avatar {
+  background-color: var(--brand-light) !important;
+  color: var(--brand-primary) !important;
+  font-weight: 700 !important;
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 13px !important;
+}
+
+.patient-option-name {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.patient-option-id {
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
 .custom-input-label {
+  display: block;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.custom-input, .custom-select, .custom-textarea {
+.custom-textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   background-color: #f8fafc;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   outline: none;
   box-sizing: border-box;
-  transition: all 0.2s ease;
+  resize: vertical;
 }
 
-.custom-input:focus, .custom-select:focus, .custom-textarea:focus {
+.custom-textarea:focus {
   border-color: var(--brand-primary);
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.patient-summary-box {
-  display: flex;
-  align-items: center;
+/* Tarjetas de Selección de Tipo de Cita */
+.type-selector-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  margin-top: 16px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  background-color: var(--brand-light);
-  border: 1px solid rgba(37, 99, 235, 0.15);
 }
 
-.patient-avatar {
-  background-color: var(--brand-primary) !important;
-  font-weight: 700 !important;
-}
-
-.patient-name {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.patient-subtext {
-  margin: 2px 0 0 0;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-/* Acordeón de Medicamentos */
-.prescription-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.empty-meds-box {
-  text-align: center;
-  padding: 16px;
-  border: 1px dashed var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-tertiary);
-  font-size: 13px;
-}
-
-.med-accordion {
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: #ffffff;
-}
-
-.med-accordion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 14px;
-  background-color: #f8fafc;
-  cursor: pointer;
-}
-
-.med-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.med-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-icon-delete {
-  background: none;
-  border: none;
-  color: #dc2626;
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-}
-
-.btn-icon-delete:hover {
-  background-color: #fef2f2;
-}
-
-.med-accordion-content {
-  padding: 14px;
-  border-top: 1px solid var(--border-subtle);
-  background: #ffffff;
-}
-
-.btn-add-medication {
-  width: 100%;
+.type-card {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: #ffffff;
-  border: 1px dashed var(--brand-primary);
-  color: var(--brand-primary);
-  padding: 10px;
+  padding: 12px;
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 13px;
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-add-medication:hover {
-  background-color: var(--brand-light);
+.type-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
-/* Panel de Acciones */
-.action-panel {
+.type-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Estado Rutina */
+.type-card.rutina .type-dot { background-color: var(--brand-primary); }
+.type-card.rutina .type-title { color: var(--text-primary); }
+.type-card.rutina.selected {
+  background-color: var(--status-routine-bg);
+  border-color: var(--brand-primary);
+}
+.type-card.rutina.selected .type-title { color: var(--status-routine-text); }
+
+/* Estado Seguimiento */
+.type-card.seguimiento .type-dot { background-color: #059669; }
+.type-card.seguimiento.selected {
+  background-color: var(--status-follow-bg);
+  border-color: #059669;
+}
+.type-card.seguimiento.selected .type-title { color: var(--status-follow-text); }
+
+/* Estado Urgente */
+.type-card.urgente .type-dot { background-color: #dc2626; }
+.type-card.urgente.selected {
+  background-color: var(--status-urgent-bg);
+  border-color: #dc2626;
+}
+.type-card.urgente.selected .type-title { color: var(--status-urgent-text); }
+
+/* Picker y Resumen */
+.picker-wrapper {
+  display: flex;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.summary-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.summary-title {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--brand-primary);
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+
+.summary-item span {
+  color: var(--text-secondary);
+}
+
+.badge-type {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.badge-type.rutina { background: var(--status-routine-bg); color: var(--status-routine-text); }
+.badge-type.seguimiento { background: var(--status-follow-bg); color: var(--status-follow-text); }
+.badge-type.urgente { background: var(--status-urgent-bg); color: var(--status-urgent-text); }
+
+.action-buttons-wrapper {
   display: flex;
   gap: 12px;
 }
 
-.btn-cancel {
-  flex: 1;
-  text-align: center;
-  text-decoration: none;
-  background-color: #ffffff;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 13px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
-}
-
-.btn-cancel:hover {
-  background-color: #f1f5f9;
-  color: var(--text-primary);
-}
-
-.btn-submit-consult {
-  flex: 2;
-  display: flex;
+.btn-submit-appointment {
+  width: 100%;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   background-color: var(--brand-primary);
-  border: none;
   color: #ffffff;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   padding: 12px;
   border-radius: var(--radius-md);
+  border: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
   transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
-.btn-submit-consult:hover {
+.btn-submit-appointment:hover {
   background-color: var(--brand-hover);
   transform: translateY(-1px);
 }

@@ -1,0 +1,164 @@
+/* Layout Principal */
+.agenda-wrapper {
+  padding: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Header */
+.agenda-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #eff6ff;
+  color: #2563eb;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.header-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.header-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* Botón Acción Principal */
+.btn-add-cita {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #2563eb;
+  color: #ffffff !important;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-add-cita:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+/* Leyenda del Calendario */
+.agenda-legend-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.legend-icon {
+  font-size: 18px !important;
+  color: #64748b;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-presencial {
+  background-color: #2563eb;
+}
+
+.dot-virtual {
+  background-color: #10b981;
+}
+
+/* Contenedor del Calendario */
+.calendar-glass-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.calendar-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.calendar-header-title h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.calendar-icon {
+  color: #2563eb;
+}
+
+.calendar-embed-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Ajustes globales para FullCalendar si se renderiza adentro */
+.fc {
+  font-family: inherit !important;
+}
+
+.fc-button-primary {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+.fc-button-primary:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+.fc-toolbar-title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
