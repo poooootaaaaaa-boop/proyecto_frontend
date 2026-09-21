@@ -22,6 +22,8 @@ import ReporteHabitacion from "../pages/farmacia/ReporteHabitacion";
 
 import PruebaConsentimientoFirma from "../pages/farmacia/PruebaConsentimientoFirma";
 
+import DocumentoReporte  from "../pages/farmacia/DocumentoReporte";
+import ControlAlimientos from "../pages/farmacia/ControlAlimientos";
 
 export default function FarmaciaRoutes(){
     return(
@@ -46,7 +48,8 @@ export default function FarmaciaRoutes(){
             <Route path="configurar-pago-doctor" element={<ConfigurarPagoDoctor/>}/>
             <Route path="asignar-doctor-consultorio" element={<AsignarDoctorConsultorio/>}/>
             <Route path="prueba-consentimiento-firma" element={<PruebaConsentimientoFirma />} />
-            
+            <Route path="documento-reporte" element={<DocumentoReporte />} />
+            <Route path="control-alimentos" element={<ControlAlimientos />} />
         </Routes>
     );
 }

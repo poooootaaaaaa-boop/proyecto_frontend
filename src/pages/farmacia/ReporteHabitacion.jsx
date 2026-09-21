@@ -9,6 +9,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function ReporteHabitacion() {
 
+    const navigate = useNavigate();
+
   const [listaCuartos, setListaCuartos] = useState([]);
   const [listaInstrumentos, setListaInstrumentos] = useState([]);
 
@@ -17,6 +19,11 @@ function ReporteHabitacion() {
   const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [foto, setFoto] = useState(null);
+  const [fechaRegistro, setFechaRegistro] = useState('');
+  const [costo, setCosto] = useState('');
+  const [prioridad, setPrioridad] = useState('');
+
+  const [reportes, setReportes] = useState([]);
 
 
   /*
@@ -70,12 +77,51 @@ useEffect(() => {
 
 
 
+const agregarReporte = () => {
 
+  if (!cuartoSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
+    alert('Por favor, llena todos los campos antes de agregar el reporte.');
+    return;
+  }
 
+  const nuevoReporte = {
+    cuarto_id: cuartoSeleccionado,
+    instrumento_id: instrumentoSeleccionado,
+        instrumento_nombre: listaInstrumentos.find(
+            (instrumento) => String(instrumento.id) === String(instrumentoSeleccionado)
+        )?.nombre || `Instrumento #${instrumentoSeleccionado}`,
+    descripcion: descripcion,
+    foto: foto,
+    fecha_registro: fechaRegistro,
+    costo: costo,
+    prioridad: prioridad
+
+  };
+
+  setReportes([...reportes, nuevoReporte]);
+
+  // Limpiar campos para poder crear otro reporte
+  setCuartoSeleccionado('');
+  setInstrumentoSeleccionado('');
+  setDescripcion('');
+  setFoto(null);
+  setFechaRegistro('');
+  setCosto('');
+  setPrioridad('');
+
+  alert('Reporte agregado. Puedes agregar otro.');
+};
+
+const eliminarReporte = (indice) => {
+  const nuevosReportes = reportes.filter((_, index) => index !== indice);
+  setReportes(nuevosReportes);
+};
+
+/*
   // La función ya no necesita el "e.preventDefault()" porque no hay un submit nativo que recargue la página
   const manejarEnvio = async () => {
     // Validamos a mano que no dejen campos vacíos (ya que no tenemos el "required" nativo del form)
-    if (!cuartoSeleccionado || !instrumentoSeleccionado || !descripcion || !foto) {
+        if (!cuartoSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
       alert('Por favor, llena todos los campos antes de enviar.');
       return;
     }
@@ -85,6 +131,9 @@ useEffect(() => {
     datosFormulario.append('instrumento_id', instrumentoSeleccionado);
     datosFormulario.append('descripcion', descripcion);
     datosFormulario.append('foto', foto);
+    datosFormulario.append('fecha_registro', fechaRegistro);
+    datosFormulario.append('costo', costo);
+    datosFormulario.append('prioridad', prioridad);
 
     try {
       const respuesta = await Axios.post(`${API_URL}/reporte-habitacion`, datosFormulario, {
@@ -101,6 +150,9 @@ useEffect(() => {
       setInstrumentoSeleccionado('');
       setDescripcion('');
       setFoto(null);
+    setFechaRegistro('');
+    setCosto('');
+    setPrioridad('');
 
     } catch (error) {
       console.error('Error al enviar:', error);
@@ -108,7 +160,80 @@ useEffect(() => {
     }
   };
 
-    
+    */
+
+
+  const manejarEnvio = async () => {
+
+    const formularioCompleto = cuartoSeleccionado && instrumentoSeleccionado && descripcion && foto && fechaRegistro && costo && prioridad;
+    const reportesParaEnviar = [...reportes];
+
+    if (formularioCompleto) {
+        reportesParaEnviar.push({
+            cuarto_id: cuartoSeleccionado,
+            instrumento_id: instrumentoSeleccionado,
+            instrumento_nombre: listaInstrumentos.find(
+                (instrumento) => String(instrumento.id) === String(instrumentoSeleccionado)
+            )?.nombre || `Instrumento #${instrumentoSeleccionado}`,
+            descripcion,
+            foto,
+            fecha_registro: fechaRegistro,
+            costo,
+            prioridad
+        });
+    } else if (cuartoSeleccionado || instrumentoSeleccionado || descripcion || foto || fechaRegistro || costo || prioridad) {
+        alert('Por favor, llena todos los campos del reporte antes de enviarlo.');
+        return;
+    }
+
+    if (reportesParaEnviar.length === 0) {
+    alert('Primero agrega al menos un reporte.');
+    return;
+  }
+
+  try {
+
+    const reportesGuardados = [];
+
+    for (const reporte of reportesParaEnviar) {
+
+      const datosFormulario = new FormData();
+
+      datosFormulario.append('cuarto_id', reporte.cuarto_id);
+      datosFormulario.append('instrumento_id', reporte.instrumento_id);
+      datosFormulario.append('descripcion', reporte.descripcion);
+      datosFormulario.append('foto', reporte.foto);
+      datosFormulario.append('fecha_registro', reporte.fecha_registro);
+      datosFormulario.append('costo', reporte.costo);
+      datosFormulario.append('prioridad', reporte.prioridad);
+
+            await Axios.post(
+        `${API_URL}/reporte-habitacion`,
+        datosFormulario,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+            reportesGuardados.push(reporte);
+    }
+
+        navigate('/farmacia/documento-reporte', {
+            state: {
+                reporte: reportesGuardados[0],
+                reportes: reportesGuardados
+            }
+        });
+
+  } catch (error) {
+
+    console.error('Error al enviar:', error);
+
+    alert('Hubo un error al guardar los reportes.');
+  }
+};
     return (
       <div className="movimientos-layout" style={{ backgroundColor: '#f4f7f6', minHeight: '100vh', display: 'flex' }}>
     <Sidebar />
@@ -232,6 +357,82 @@ useEffect(() => {
                     />
                 </div>
 
+                {/* Fecha de Registro */}
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
+                        Fecha de registro
+                    </label>
+                    <input
+                        type="date"
+                        value={fechaRegistro}
+                        onChange={(e) => setFechaRegistro(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '12px 14px',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            backgroundColor: '#f8fafc',
+                            color: '#4a5568',
+                            fontSize: '14px',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                        }}
+                    />
+                </div>
+
+                {/* Costo */}
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
+                        Costo
+                    </label>
+                    <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={costo}
+                        onChange={(e) => setCosto(e.target.value)}
+                        placeholder="Ingresa el costo"
+                        style={{
+                            width: '100%',
+                            padding: '12px 14px',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            backgroundColor: '#f8fafc',
+                            color: '#4a5568',
+                            fontSize: '14px',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                        }}
+                    />
+                </div>
+
+                {/* Prioridad */}
+                <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
+                        Prioridad
+                    </label>
+                    <select
+                        value={prioridad}
+                        onChange={(e) => setPrioridad(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '12px 14px',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                            backgroundColor: '#f8fafc',
+                            color: '#4a5568',
+                            fontSize: '14px',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                        }}
+                    >
+                        <option value="">-- Selecciona una prioridad --</option>
+                        <option value="alta">Alta</option>
+                        <option value="media">Media</option>
+                        <option value="baja">Baja</option>
+                    </select>
+                </div>
+
                 {/* Campo de Foto (Estilizado como la zona de arrastrar archivo de la imagen) */}
                 {/* Campo de Foto */}
       <div style={{ marginBottom: '30px' }}>
@@ -334,6 +535,150 @@ useEffect(() => {
               
           </div>
       </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      {reportes.length > 0 && (
+    <div style={{ marginBottom: '20px' }}>
+
+        <h3 style={{
+            fontSize: '16px',
+            color: '#0a1931',
+            marginBottom: '10px'
+        }}>
+            Reportes agregados ({reportes.length})
+        </h3>
+
+        {reportes.map((reporte, index) => (
+            <div
+                key={index}
+                style={{
+                    padding: '12px',
+                    marginBottom: '10px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    backgroundColor: '#ffffff'
+                }}
+            >
+
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+
+                    <strong>
+                        Reporte #{index + 1}
+                    </strong>
+
+                    <button
+                        type="button"
+                        onClick={() => eliminarReporte(index)}
+                        style={{
+                            backgroundColor: '#e11d48',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '5px 10px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Eliminar
+                    </button>
+
+                </div>
+
+                <p style={{ margin: '6px 0', fontSize: '13px' }}>
+                    Cuarto: {reporte.cuarto_id}
+                </p>
+
+                <p style={{ margin: '6px 0', fontSize: '13px' }}>
+                    Instrumento: {reporte.instrumento_nombre || `Instrumento #${reporte.instrumento_id}`}
+                </p>
+
+                <p style={{ margin: '6px 0', fontSize: '13px' }}>
+                    Descripción: {reporte.descripcion}
+                </p>
+
+                <p style={{ margin: '6px 0', fontSize: '13px' }}>
+                    Costo: ${reporte.costo}
+                </p>
+
+                <p style={{ margin: '6px 0', fontSize: '13px' }}>
+                    Prioridad: {reporte.prioridad}
+                </p>
+
+                <p style={{ margin: '6px 0', fontSize: '13px' }}>
+                    Fecha de Registro: {reporte.fecha_registro}
+                </p>
+
+            </div>
+        ))}
+    </div>
+)}
+
+        <button 
+            type="button"
+            onClick={agregarReporte}
+            style={{ 
+                width: '100%', 
+                padding: '14px', 
+                backgroundColor: '#64748b', 
+                color: '#ffffff', 
+                border: 'none', 
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '15px',
+                fontWeight: '600',
+                marginBottom: '10px',
+                boxSizing: 'border-box'
+            }}
+        >
+            + Agregar otro reporte
+        </button>
 
                 {/* Botón de Enviar */}
                 <button 
