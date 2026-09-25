@@ -26,26 +26,22 @@ function ReporteHabitacion() {
   const [reportes, setReportes] = useState([]);
 
 
-  /*
-  // Simulación de la base de datos
-  useEffect(() => {
-    const cuartosBD = [
-      { id: 1, nombre: 'Estudio Principal' },
-      { id: 2, nombre: 'Cabina de Grabación' },
-      { id: 3, nombre: 'Sala de Ensayo A' }
-    ];
+  const [listaDoctores, setListaDoctores] = useState([]);
+  const [doctorSeleccionado, setDoctorSeleccionado] = useState('');   
 
-    const instrumentosBD = [
-      { id: 1, nombre: 'Guitarra Eléctrica' },
-      { id: 2, nombre: 'Batería Acústica' },
-      { id: 3, nombre: 'Teclado MIDI' }
-    ];
 
-    setListaCuartos(cuartosBD);
-    setListaInstrumentos(instrumentosBD);
-  }, []);
 
-*/
+  
+const obtenerDoctores = async () => {
+  try {
+    const response = await Axios.get(`${API_URL}/doctores-completo`);
+    setListaDoctores(response.data || []);
+  } catch (error) {
+    console.error("Error cargando doctores:", error);
+  }
+};
+
+  
   
 
   // 1. Declaras tus funciones asíncronas para traer los datos de la BD
@@ -73,19 +69,29 @@ const obtenerInstrumentos = async () => {
 useEffect(() => {
   obtenerHabitaciones();
   obtenerInstrumentos();
+  obtenerDoctores();
 }, []); // Arreglo vacío para que se ejecute solo una vez
 
 
 
 const agregarReporte = () => {
 
-  if (!cuartoSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
+  if (!cuartoSeleccionado || !doctorSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
     alert('Por favor, llena todos los campos antes de agregar el reporte.');
     return;
   }
 
+  const doctorSeleccionadoObj = listaDoctores.find(
+  (doctor) => String(doctor.id) === String(doctorSeleccionado)
+);
+
   const nuevoReporte = {
+    
     cuarto_id: cuartoSeleccionado,
+    doctor_id: doctorSeleccionado,
+    doctor_nombre: doctorSeleccionadoObj?.usuario?.nombre || "",
+
+
     instrumento_id: instrumentoSeleccionado,
         instrumento_nombre: listaInstrumentos.find(
             (instrumento) => String(instrumento.id) === String(instrumentoSeleccionado)
@@ -102,6 +108,7 @@ const agregarReporte = () => {
 
   // Limpiar campos para poder crear otro reporte
   setCuartoSeleccionado('');
+  setDoctorSeleccionado('');
   setInstrumentoSeleccionado('');
   setDescripcion('');
   setFoto(null);
@@ -165,12 +172,20 @@ const eliminarReporte = (indice) => {
 
   const manejarEnvio = async () => {
 
-    const formularioCompleto = cuartoSeleccionado && instrumentoSeleccionado && descripcion && foto && fechaRegistro && costo && prioridad;
+    const formularioCompleto = cuartoSeleccionado && doctorSeleccionado && instrumentoSeleccionado && descripcion && foto && fechaRegistro && costo && prioridad;
     const reportesParaEnviar = [...reportes];
 
     if (formularioCompleto) {
+
+            const doctorSeleccionadoObj = listaDoctores.find(
+        (doctor) => String(doctor.id) === String(doctorSeleccionado)
+    );
+
+
         reportesParaEnviar.push({
             cuarto_id: cuartoSeleccionado,
+            doctor_id: doctorSeleccionado,
+            doctor_nombre: doctorSeleccionadoObj?.usuario?.nombre || "",
             instrumento_id: instrumentoSeleccionado,
             instrumento_nombre: listaInstrumentos.find(
                 (instrumento) => String(instrumento.id) === String(instrumentoSeleccionado)
@@ -199,6 +214,7 @@ const eliminarReporte = (indice) => {
 
       const datosFormulario = new FormData();
 
+      datosFormulario.append('doctor_id', reporte.doctor_id);
       datosFormulario.append('cuarto_id', reporte.cuarto_id);
       datosFormulario.append('instrumento_id', reporte.instrumento_id);
       datosFormulario.append('descripcion', reporte.descripcion);
@@ -302,6 +318,56 @@ const eliminarReporte = (indice) => {
                         ))}
                     </select>
                 </div>
+
+
+
+
+                <div style={{ marginBottom: '20px' }}>
+                    <label
+                        style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        color: '#333333',
+                        fontSize: '13.5px',
+                        fontWeight: '500'
+                        }}
+                    >
+                        Selecciona el Doctor
+                    </label>
+
+                    <select
+                        value={doctorSeleccionado}
+                        onChange={(e) => setDoctorSeleccionado(e.target.value)}
+                        style={{
+                        width: '100%',
+                        padding: '12px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#f8fafc',
+                        color: '#4a5568',
+                        fontSize: '14px',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                        }}
+                    >
+                        <option value="">-- Selecciona un doctor --</option>
+
+                        {listaDoctores.map((doctor) => (
+                        <option key={doctor.id} value={doctor.id}>
+                            {doctor.usuario?.nombre}
+                        </option>
+                        ))}
+                    </select>
+                    </div>
+
+
+
+
+
+
+
+
+
 
                 {/* Selector de Instrumentos */}
                 <div style={{ marginBottom: '20px' }}>

@@ -131,6 +131,16 @@ export default function Sidebar() {
           Acepto
         </Nav.Link>
 
+        <Nav.Link as={NavLink} to="/farmacia/reporte-habitacion" style={linkStyle}>
+          <i class="bi bi-card-checklist"></i>
+          Reporte Habitacion
+        </Nav.Link>
+
+        <Nav.Link as={NavLink} to="/farmacia/control-alimentos" style={linkStyle}>
+          <i class="bi bi-card-list"></i>
+          Control de alimentos
+        </Nav.Link>
+
       </Nav>
 
       <div style={{ marginTop: "auto" }}>
