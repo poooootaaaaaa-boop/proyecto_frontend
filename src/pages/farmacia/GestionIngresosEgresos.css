@@ -1,0 +1,595 @@
+/* ===== Layout con sidebar ===== */
+.ie-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.ie-container {
+  flex: 1;
+  padding: 24px;
+  max-width: 1300px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ===== Header ===== */
+.ie-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ie-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0fdf4;
+  color: #16a34a;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ie-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.ie-header p {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+  max-width: 520px;
+}
+
+/* ===== Alertas ===== */
+.ie-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.ie-alert span {
+  flex: 1;
+}
+
+.ie-alert button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.ie-alert.is-ok {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.ie-alert.is-error {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== Tabs ===== */
+.ie-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.ie-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ie-tabs button.is-active {
+  background-color: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Card principal ===== */
+.ie-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.ie-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ie-card-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.ie-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 20px 0 12px 0;
+}
+
+/* ===== Buscador / rango de fechas ===== */
+.ie-search {
+  position: relative;
+  width: 260px;
+  max-width: 100%;
+}
+
+.ie-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.ie-search input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.ie-search input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ie-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ===== Tabla ===== */
+.ie-table-wrap {
+  overflow-x: auto;
+}
+
+.ie-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ie-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 600;
+  padding: 12px 14px;
+  border-bottom: 2px solid #f1f5f9;
+  white-space: nowrap;
+}
+
+.ie-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  font-size: 13px;
+  color: #334155;
+}
+
+.ie-center {
+  text-align: center;
+}
+
+.ie-strong {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.ie-muted {
+  color: #94a3b8;
+}
+
+.ie-empty {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 32px !important;
+}
+
+.ie-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ie-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ie-status.is-active { background-color: #fef3c7; color: #b45309; }
+.ie-status.is-done { background-color: #dcfce7; color: #15803d; }
+.ie-status.is-off { background-color: #fee2e2; color: #b91c1c; }
+.ie-status.is-cleaning { background-color: #e0f2fe; color: #0369a1; }
+
+.ie-hint-block {
+  font-size: 13px;
+  color: #64748b;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.ie-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ie-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #2563eb;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ie-icon-btn:hover {
+  background-color: #eff6ff;
+}
+
+/* ===== Métricas de reporte ===== */
+.ie-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .ie-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ie-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.ie-stat small {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ie-stat strong {
+  font-size: 19px;
+  color: #0f172a;
+}
+
+.ie-stat-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ie-stat-icon.blue { background-color: #eff6ff; color: #2563eb; }
+.ie-stat-icon.green { background-color: #f0fdf4; color: #16a34a; }
+.ie-stat-icon.amber { background-color: #fffbeb; color: #d97706; }
+.ie-stat-icon.violet { background-color: #f5f3ff; color: #7c3aed; }
+
+/* ===== Barras simples (ingresos por tipo) ===== */
+.ie-bars {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ie-bars li {
+  display: grid;
+  grid-template-columns: 120px 1fr 32px;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.ie-bar-label {
+  color: #475569;
+  font-weight: 500;
+}
+
+.ie-bar-track {
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ie-bar-fill {
+  display: block;
+  height: 100%;
+  background-color: #2563eb;
+  border-radius: 6px;
+}
+
+.ie-bar-value {
+  text-align: right;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* ===== Botones ===== */
+.ie-btn-primary,
+.ie-btn-secondary,
+.ie-btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ie-btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.ie-btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.ie-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ie-btn-secondary {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.ie-btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.ie-btn-cancel {
+  background-color: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.ie-btn-compact {
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+/* ===== Formularios / modales ===== */
+.ie-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.ie-modal {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 22px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+}
+
+.ie-modal-wide {
+  max-width: 720px;
+}
+
+.ie-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 16px;
+}
+
+.ie-modal-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.ie-modal-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.ie-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ie-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.ie-input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0f172a;
+  outline: none;
+  background-color: #ffffff;
+  font-family: inherit;
+}
+
+.ie-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ie-input-compact {
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+.ie-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: #b45309;
+}
+
+.ie-loading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.ie-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* ===== Resumen dentro del modal de alta ===== */
+.ie-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.ie-summary div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ie-summary small {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.ie-summary strong {
+  font-size: 13px;
+  color: #0f172a;
+}
+
+/* ===== Spinner ===== */
+.ie-spin {
+  animation: ie-spin 0.8s linear infinite;
+}
+
+@keyframes ie-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

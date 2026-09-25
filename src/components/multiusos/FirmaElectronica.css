@@ -1,0 +1,164 @@
+.firma {
+  --f-ink: var(--ink, #0e2a3b);
+  --f-soft: var(--ink-soft, #46606f);
+  --f-mute: var(--ink-mute, #7d929e);
+  --f-line: var(--line, #d9e3e6);
+  --f-accent: var(--teal, #0f766e);
+  --f-accent-deep: var(--teal-deep, #0b5a54);
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: inherit;
+  color: var(--f-ink);
+}
+
+.firma *,
+.firma *::before,
+.firma *::after {
+  box-sizing: border-box;
+}
+
+.firma-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.firma-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--f-soft);
+}
+
+.firma-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #047857;
+}
+
+.firma-lienzo {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--f-line);
+  border-radius: 10px;
+  background: #fbfdfd;
+  overflow: hidden;
+}
+
+.firma-lienzo canvas {
+  display: block;
+  cursor: crosshair;
+  touch-action: none; /* evita que el dedo desplace la página mientras se firma */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.firma-lienzo.is-bloqueado canvas {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.firma-guia {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--f-mute);
+  pointer-events: none;
+}
+
+.firma-linea-base {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 24%;
+  border-bottom: 1px dashed var(--f-line);
+  pointer-events: none;
+}
+
+.firma-aviso {
+  margin: 0;
+  font-size: 12.5px;
+  color: #b45309;
+}
+
+.firma-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.firma-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--f-line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--f-soft);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.firma-btn:hover:not(:disabled) {
+  background: #f3f6f6;
+}
+
+.firma-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.firma-btn:focus-visible {
+  outline: 2px solid var(--f-accent);
+  outline-offset: 2px;
+}
+
+.firma-btn-principal {
+  margin-left: auto;
+  background: var(--f-accent);
+  border-color: var(--f-accent);
+  color: #fff;
+}
+
+.firma-btn-principal:hover:not(:disabled) {
+  background: var(--f-accent-deep);
+  border-color: var(--f-accent-deep);
+}
+
+.firma-giro {
+  animation: firma-giro 0.8s linear infinite;
+}
+
+@keyframes firma-giro {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 420px) {
+  .firma-btn-principal {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+  }
+}
