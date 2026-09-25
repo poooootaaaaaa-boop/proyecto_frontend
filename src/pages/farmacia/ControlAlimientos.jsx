@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import Sidebar from "../../components/farmacia/Sidebar";
+import { useNavigate } from "react-router-dom";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 const CONTROL_ALIMENTOS_ENDPOINT =
   import.meta.env.VITE_CONTROL_ALIMENTOS_ENDPOINT || "/control-alimentos";
 
 function ControlAlimientos() {
+  const navigate = useNavigate();
   const [listaPacientes, setListaPacientes] = useState([]);
 
   // Un const independiente para cada campo
@@ -24,6 +27,14 @@ function ControlAlimientos() {
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
 
+
+  //----------------------------- nuevo-------------------------
+      const [alimentosRecibidos, setAlimentosRecibidos] = useState([
+      { nombre: "", cantidad: 1 }
+    ]);
+
+
+  //------------------------------------------------------------
   // Función para traer los pacientes de la base de datos
   const obtenerPacientes = async () => {
     try {
@@ -37,6 +48,16 @@ function ControlAlimientos() {
       setCargandoPacientes(false);
     }
   };
+
+  /*
+    useEffect(() => {
+    Axios.get(`${API_URL}/MostrarPaciente`)
+      .then((response) => {
+        setDataPacientes(response.data.paciente || []);
+      })
+      .catch((error) => console.error("Error cargando pacientes:", error));
+  }, []);
+  */
 
   // Se ejecuta solo una vez al cargar la pantalla
   useEffect(() => {
@@ -52,6 +73,32 @@ function ControlAlimientos() {
     return `${nombre} ${apellidos}`.trim() || `Paciente #${paciente.id}`;
   };
 
+  //---------------------------nuevo-------------------------------
+
+        const agregarAlimento = () => {
+      setAlimentosRecibidos([
+        ...alimentosRecibidos,
+        { nombre: "", cantidad: 1 }
+      ]);
+    };
+
+    const eliminarAlimento = (index) => {
+      setAlimentosRecibidos(
+        alimentosRecibidos.filter((_, i) => i !== index)
+      );
+    };
+
+    const actualizarAlimento = (index, campo, valor) => {
+      const nuevosAlimentos = [...alimentosRecibidos];
+
+      nuevosAlimentos[index][campo] =
+        campo === "cantidad" ? Number(valor) : valor;
+
+      setAlimentosRecibidos(nuevosAlimentos);
+    };
+
+  //---------------------------------------------------------------
+
   const limpiarCampos = () => {
     setPacienteSeleccionado("");
     setFechaHoraRecepcion("");
@@ -64,6 +111,12 @@ function ControlAlimientos() {
     setEntregaAlimentosPaciente("");
   };
 
+
+
+
+
+
+  /*
   const manejarEnvio = async (event) => {
     event.preventDefault();
     setMensaje(null);
@@ -80,7 +133,9 @@ function ControlAlimientos() {
         paciente_id: Number(pacienteSeleccionado),
         fecha_hora_recepcion: fechaHoraRecepcion,
         estado_alimentos: estadoAlimentos,
-        cantidad_recibida: Number(cantidadRecibida),
+        //cantidad_recibida: Number(cantidadRecibida),
+          // NUEVO
+        detalle_alimentos: alimentosRecibidos,
         alimentos_desechados: alimentosDesechados || null,
         motivo_desecho: motivoDesecho || null,
         paciente_consumio: pacienteConsumio === "si",
@@ -100,6 +155,86 @@ function ControlAlimientos() {
       setGuardando(false);
     }
   };
+  */
+
+  const manejarEnvio = async (event) => {
+  event.preventDefault();
+  setMensaje(null);
+
+  if (alimentosDesechados && !motivoDesecho.trim()) {
+    setMensaje({
+      tipo: "error",
+      texto: "Indica el motivo del desecho."
+    });
+    return;
+  }
+
+  setGuardando(true);
+
+  try {
+    await Axios.post(`${API_URL}${CONTROL_ALIMENTOS_ENDPOINT}`, {
+      paciente_id: Number(pacienteSeleccionado),
+      fecha_hora_recepcion: fechaHoraRecepcion,
+      estado_alimentos: estadoAlimentos,
+      // cantidad_recibida: Number(cantidadRecibida),
+
+      detalle_alimentos: alimentosRecibidos,
+      alimentos_desechados: alimentosDesechados || null,
+      motivo_desecho: motivoDesecho || null,
+      paciente_consumio: pacienteConsumio === "si",
+      observaciones_nutricionales: observacionesNutricionales || null,
+      entrega_alimentos_paciente: entregaAlimentosPaciente === "si",
+    });
+
+    // Primero limpiamos los campos
+    limpiarCampos();
+
+    // Después de guardar correctamente, enviamos los datos
+    navigate("/farmacia/documento-control-alimentos", {
+      state: {
+        control: {
+          paciente_id: Number(pacienteSeleccionado),
+
+          paciente_nombre:
+            listaPacientes.find(
+              p => String(p.id) === String(pacienteSeleccionado)
+            )
+              ? nombrePaciente(
+                  listaPacientes.find(
+                    p => String(p.id) === String(pacienteSeleccionado)
+                  )
+                )
+              : null,
+
+          fecha_hora_recepcion: fechaHoraRecepcion,
+          estado_alimentos: estadoAlimentos,
+          detalle_alimentos: alimentosRecibidos,
+          alimentos_desechados: alimentosDesechados,
+          motivo_desecho: motivoDesecho,
+          paciente_consumio: pacienteConsumio,
+          observaciones_nutricionales: observacionesNutricionales,
+          entrega_alimentos_paciente: entregaAlimentosPaciente,
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error(
+      "Error guardando el control de alimentos:",
+      error
+    );
+
+    setMensaje({
+      tipo: "error",
+      texto:
+        error.response?.data?.message ||
+        "No se pudo guardar el control de alimentos.",
+    });
+
+  } finally {
+    setGuardando(false);
+  }
+};
 
   return (
     <div
@@ -198,11 +333,109 @@ function ControlAlimientos() {
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <label htmlFor="cantidad-recibida" style={{ display: "block", marginBottom: "8px", color: "#333333", fontSize: "13.5px", fontWeight: "500" }}>
-                Cantidad recibida
-              </label>
-              <input id="cantidad-recibida" type="number" min="0" step="any" value={cantidadRecibida} onChange={(event) => setCantidadRecibida(event.target.value)} required placeholder="Ingresa la cantidad recibida" style={{ width: "100%", padding: "12px 14px", borderRadius: "8px", border: "1px solid #e2e8f0", backgroundColor: "#f8fafc", color: "#4a5568", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
-            </div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    color: "#333333",
+                    fontSize: "13.5px",
+                    fontWeight: "500"
+                  }}
+                >
+                  Alimentos recibidos
+                </label>
+
+                {alimentosRecibidos.map((alimento, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      marginBottom: "10px"
+                    }}
+                  >
+
+                    <input
+                      type="text"
+                      placeholder="Ej. Plátano"
+                      value={alimento.nombre}
+                      onChange={(event) =>
+                        actualizarAlimento(
+                          index,
+                          "nombre",
+                          event.target.value
+                        )
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "12px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid #e2e8f0",
+                        backgroundColor: "#f8fafc",
+                        fontSize: "14px",
+                        boxSizing: "border-box"
+                      }}
+                    />
+
+                    <input
+                      type="number"
+                      min="1"
+                      value={alimento.cantidad}
+                      onChange={(event) =>
+                        actualizarAlimento(
+                          index,
+                          "cantidad",
+                          event.target.value
+                        )
+                      }
+                      style={{
+                        width: "80px",
+                        padding: "12px",
+                        borderRadius: "8px",
+                        border: "1px solid #e2e8f0",
+                        backgroundColor: "#f8fafc",
+                        fontSize: "14px",
+                        boxSizing: "border-box"
+                      }}
+                    />
+
+                    {alimentosRecibidos.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => eliminarAlimento(index)}
+                        style={{
+                          padding: "0 12px",
+                          backgroundColor: "#dc2626",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        ✕
+                      </button>
+                    )}
+
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={agregarAlimento}
+                  style={{
+                    marginTop: "5px",
+                    padding: "9px 14px",
+                    backgroundColor: "#16a34a",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    cursor: "pointer"
+                  }}
+                >
+                  + Agregar alimento
+                </button>
+
+              </div>
 
             <div style={{ marginBottom: "20px" }}>
               <label htmlFor="alimentos-desechados" style={{ display: "block", marginBottom: "8px", color: "#333333", fontSize: "13.5px", fontWeight: "500" }}>
