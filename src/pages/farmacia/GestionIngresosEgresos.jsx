@@ -20,6 +20,11 @@ import {
   DoorOpen,
   SprayCan,
   Wrench,
+  FileText,
+  Download,
+  Eye,
+  ArrowLeftRight,
+  Route,
 } from "lucide-react";
 
 import "./GestionIngresosEgresos.css";
@@ -65,6 +70,9 @@ const formatoFechaCorta = (valor) => {
 };
 
 const nombrePaciente = (p) => p?.usuario?.nombre ?? p?.nombre ?? p?.correo ?? (p?.id ? `Paciente #${p.id}` : "—");
+const nombreDoctor = (d) => d?.nombre ?? d?.usuario?.nombre ?? d?.correo ?? (d?.id ? `Doctor #${d.id}` : "—");
+
+const CONDICIONES_EGRESO = ["Mejorado", "Curado", "Referido", "Voluntaria", "Fallecido"];
 
 const formIngresoInicial = {
   paciente_id: "",
@@ -72,6 +80,7 @@ const formIngresoInicial = {
   fecha_ingreso: ahoraLocal(),
   motivo: "",
   diagnostico: "",
+  dias_estimados: "",
 };
 
 export default function GestionIngresosEgresos() {
@@ -81,6 +90,8 @@ export default function GestionIngresosEgresos() {
   const [cargandoPacientes, setCargandoPacientes] = useState(true);
   const [habitaciones, setHabitaciones] = useState([]);
   const [cargandoHabitaciones, setCargandoHabitaciones] = useState(true);
+  const [doctores, setDoctores] = useState([]);
+  const [cargandoDoctores, setCargandoDoctores] = useState(true);
 
   const [activos, setActivos] = useState([]);
   const [cargandoActivos, setCargandoActivos] = useState(true);
@@ -91,7 +102,19 @@ export default function GestionIngresosEgresos() {
   const [guardandoIngreso, setGuardandoIngreso] = useState(false);
 
   const [modalAlta, setModalAlta] = useState(null); // ocupación seleccionada
-  const [formAlta, setFormAlta] = useState({ fecha_salida: ahoraLocal(), notas_alta: "" });
+  const formAltaInicial = () => ({
+    fecha_alta_medica: ahoraLocal(),
+    fecha_salida: ahoraLocal(),
+    doctor_alta_id: "",
+    diagnostico_egreso: "",
+    tratamiento_egreso: "",
+    medicamentos_egreso: "",
+    recomendaciones: "",
+    proxima_consulta: "",
+    condicion_egreso: "",
+    notas_alta: "",
+  });
+  const [formAlta, setFormAlta] = useState(formAltaInicial());
   const [guardandoAlta, setGuardandoAlta] = useState(false);
 
   const [modalHistorial, setModalHistorial] = useState(null); // ocupación (para saber el paciente)
@@ -104,8 +127,27 @@ export default function GestionIngresosEgresos() {
 
   const [actualizandoHabitacion, setActualizandoHabitacion] = useState(null); // id de la habitación en proceso
 
+  const [documentos, setDocumentos] = useState([]);
+  const [cargandoDocumentos, setCargandoDocumentos] = useState(false);
+  const [busquedaDocumentos, setBusquedaDocumentos] = useState("");
+  const [rangoDocumentos, setRangoDocumentos] = useState({ desde: "", hasta: "" });
+
   const [mensaje, setMensaje] = useState(null);
   const mostrarMensaje = useCallback((tipo, texto) => setMensaje({ tipo, texto }), []);
+
+  // ---------- Traslado de habitación ----------
+  const [modalTraslado, setModalTraslado] = useState(null); // ocupación seleccionada
+  const [formTraslado, setFormTraslado] = useState({
+    habitacion_destino_id: "",
+    doctor_id: "",
+    motivo: "",
+    fecha_traslado: ahoraLocal(),
+  });
+  const [guardandoTraslado, setGuardandoTraslado] = useState(false);
+
+  const [modalTraslados, setModalTraslados] = useState(null); // ocupación (para ver su historial de traslados)
+  const [traslados, setTraslados] = useState([]);
+  const [cargandoTraslados, setCargandoTraslados] = useState(false);
 
   const cargarActivos = useCallback(
     async (q = busqueda) => {
@@ -149,6 +191,18 @@ export default function GestionIngresosEgresos() {
       .then((res) => activo && setPacientes(lista(res, "paciente")))
       .catch((err) => activo && mostrarMensaje("error", errorTexto(err, "No se pudieron cargar los pacientes.")))
       .finally(() => activo && setCargandoPacientes(false));
+    return () => {
+      activo = false;
+    };
+  }, [mostrarMensaje]);
+
+  useEffect(() => {
+    let activo = true;
+    axios
+      .get(`${API_URL}/doctores-completo`)
+      .then((res) => activo && setDoctores(lista(res)))
+      .catch((err) => activo && mostrarMensaje("error", errorTexto(err, "No se pudieron cargar los doctores.")))
+      .finally(() => activo && setCargandoDoctores(false));
     return () => {
       activo = false;
     };
@@ -202,7 +256,7 @@ export default function GestionIngresosEgresos() {
   // ---------- Dar de alta ----------
   const abrirAlta = (ocupacion) => {
     setModalAlta(ocupacion);
-    setFormAlta({ fecha_salida: ahoraLocal(), notas_alta: "" });
+    setFormAlta(formAltaInicial());
   };
 
   const confirmarAlta = async (e) => {
@@ -211,7 +265,14 @@ export default function GestionIngresosEgresos() {
     setMensaje(null);
     setGuardandoAlta(true);
     try {
-      await axios.post(`${API_URL}/hospitalizaciones/${modalAlta.id}/alta`, formAlta);
+      await axios.post(`${API_URL}/hospitalizaciones/${modalAlta.id}/alta`, {
+        ...formAlta,
+        tratamiento_egreso: formAlta.tratamiento_egreso || null,
+        medicamentos_egreso: formAlta.medicamentos_egreso || null,
+        recomendaciones: formAlta.recomendaciones || null,
+        proxima_consulta: formAlta.proxima_consulta || null,
+        notas_alta: formAlta.notas_alta || null,
+      });
       mostrarMensaje("ok", "Alta registrada. La habitación quedó libre para limpieza.");
       setModalAlta(null);
       cargarActivos();
@@ -223,7 +284,7 @@ export default function GestionIngresosEgresos() {
     }
   };
 
-  // ---------- Historial ----------
+  // ---------- Historial de estancias ----------
   const abrirHistorial = async (ocupacion) => {
     setModalHistorial(ocupacion);
     setCargandoHistorial(true);
@@ -271,6 +332,99 @@ export default function GestionIngresosEgresos() {
     }
   };
 
+  // ---------- Historial de documentos (consentimientos) ----------
+  const [finalizandoDocumento, setFinalizandoDocumento] = useState(null);
+
+  const cargarDocumentos = useCallback(async () => {
+    setCargandoDocumentos(true);
+    try {
+      const params = {};
+      if (busquedaDocumentos) params.buscar = busquedaDocumentos;
+      if (rangoDocumentos.desde) params.desde = rangoDocumentos.desde;
+      if (rangoDocumentos.hasta) params.hasta = rangoDocumentos.hasta;
+      const res = await axios.get(`${API_URL}/consentimientos`, { params });
+      setDocumentos(lista(res));
+    } catch (err) {
+      mostrarMensaje("error", errorTexto(err, "No se pudieron cargar los documentos."));
+    } finally {
+      setCargandoDocumentos(false);
+    }
+  }, [busquedaDocumentos, rangoDocumentos, mostrarMensaje]);
+
+  useEffect(() => {
+    if (tab === "documentos") cargarDocumentos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "documentos") return;
+    const t = setTimeout(() => cargarDocumentos(), 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busquedaDocumentos, rangoDocumentos]);
+
+  const finalizarDocumento = async (consentimiento) => {
+    setMensaje(null);
+    setFinalizandoDocumento(consentimiento.id);
+    try {
+      await axios.post(`${API_URL}/consentimientos/${consentimiento.id}/finalizar`);
+      mostrarMensaje("ok", `Documento #${consentimiento.id} marcado como Finalizado.`);
+      cargarDocumentos();
+    } catch (err) {
+      mostrarMensaje("error", errorTexto(err, "No se pudo finalizar el documento."));
+    } finally {
+      setFinalizandoDocumento(null);
+    }
+  };
+
+  // ---------- Traslado de paciente ----------
+  const abrirTraslado = (ocupacion) => {
+    setModalTraslado(ocupacion);
+    setFormTraslado({
+      habitacion_destino_id: "",
+      doctor_id: "",
+      motivo: "",
+      fecha_traslado: ahoraLocal(),
+    });
+  };
+
+  const confirmarTraslado = async (e) => {
+    e.preventDefault();
+    if (!modalTraslado) return;
+    setMensaje(null);
+    setGuardandoTraslado(true);
+    try {
+      await axios.post(`${API_URL}/hospitalizaciones/${modalTraslado.id}/traslado`, {
+        habitacion_destino_id: Number(formTraslado.habitacion_destino_id),
+        doctor_id: formTraslado.doctor_id ? Number(formTraslado.doctor_id) : null,
+        motivo: formTraslado.motivo || null,
+        fecha_traslado: formTraslado.fecha_traslado || null,
+      });
+      mostrarMensaje("ok", "Paciente trasladado de habitación.");
+      setModalTraslado(null);
+      cargarActivos();
+      cargarHabitaciones();
+    } catch (err) {
+      mostrarMensaje("error", errorTexto(err, "No se pudo trasladar al paciente."));
+    } finally {
+      setGuardandoTraslado(false);
+    }
+  };
+
+  // ---------- Historial de traslados ----------
+  const abrirHistorialTraslados = async (ocupacion) => {
+    setModalTraslados(ocupacion);
+    setCargandoTraslados(true);
+    try {
+      const res = await axios.get(`${API_URL}/hospitalizaciones/${ocupacion.id}/traslados`);
+      setTraslados(lista(res));
+    } catch (err) {
+      mostrarMensaje("error", errorTexto(err, "No se pudo cargar el historial de traslados."));
+    } finally {
+      setCargandoTraslados(false);
+    }
+  };
+
   return (
     <div className="ie-layout">
       <Sidebar />
@@ -313,6 +467,10 @@ export default function GestionIngresosEgresos() {
           <button type="button" className={tab === "habitaciones" ? "is-active" : ""} onClick={() => setTab("habitaciones")}>
             <DoorOpen size={15} />
             Habitaciones
+          </button>
+          <button type="button" className={tab === "documentos" ? "is-active" : ""} onClick={() => setTab("documentos")}>
+            <FileText size={15} />
+            Documentos
           </button>
         </nav>
 
@@ -377,8 +535,15 @@ export default function GestionIngresosEgresos() {
                         <td className="ie-muted">{o.motivo || "—"}</td>
                         <td>
                           <div className="ie-actions">
-                            <button type="button" className="ie-icon-btn" onClick={() => abrirHistorial(o)} title="Ver historial">
+                            <button type="button" className="ie-icon-btn" onClick={() => abrirHistorial(o)} title="Ver historial de estancias">
                               <History size={15} />
+                            </button>
+                            <button type="button" className="ie-icon-btn" onClick={() => abrirHistorialTraslados(o)} title="Ver historial de traslados">
+                              <Route size={15} />
+                            </button>
+                            <button type="button" className="ie-btn-secondary ie-btn-compact" onClick={() => abrirTraslado(o)}>
+                              <ArrowLeftRight size={13} />
+                              Trasladar
                             </button>
                             <button type="button" className="ie-btn-secondary ie-btn-compact" onClick={() => abrirAlta(o)}>
                               <LogOut size={13} />
@@ -639,6 +804,128 @@ export default function GestionIngresosEgresos() {
             </div>
           </section>
         )}
+
+        {tab === "documentos" && (
+          <section className="ie-card">
+            <div className="ie-card-header">
+              <h3>Historial de documentos</h3>
+              <div className="ie-range">
+                <input
+                  type="date"
+                  value={rangoDocumentos.desde}
+                  onChange={(e) => setRangoDocumentos((r) => ({ ...r, desde: e.target.value }))}
+                  className="ie-input ie-input-compact"
+                />
+                <span>a</span>
+                <input
+                  type="date"
+                  value={rangoDocumentos.hasta}
+                  onChange={(e) => setRangoDocumentos((r) => ({ ...r, hasta: e.target.value }))}
+                  className="ie-input ie-input-compact"
+                />
+              </div>
+            </div>
+
+            <div className="ie-search" style={{ marginBottom: 14 }}>
+              <Search size={14} />
+              <input
+                type="search"
+                value={busquedaDocumentos}
+                onChange={(e) => setBusquedaDocumentos(e.target.value)}
+                placeholder="Buscar por paciente"
+              />
+            </div>
+
+            <div className="ie-table-wrap">
+              <table className="ie-table">
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Doctor</th>
+                    <th>Formato</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th className="ie-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cargandoDocumentos ? (
+                    <tr>
+                      <td colSpan={6} className="ie-empty">
+                        <Loader2 size={16} className="ie-spin" /> Cargando...
+                      </td>
+                    </tr>
+                  ) : documentos.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="ie-empty">
+                        No hay documentos registrados en este rango.
+                      </td>
+                    </tr>
+                  ) : (
+                    documentos.map((c) => (
+                      <tr key={c.id}>
+                        <td className="ie-strong">{nombrePaciente(c.paciente)}</td>
+                        <td className="ie-muted">{nombreDoctor(c.doctor)}</td>
+                        <td className="ie-muted">{c.formato?.nombre || "—"}</td>
+                        <td>{formatoFecha(c.created_at)}</td>
+                        <td>
+                          <span
+                            className={`ie-status ${
+                              c.estado === "Finalizado"
+                                ? "is-done"
+                                : c.estado === "Firmado"
+                                ? "is-cleaning"
+                                : c.estado === "Cancelado"
+                                ? "is-off"
+                                : "is-active"
+                            }`}
+                          >
+                            {c.estado || "Pendiente"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="ie-actions">
+                            {c.estado !== "Finalizado" && c.estado !== "Cancelado" && (
+                              <button
+                                type="button"
+                                className="ie-btn-secondary ie-btn-compact"
+                                disabled={finalizandoDocumento === c.id}
+                                onClick={() => finalizarDocumento(c)}
+                              >
+                                {finalizandoDocumento === c.id ? (
+                                  <Loader2 size={13} className="ie-spin" />
+                                ) : (
+                                  <CheckCircle2 size={13} />
+                                )}
+                                Finalizar
+                              </button>
+                            )}
+                            <a
+                              href={`${API_URL}/consentimientos/${c.id}/pdf`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="ie-icon-btn"
+                              title="Ver PDF"
+                            >
+                              <Eye size={15} />
+                            </a>
+                            <a
+                              href={`${API_URL}/consentimientos/${c.id}/pdf?download=1`}
+                              className="ie-icon-btn"
+                              title="Descargar PDF"
+                            >
+                              <Download size={15} />
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
       </div>
 
       {/* ---------- Modal: registrar ingreso ---------- */}
@@ -724,6 +1011,17 @@ export default function GestionIngresosEgresos() {
                   placeholder="Diagnóstico de ingreso"
                 />
               </label>
+              <label className="ie-field">
+  Días estimados de estancia (opcional)
+  <input
+    type="number"
+    min="1"
+    value={formIngreso.dias_estimados}
+    onChange={(e) => setFormIngreso((p) => ({ ...p, dias_estimados: e.target.value }))}
+    className="ie-input"
+    placeholder="Ej. 5"
+  />
+</label>
 
               <label className="ie-field">
                 Motivo de la hospitalización
@@ -753,7 +1051,7 @@ export default function GestionIngresosEgresos() {
       {/* ---------- Modal: dar de alta ---------- */}
       {modalAlta && (
         <div className="ie-overlay" onClick={() => setModalAlta(null)}>
-          <div className="ie-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="ie-modal ie-modal-wide" onClick={(e) => e.stopPropagation()}>
             <div className="ie-modal-header">
               <h3>Dar de alta</h3>
               <button type="button" onClick={() => setModalAlta(null)} aria-label="Cerrar">
@@ -778,7 +1076,19 @@ export default function GestionIngresosEgresos() {
 
             <form onSubmit={confirmarAlta} className="ie-form">
               <label className="ie-field">
-                Fecha y hora de salida
+                Fecha y hora de alta médica
+                <input
+                  type="datetime-local"
+                  required
+                  value={formAlta.fecha_alta_medica}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, fecha_alta_medica: e.target.value }))}
+                  className="ie-input"
+                />
+                <span className="ie-hint">Cuándo el médico decide que el paciente puede egresar.</span>
+              </label>
+
+              <label className="ie-field">
+                Fecha y hora de salida real
                 <input
                   type="datetime-local"
                   required
@@ -786,16 +1096,112 @@ export default function GestionIngresosEgresos() {
                   onChange={(e) => setFormAlta((f) => ({ ...f, fecha_salida: e.target.value }))}
                   className="ie-input"
                 />
+                <span className="ie-hint">Cuándo el paciente físicamente se retira.</span>
               </label>
 
               <label className="ie-field">
-                Notas del alta (opcional)
+                Médico que autoriza el alta
+                {cargandoDoctores ? (
+                  <span className="ie-loading">
+                    <Loader2 size={13} className="ie-spin" /> Cargando...
+                  </span>
+                ) : (
+                  <select
+                    required
+                    value={formAlta.doctor_alta_id}
+                    onChange={(e) => setFormAlta((f) => ({ ...f, doctor_alta_id: e.target.value }))}
+                    className="ie-input"
+                  >
+                    <option value="">Selecciona un doctor</option>
+                    {doctores.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {nombreDoctor(d)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </label>
+
+              <label className="ie-field">
+                Diagnóstico final
+                <input
+                  type="text"
+                  required
+                  value={formAlta.diagnostico_egreso}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, diagnostico_egreso: e.target.value }))}
+                  className="ie-input"
+                  placeholder="Diagnóstico con el que egresa el paciente"
+                />
+              </label>
+
+              <label className="ie-field">
+                Condición del paciente al egresar
+                <select
+                  required
+                  value={formAlta.condicion_egreso}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, condicion_egreso: e.target.value }))}
+                  className="ie-input"
+                >
+                  <option value="">Selecciona una condición</option>
+                  {CONDICIONES_EGRESO.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="ie-field">
+                Tratamiento al egreso
+                <textarea
+                  rows={2}
+                  value={formAlta.tratamiento_egreso}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, tratamiento_egreso: e.target.value }))}
+                  className="ie-input"
+                  placeholder="Indicaciones de tratamiento a seguir en casa"
+                />
+              </label>
+
+              <label className="ie-field">
+                Medicamentos indicados
+                <textarea
+                  rows={2}
+                  value={formAlta.medicamentos_egreso}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, medicamentos_egreso: e.target.value }))}
+                  className="ie-input"
+                  placeholder="Nombre, dosis y frecuencia de cada medicamento"
+                />
+              </label>
+
+              <label className="ie-field">
+                Recomendaciones
+                <textarea
+                  rows={2}
+                  value={formAlta.recomendaciones}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, recomendaciones: e.target.value }))}
+                  className="ie-input"
+                  placeholder="Cuidados, dieta, actividad física, signos de alarma..."
+                />
+              </label>
+
+              <label className="ie-field">
+                Próxima consulta (opcional)
+                <input
+                  type="date"
+                  value={formAlta.proxima_consulta}
+                  onChange={(e) => setFormAlta((f) => ({ ...f, proxima_consulta: e.target.value }))}
+                  className="ie-input"
+                />
+              </label>
+
+              <label className="ie-field">
+                Notas adicionales (opcional)
                 <textarea
                   rows={2}
                   value={formAlta.notas_alta}
                   onChange={(e) => setFormAlta((f) => ({ ...f, notas_alta: e.target.value }))}
                   className="ie-input"
-                  placeholder="Indicaciones al egreso, observaciones..."
+                  placeholder="Cualquier otra observación del alta"
                 />
               </label>
 
@@ -864,6 +1270,169 @@ export default function GestionIngresosEgresos() {
                           </span>
                         </td>
                         <td className="ie-muted">{h.motivo || "—"}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---------- Modal: trasladar de habitación ---------- */}
+      {modalTraslado && (
+        <div className="ie-overlay" onClick={() => setModalTraslado(null)}>
+          <div className="ie-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ie-modal-header">
+              <h3>Trasladar de habitación</h3>
+              <button type="button" onClick={() => setModalTraslado(null)} aria-label="Cerrar">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="ie-summary">
+              <div>
+                <small>Paciente</small>
+                <strong>{nombrePaciente(modalTraslado.paciente)}</strong>
+              </div>
+              <div>
+                <small>Habitación actual</small>
+                <strong>{modalTraslado.habitacion ? `Hab. ${modalTraslado.habitacion.numero}` : "—"}</strong>
+              </div>
+            </div>
+
+            <form onSubmit={confirmarTraslado} className="ie-form">
+              <label className="ie-field">
+                Habitación destino
+                {cargandoHabitaciones ? (
+                  <span className="ie-loading">
+                    <Loader2 size={13} className="ie-spin" /> Cargando...
+                  </span>
+                ) : (
+                  <select
+                    required
+                    value={formTraslado.habitacion_destino_id}
+                    onChange={(e) => setFormTraslado((f) => ({ ...f, habitacion_destino_id: e.target.value }))}
+                    className="ie-input"
+                  >
+                    <option value="">Selecciona una habitación disponible</option>
+                    {habitacionesDisponibles.map((h) => (
+                      <option key={h.id} value={h.id}>
+                        Hab. {h.numero}
+                        {h.piso ? ` · Piso ${h.piso}` : ""}
+                        {h.tipo ? ` · ${h.tipo}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {!cargandoHabitaciones && habitacionesDisponibles.length === 0 && (
+                  <span className="ie-hint">No hay habitaciones disponibles ahora mismo.</span>
+                )}
+              </label>
+
+              <label className="ie-field">
+                Fecha y hora del traslado
+                <input
+                  type="datetime-local"
+                  required
+                  value={formTraslado.fecha_traslado}
+                  onChange={(e) => setFormTraslado((f) => ({ ...f, fecha_traslado: e.target.value }))}
+                  className="ie-input"
+                />
+                <span className="ie-hint">Cuándo se mueve físicamente al paciente a la nueva habitación.</span>
+              </label>
+
+              <label className="ie-field">
+                Doctor que autoriza (opcional)
+                {cargandoDoctores ? (
+                  <span className="ie-loading">
+                    <Loader2 size={13} className="ie-spin" /> Cargando...
+                  </span>
+                ) : (
+                  <select
+                    value={formTraslado.doctor_id}
+                    onChange={(e) => setFormTraslado((f) => ({ ...f, doctor_id: e.target.value }))}
+                    className="ie-input"
+                  >
+                    <option value="">Sin especificar</option>
+                    {doctores.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {nombreDoctor(d)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </label>
+
+              <label className="ie-field">
+                Motivo del traslado
+                <textarea
+                  rows={2}
+                  value={formTraslado.motivo}
+                  onChange={(e) => setFormTraslado((f) => ({ ...f, motivo: e.target.value }))}
+                  className="ie-input"
+                  placeholder="Ej. necesita monitoreo en UCI, cambio de piso por disponibilidad..."
+                />
+              </label>
+
+              <div className="ie-modal-actions">
+                <button type="button" className="ie-btn-cancel" onClick={() => setModalTraslado(null)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="ie-btn-primary" disabled={guardandoTraslado}>
+                  {guardandoTraslado && <Loader2 size={14} className="ie-spin" />}
+                  Confirmar traslado
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------- Modal: historial de traslados ---------- */}
+      {modalTraslados && (
+        <div className="ie-overlay" onClick={() => setModalTraslados(null)}>
+          <div className="ie-modal ie-modal-wide" onClick={(e) => e.stopPropagation()}>
+            <div className="ie-modal-header">
+              <h3>Historial de traslados — {nombrePaciente(modalTraslados.paciente)}</h3>
+              <button type="button" onClick={() => setModalTraslados(null)} aria-label="Cerrar">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="ie-table-wrap">
+              <table className="ie-table">
+                <thead>
+                  <tr>
+                    <th>De</th>
+                    <th>A</th>
+                    <th>Fecha</th>
+                    <th>Autorizó</th>
+                    <th>Motivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cargandoTraslados ? (
+                    <tr>
+                      <td colSpan={5} className="ie-empty">
+                        <Loader2 size={16} className="ie-spin" /> Cargando...
+                      </td>
+                    </tr>
+                  ) : traslados.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="ie-empty">
+                        Sin traslados registrados para esta estancia.
+                      </td>
+                    </tr>
+                  ) : (
+                    traslados.map((t) => (
+                      <tr key={t.id}>
+                        <td className="ie-muted">{t.habitacionOrigen ? `Hab. ${t.habitacionOrigen.numero}` : "—"}</td>
+                        <td className="ie-strong">{t.habitacionDestino ? `Hab. ${t.habitacionDestino.numero}` : "—"}</td>
+                        <td>{formatoFecha(t.fecha_traslado)}</td>
+                        <td className="ie-muted">{t.doctor ? nombreDoctor(t.doctor) : "—"}</td>
+                        <td className="ie-muted">{t.motivo || "—"}</td>
                       </tr>
                     ))
                   )}

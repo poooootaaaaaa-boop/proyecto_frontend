@@ -33,6 +33,10 @@
   font-size: 15px;
 }
 
+.alerta-flotante {
+  margin-bottom: 20px;
+}
+
 /* ========================================
    TARJETAS PRINCIPALES
 ======================================== */
@@ -50,13 +54,307 @@
 }
 
 /* ========================================
+   TARJETAS RESUMEN (clicables, cambian de pestaña)
+======================================== */
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #ffffff;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  padding: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(31, 63, 163, 0.08);
+  transition: all .2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(31, 63, 163, 0.14);
+}
+
+.stat-card.activo {
+  border-color: #1f3fa3;
+  background: linear-gradient(135deg, #eef3ff, #ffffff);
+}
+
+.stat-card h2 {
+  margin: 0;
+  font-weight: 800;
+  color: #1f3fa3;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.stat-card small {
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: 11px;
+}
+
+.stat-icono {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: white;
+}
+
+.stat-card.tone-consultorio .stat-icono {
+  background: linear-gradient(135deg, #1f3fa3, #284fc7);
+}
+
+.stat-card.tone-habitacion .stat-icono {
+  background: linear-gradient(135deg, #3458d4, #3d63d8);
+}
+
+.stat-card.tone-instrumento .stat-icono {
+  background: linear-gradient(135deg, #2563eb, #3d63d8);
+}
+
+/* ========================================
+   PESTAÑAS
+======================================== */
+
+.tabs-modernas {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 8px 20px rgba(31, 63, 163, 0.06);
+  margin-bottom: 22px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tabs-modernas .nav-link {
+  border-radius: 12px;
+  color: #23335d;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  transition: all .2s ease;
+}
+
+.tabs-modernas .nav-link:hover {
+  background: #eef3ff;
+}
+
+.tabs-modernas .nav-link.active {
+  background: linear-gradient(135deg, #1f3fa3, #284fc7) !important;
+  color: white !important;
+  box-shadow: 0 6px 16px rgba(31, 63, 163, .25);
+}
+
+/* ========================================
+   TARJETAS DE FORMULARIO / LISTA
+======================================== */
+
+.form-card-titulo {
+  font-weight: 700;
+  color: #23335d;
+  margin-bottom: 18px;
+}
+
+.lista-card {
+  height: 100%;
+}
+
+.seccion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eef2fa;
+}
+
+.seccion-header h5 {
+  margin: 0;
+  font-weight: 700;
+  color: #23335d;
+}
+
+.contador-pill {
+  background: #eef3ff;
+  color: #1f3fa3;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+
+/* Banner que aparece arriba del formulario cuando se está editando */
+.modo-edicion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff7e6;
+  color: #92620a;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.modo-edicion button {
+  border: none;
+  background: transparent;
+  color: #92620a;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ========================================
+   LISTAS TIPO TARJETA (reemplazan las tablas planas)
+======================================== */
+
+.lista-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 560px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f9fbff;
+  border: 1px solid #eef2fa;
+  border-radius: 14px;
+  padding: 12px 14px;
+  transition: all .2s ease;
+}
+
+.item-row:hover {
+  background: #f2f6ff;
+  border-color: #d7def0;
+}
+
+.item-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 16px;
+}
+
+.item-avatar.tone-consultorio {
+  background: linear-gradient(135deg, #1f3fa3, #284fc7);
+}
+
+.item-avatar.tone-habitacion {
+  background: linear-gradient(135deg, #3458d4, #3d63d8);
+}
+
+.item-avatar.tone-instrumento {
+  background: linear-gradient(135deg, #2563eb, #3d63d8);
+}
+
+.item-avatar.tone-asignacion {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-title {
+  font-weight: 700;
+  color: #23335d;
+  font-size: 14.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-subtitle {
+  color: #64748b;
+  font-size: 12.5px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-badge {
+  flex-shrink: 0;
+}
+
+.item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f5;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.icon-btn-edit:hover {
+  background: #eef3ff;
+  border-color: #1f3fa3;
+}
+
+.icon-btn-delete:hover {
+  background: #fdeced;
+  border-color: #f5b5b0;
+}
+
+/* Estado vacío */
+.lista-vacia {
+  text-align: center;
+  padding: 50px 20px;
+  color: #94a3b8;
+}
+
+.lista-vacia-icono {
+  font-size: 36px;
+  margin-bottom: 10px;
+  opacity: .6;
+}
+
+.lista-vacia p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ========================================
    INPUTS
 ======================================== */
 
 .form-control,
 .form-select {
   border-radius: 12px !important;
-  min-height: 48px;
+  min-height: 46px;
   border: 1px solid #d7def0 !important;
   box-shadow: none !important;
 }
@@ -70,7 +368,8 @@
 .form-label {
   font-weight: 600;
   color: #23335d;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  font-size: 13.5px;
 }
 
 /* ========================================
@@ -78,20 +377,11 @@
 ======================================== */
 
 .btn-primary-modern {
-  background: linear-gradient(
-    135deg,
-    #1f3fa3,
-    #284fc7
-  ) !important;
-
+  background: linear-gradient(135deg, #1f3fa3, #284fc7) !important;
   border: none !important;
-
   border-radius: 12px !important;
-
   padding: 12px 22px !important;
-
   font-weight: 600 !important;
-
   transition: all .25s ease;
 }
 
@@ -112,8 +402,14 @@
   color: white;
 }
 
+.card-modern-consultorio .btn-secondary,
+.page-consultorio .btn-secondary {
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 /* ========================================
-   DOCTORES
+   DOCTORES (sin cambios, se mantienen para otras vistas)
 ======================================== */
 
 .doctor-card {
@@ -132,11 +428,7 @@
 
 .doctor-card.selected {
   border-color: #1f3fa3;
-  background: linear-gradient(
-    135deg,
-    #eef3ff,
-    #ffffff
-  );
+  background: linear-gradient(135deg, #eef3ff, #ffffff);
   box-shadow: 0 8px 20px rgba(31,63,163,.15);
 }
 
@@ -151,7 +443,7 @@
 }
 
 /* ========================================
-   CONSULTORIOS
+   CONSULTORIOS (tarjetas seleccionables usadas en otras vistas)
 ======================================== */
 
 .consultorio-card {
@@ -179,13 +471,10 @@
   background: #1f3fa3;
   color: white;
   border-radius: 15px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 22px;
-
   margin-bottom: 15px;
 }
 
@@ -222,21 +511,13 @@
 ======================================== */
 
 .tipo-pago-card {
-
   background: white;
-
   border: 2px solid #e7ebf7;
-
   border-radius: 20px;
-
   text-align: center;
-
   padding: 25px 15px;
-
   cursor: pointer;
-
   transition: all .25s ease;
-
   height: 100%;
 }
 
@@ -253,25 +534,14 @@
 .tipo-pago-icon {
   width: 70px;
   height: 70px;
-
-  background: linear-gradient(
-    135deg,
-    #1f3fa3,
-    #3d63d8
-  );
-
+  background: linear-gradient(135deg, #1f3fa3, #3d63d8);
   color: white;
-
   margin: auto;
-
   border-radius: 18px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 28px;
-
   margin-bottom: 15px;
 }
 
@@ -287,158 +557,110 @@
 .alert {
   border-radius: 14px !important;
   border: none !important;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: #e6f6ee !important;
+  color: #16794f !important;
+}
+
+.alert-danger {
+  background: #fdeced !important;
+  color: #b3261e !important;
 }
 
 /* ========================================
-   TABLAS
+   BADGES DE ESTADO
 ======================================== */
 
-.table-modern {
-  border-radius: 15px;
-  overflow: hidden;
+.badge {
+  font-weight: 600 !important;
+  font-size: 11.5px !important;
+  padding: 5px 11px !important;
+  border-radius: 999px !important;
+  letter-spacing: .01em;
 }
 
-.table-modern thead {
-  background: #1f3fa3;
-  color: white;
-}
-
-.table-modern tbody tr:hover {
-  background: #f6f9ff;
-}
-
-
+/* ========================================
+   PREVIEW DE CONSULTORIO (si se usa en otras vistas)
+======================================== */
 
 .consultorio-preview {
-
   background: white;
-
   border-radius: 20px;
-
   padding: 25px;
-
   text-align: center;
-
   box-shadow: 0 10px 30px rgba(0,0,0,.08);
 }
 
+.consultorio-preview h5 {
+  font-weight: 700;
+  color: #23335d;
+  margin-bottom: 18px;
+}
+
+.consultorio-preview h6 {
+  font-weight: 700;
+  color: #23335d;
+  margin: 10px 0 8px;
+}
+
+.consultorio-preview p {
+  color: #64748b;
+  font-size: 14px;
+}
+
 .consultorio-box {
-
   width: 120px;
-
   height: 120px;
-
   margin: auto;
-
   border-radius: 20px;
-
-  background: linear-gradient(
-    135deg,
-    #1f3fa3,
-    #3458d4
-  );
-
+  background: linear-gradient(135deg, #1f3fa3, #3458d4);
   color: white;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 35px;
   font-weight: bold;
-
   margin-bottom: 15px;
 }
 
-.table-modern thead {
-
-  background: #1f3fa3;
-
-  color: white;
-}
-
-.table-modern thead th {
-
-  border: none !important;
-}
-
-.table-modern tbody tr {
-
-  transition: .2s;
-}
-
-.table-modern tbody tr:hover {
-
-  background: #f3f7ff;
-}
-
-
-
-
 /* ========================================
-   TARJETAS DOCTORES
+   TARJETAS DOCTORES (pago)
 ======================================== */
-
 
 .doctor-card-pago {
   display: flex;
   align-items: center;
   gap: 20px;
-
-  background: linear-gradient(
-    135deg,
-    #ffffff,
-    #f4f9ff
-  );
-
+  background: linear-gradient(135deg, #ffffff, #f4f9ff);
   border: 2px solid #dbeafe;
-
   border-radius: 20px;
-
   padding: 18px;
-
   cursor: pointer;
-
   transition: all .3s ease;
-
   position: relative;
-
   overflow: hidden;
 }
 
 .doctor-card-pago:hover {
   transform: translateY(-4px);
-
-  box-shadow:
-    0 10px 30px
-    rgba(37,99,235,.15);
+  box-shadow: 0 10px 30px rgba(37,99,235,.15);
 }
 
 .doctor-card-pago.selected {
-
   border-color: #2563eb;
-
-  background: linear-gradient(
-    135deg,
-    #eff6ff,
-    #dbeafe
-  );
-
-  box-shadow:
-    0 10px 30px
-    rgba(37,99,235,.25);
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  box-shadow: 0 10px 30px rgba(37,99,235,.25);
 }
 
 .doctor-photo {
   width: 90px;
   height: 90px;
-
   border-radius: 14px;
-
   overflow: hidden;
-
   border: 3px solid #2563eb;
-
   flex-shrink: 0;
 }
 
@@ -469,45 +691,70 @@
 }
 
 .doctor-check {
-
   width: 45px;
   height: 45px;
-
   border-radius: 50%;
-
   background: #2563eb;
-
   color: white;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 22px;
   font-weight: bold;
 }
 
 .doctor-card-pago::before {
   content: "";
-
   position: absolute;
-
   top: 0;
   left: 0;
-
   width: 8px;
   height: 100%;
-
   background: #2563eb;
 }
 
+/* ========================================
+   MODAL DE CONFIRMACIÓN
+======================================== */
+
+.modal-modern .modal-content {
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(15, 30, 80, .2);
+}
+
+.modal-modern .modal-header {
+  border-bottom: 1px solid #eef2fa;
+  padding: 20px 24px;
+}
+
+.modal-modern .modal-title {
+  font-weight: 700;
+  color: #23335d;
+  font-size: 18px;
+}
+
+.modal-modern .modal-body {
+  padding: 22px 24px;
+  color: #475569;
+}
+
+.modal-modern .modal-footer {
+  border-top: 1px solid #eef2fa;
+  padding: 16px 24px;
+}
+
+.modal-modern .btn-danger,
+.modal-modern .btn-secondary {
+  border-radius: 10px;
+  font-weight: 600;
+}
 
 /* ========================================
    RESPONSIVE
 ======================================== */
 
 @media (max-width: 768px) {
-
   .page-consultorio {
     padding: 15px;
   }
@@ -517,7 +764,7 @@
   }
 
   .consultorio-header h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .doctor-card,
@@ -526,4 +773,21 @@
     margin-bottom: 15px;
   }
 
+  .tabs-modernas {
+    justify-content: center;
+  }
+
+  .tabs-modernas .nav-link {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .item-title,
+  .item-subtitle {
+    white-space: normal;
+  }
 }

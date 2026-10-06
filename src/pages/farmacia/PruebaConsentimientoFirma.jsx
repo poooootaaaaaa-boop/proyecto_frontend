@@ -416,7 +416,8 @@ export default function PruebaConsentimientoFirma() {
   const urlPdf = (descargar = false) =>
     `${API_URL}/consentimientos/${consentimiento.id}/pdf${descargar ? "?download=1" : ""}`;
 
-  // ---- 4) Finalizar el proceso: descarga el documento y cierra este consentimiento ----
+  // ---- 4) Finalizar el proceso: marca el documento como Finalizado en el
+  // backend, descarga el PDF final y cierra este consentimiento ----
   const finalizarProceso = async () => {
     if (!consentimiento?.id || finalizando) return;
 
@@ -428,6 +429,11 @@ export default function PruebaConsentimientoFirma() {
     setMensaje(null);
     setFinalizando(true);
     try {
+      // Esto es lo que realmente cierra el documento en la base de datos
+      // (antes solo se descargaba el PDF y nunca se avisaba al backend).
+      const res = await api.post(`/consentimientos/${consentimiento.id}/finalizar`);
+      setConsentimiento((prev) => ({ ...prev, ...(res.data?.data ?? { estado: "Finalizado" }) }));
+
       // Dispara la descarga forzada del PDF (misma ruta que "Descargar")
       const enlace = document.createElement("a");
       enlace.href = urlPdf(true);
@@ -868,7 +874,7 @@ export default function PruebaConsentimientoFirma() {
               <section className="consent-card">
                 <div className="consent-card-header consent-card-header-split">
                   <h3>Firmas</h3>
-                  <span className={`consent-badge ${consentimiento.estado === "Firmado" ? "is-signed" : "is-pending"}`}>
+                  <span className={`consent-badge ${["Firmado", "Finalizado"].includes(consentimiento.estado) ? "is-signed" : "is-pending"}`}>
                     {consentimiento.estado}
                   </span>
                 </div>

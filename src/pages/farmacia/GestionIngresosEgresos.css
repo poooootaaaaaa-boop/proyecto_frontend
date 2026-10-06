@@ -292,6 +292,7 @@
   color: #2563eb;
   cursor: pointer;
   transition: all 0.15s;
+  text-decoration: none;
 }
 
 .ie-icon-btn:hover {
