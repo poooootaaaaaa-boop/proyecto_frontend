@@ -19,3 +19,14 @@ export const loginUser = async (data) => {
   const response = await axios.post(`${API_URL}/login`, data);
   return response.data;
 };
+
+export const loginWithFace = async (faceEmbedding) => {
+  const response = await axios.post(
+    `${API_URL}/login-rostro`,
+    {
+      face_embedding: JSON.stringify(faceEmbedding)
+    }
+  );
+
+  return response.data;
+};
