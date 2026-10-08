@@ -23,6 +23,7 @@ import DocumentoControlAlimento from "../pages/farmacia/DocumentoControlAlimento
 import ReporteHabitacion from "../pages/farmacia/ReporteHabitacion";
 
 import PruebaConsentimientoFirma from "../pages/farmacia/PruebaConsentimientoFirma";
+import GestionIngresosEgresos from "../pages/farmacia/GestionIngresosEgresos"; // nuevo: ingresos/altas/historial/reportes
 
 import DocumentoReporte  from "../pages/farmacia/DocumentoReporte";
 import ControlAlimientos from "../pages/farmacia/ControlAlimientos";
@@ -36,6 +37,7 @@ export default function FarmaciaRoutes(){
             <Route path="prueba" element={<Stock />} />
             <Route path="manifesto-residuo" element={<ManifestoResiduo />} /> /* nuevo*/
             <Route path="medicinas-caducadas" element={<MedicinasCaducacadas />} /> /* nuevo*/
+            <Route path="ingresos-egresos" element={<GestionIngresosEgresos />} /> /* nuevo*/
 
             <Route path="Home" element={<HomeFarmacia />}/>
             <Route path="RecetasMedicas" element={<Recetas />}/>

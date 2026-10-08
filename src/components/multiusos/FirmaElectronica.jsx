@@ -1,221 +1,277 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Eraser, RotateCcw, Check, PenLine } from "lucide-react";
+import { Eraser, RotateCcw, Check, PenLine, Loader2 } from "lucide-react";
+import "./FirmaElectronica.css";
 
 /**
  * FirmaElectronica
- * Componente reutilizable de firma electrónica sobre <canvas>.
- * Funciona con mouse, touch (móvil/tablet) y pantallas táctiles con lápiz.
+ * Lienzo de firma para mouse, dedo y lápiz (Pointer Events).
  *
- * Props:
- * - onGuardar(dataUrl: string): callback que recibe la firma como imagen PNG en base64.
- * - onCambio(vacia: boolean): callback opcional que se dispara cada vez que cambia el trazo.
- * - ancho, alto: dimensiones del lienzo (por defecto 500x200).
- * - colorTrazo: color de la tinta (por defecto un azul tinta).
- * - grosorTrazo: grosor del trazo en px.
- * - etiqueta: texto que aparece arriba del componente.
- * - deshabilitado: si true, bloquea la firma (modo solo lectura).
+ * Mejoras respecto a la versión anterior:
+ * - Se adapta al ancho del contenedor (antes tenía 500 px fijos y se salía en móvil).
+ * - Trazo suavizado con curvas; los trazos se guardan normalizados, así que
+ *   sobreviven a cambios de tamaño de pantalla o rotación del dispositivo.
+ * - Exporta un PNG transparente recortado al contorno de la firma, en alta resolución.
+ *   Así entra bien en el recuadro del PDF sin bordes vacíos.
+ * - Rechaza firmas vacías o demasiado cortas (un punto o una raya).
+ * - Ya no depende de Tailwind: usa FirmaElectronica.css.
  *
- * Uso:
- * <FirmaElectronica onGuardar={(dataUrl) => console.log(dataUrl)} />
+ * Props (las anteriores siguen funcionando):
+ * - onGuardar(dataUrl)  → PNG en base64 (data URL).
+ * - onCambio(vacia)     → se llama cuando el lienzo pasa de vacío a con trazo y al revés.
+ * - ancho, alto         → proporción y tamaño máximo del lienzo (500x200 por defecto).
+ * - colorTrazo, grosorTrazo
+ * - etiqueta            → texto de la cabecera.
+ * - textoGuardar        → texto del botón principal.
+ * - guardando           → muestra un spinner y bloquea el componente mientras se envía.
+ * - deshabilitado       → modo solo lectura.
  */
 export default function FirmaElectronica({
   onGuardar,
   onCambio,
   ancho = 500,
   alto = 200,
-  colorTrazo = "#1e3a5f",
-  grosorTrazo = 2.5,
+  colorTrazo = "#0e2a3b",
+  grosorTrazo = 2.4,
   etiqueta = "Firme dentro del recuadro",
+  textoGuardar = "Guardar firma",
+  guardando = false,
   deshabilitado = false,
 }) {
+  const contenedorRef = useRef(null);
   const canvasRef = useRef(null);
-  const contextoRef = useRef(null);
+  const trazosRef = useRef([]); // [[{x,y}, ...], ...] con x,y normalizados (0..1)
   const dibujandoRef = useRef(false);
-  const trazosRef = useRef([]); // historial de trazos para "deshacer"
+  const tamanoRef = useRef({ w: ancho, h: alto });
+
   const [vacio, setVacio] = useState(true);
   const [guardado, setGuardado] = useState(false);
-  const [factorEscala, setFactorEscala] = useState(1);
+  const [aviso, setAviso] = useState("");
 
-  // Configura el canvas considerando la densidad de píxeles (retina/hiDPI)
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const dpr = window.devicePixelRatio || 1;
-    setFactorEscala(dpr);
+  const bloqueado = deshabilitado || guardando;
 
-    canvas.width = ancho * dpr;
-    canvas.height = alto * dpr;
-    canvas.style.width = `${ancho}px`;
-    canvas.style.height = `${alto}px`;
+  // ---- Dibujo ----------------------------------------------------------
+  const pintarTrazo = useCallback(
+    (ctx, trazo, w, h, grosor) => {
+      ctx.strokeStyle = colorTrazo;
+      ctx.fillStyle = colorTrazo;
+      ctx.lineWidth = grosor;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
 
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = colorTrazo;
-    ctx.lineWidth = grosorTrazo;
-    contextoRef.current = ctx;
-  }, [ancho, alto, colorTrazo, grosorTrazo]);
-
-  const obtenerPosicion = useCallback((evento) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const esTouch = evento.touches && evento.touches.length > 0;
-    const clienteX = esTouch ? evento.touches[0].clientX : evento.clientX;
-    const clienteY = esTouch ? evento.touches[0].clientY : evento.clientY;
-    return {
-      x: clienteX - rect.left,
-      y: clienteY - rect.top,
-    };
-  }, []);
-
-  const iniciarTrazo = useCallback(
-    (evento) => {
-      if (deshabilitado) return;
-      evento.preventDefault();
-      const ctx = contextoRef.current;
-      const { x, y } = obtenerPosicion(evento);
-      dibujandoRef.current = true;
+      const p = trazo.map((pt) => ({ x: pt.x * w, y: pt.y * h }));
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      trazosRef.current.push([{ x, y }]);
-    },
-    [deshabilitado, obtenerPosicion]
-  );
-
-  const continuarTrazo = useCallback(
-    (evento) => {
-      if (!dibujandoRef.current || deshabilitado) return;
-      evento.preventDefault();
-      const ctx = contextoRef.current;
-      const { x, y } = obtenerPosicion(evento);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      const trazoActual = trazosRef.current[trazosRef.current.length - 1];
-      trazoActual.push({ x, y });
-
-      if (vacio) {
-        setVacio(false);
-        setGuardado(false);
-        onCambio?.(false);
+      if (p.length === 1) {
+        ctx.arc(p[0].x, p[0].y, grosor / 2, 0, Math.PI * 2);
+        ctx.fill();
+        return;
       }
+      ctx.moveTo(p[0].x, p[0].y);
+      for (let i = 1; i < p.length - 1; i++) {
+        const mx = (p[i].x + p[i + 1].x) / 2;
+        const my = (p[i].y + p[i + 1].y) / 2;
+        ctx.quadraticCurveTo(p[i].x, p[i].y, mx, my);
+      }
+      ctx.lineTo(p[p.length - 1].x, p[p.length - 1].y);
+      ctx.stroke();
     },
-    [deshabilitado, obtenerPosicion, vacio, onCambio]
+    [colorTrazo]
   );
 
-  const finalizarTrazo = useCallback(() => {
-    dibujandoRef.current = false;
-  }, []);
+  const redibujar = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const { w, h } = tamanoRef.current;
+    const dpr = window.devicePixelRatio || 1;
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    const grosor = grosorTrazo * (w / ancho);
+    trazosRef.current.forEach((t) => pintarTrazo(ctx, t, w, h, grosor));
+  }, [ancho, grosorTrazo, pintarTrazo]);
 
-  const limpiar = useCallback(() => {
-    const ctx = contextoRef.current;
-    ctx.clearRect(0, 0, ancho, alto);
+  // ---- Ajuste al ancho del contenedor ------------------------------------
+  useEffect(() => {
+    const contenedor = contenedorRef.current;
+    const canvas = canvasRef.current;
+    if (!contenedor || !canvas) return undefined;
+
+    const ajustar = () => {
+      const w = Math.max(200, Math.min(ancho, Math.floor(contenedor.clientWidth)));
+      const h = Math.round((w * alto) / ancho);
+      const dpr = window.devicePixelRatio || 1;
+      tamanoRef.current = { w, h };
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      redibujar();
+    };
+
+    ajustar();
+    const observador = new ResizeObserver(ajustar);
+    observador.observe(contenedor);
+    return () => observador.disconnect();
+  }, [ancho, alto, redibujar]);
+
+  // ---- Eventos del puntero -----------------------------------------------
+  const posicion = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    return {
+      x: Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)),
+      y: Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height)),
+    };
+  };
+
+  const alPresionar = (e) => {
+    if (bloqueado) return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dibujandoRef.current = true;
+    trazosRef.current.push([posicion(e)]);
+    setAviso("");
+    redibujar();
+  };
+
+  const alMover = (e) => {
+    if (!dibujandoRef.current || bloqueado) return;
+    e.preventDefault();
+    const trazo = trazosRef.current[trazosRef.current.length - 1];
+    trazo.push(posicion(e));
+    redibujar();
+    if (vacio) {
+      setVacio(false);
+      setGuardado(false);
+      onCambio?.(false);
+    }
+  };
+
+  const alSoltar = (e) => {
+    if (!dibujandoRef.current) return;
+    dibujandoRef.current = false;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+    // Un toque sin movimiento también cuenta como trazo (punto).
+    if (vacio && trazosRef.current.length > 0) {
+      setVacio(false);
+      setGuardado(false);
+      onCambio?.(false);
+    }
+  };
+
+  // ---- Acciones ------------------------------------------------------------
+  const limpiar = () => {
     trazosRef.current = [];
     setVacio(true);
     setGuardado(false);
+    setAviso("");
+    redibujar();
     onCambio?.(true);
-  }, [ancho, alto, onCambio]);
+  };
 
-  const deshacer = useCallback(() => {
+  const deshacer = () => {
     if (trazosRef.current.length === 0) return;
     trazosRef.current.pop();
-    const ctx = contextoRef.current;
-    ctx.clearRect(0, 0, ancho, alto);
-
-    trazosRef.current.forEach((trazo) => {
-      ctx.beginPath();
-      trazo.forEach((punto, indice) => {
-        if (indice === 0) ctx.moveTo(punto.x, punto.y);
-        else ctx.lineTo(punto.x, punto.y);
-      });
-      ctx.stroke();
-    });
-
-    const quedaVacio = trazosRef.current.length === 0;
-    setVacio(quedaVacio);
+    const queda = trazosRef.current.length === 0;
+    setVacio(queda);
     setGuardado(false);
-    onCambio?.(quedaVacio);
-  }, [ancho, alto, onCambio]);
+    setAviso("");
+    redibujar();
+    onCambio?.(queda);
+  };
 
-  const guardar = useCallback(() => {
-    if (vacio) return;
-    const canvas = canvasRef.current;
-    const dataUrl = canvas.toDataURL("image/png");
+  /** PNG transparente, recortado al contorno de la firma y a 3x de resolución. */
+  const exportarPng = () => {
+    const escala = 3;
+    const W = ancho;
+    const H = alto;
+    const puntos = trazosRef.current.flat();
+
+    const xs = puntos.map((p) => p.x * W);
+    const ys = puntos.map((p) => p.y * H);
+    const margen = 10;
+    const minX = Math.max(0, Math.min(...xs) - margen);
+    const minY = Math.max(0, Math.min(...ys) - margen);
+    const maxX = Math.min(W, Math.max(...xs) + margen);
+    const maxY = Math.min(H, Math.max(...ys) + margen);
+    const cw = maxX - minX;
+    const ch = maxY - minY;
+
+    // Evita guardar un simple punto o una raya diminuta.
+    if (puntos.length < 8 || cw + ch < 40) return null;
+
+    const salida = document.createElement("canvas");
+    salida.width = Math.round(cw * escala);
+    salida.height = Math.round(ch * escala);
+    const ctx = salida.getContext("2d");
+    ctx.scale(escala, escala);
+    ctx.translate(-minX, -minY);
+    trazosRef.current.forEach((t) => pintarTrazo(ctx, t, W, H, grosorTrazo));
+    return salida.toDataURL("image/png");
+  };
+
+  const guardar = () => {
+    if (vacio || bloqueado) return;
+    const dataUrl = exportarPng();
+    if (!dataUrl) {
+      setAviso("La firma es muy corta. Dibuja tu firma completa dentro del recuadro.");
+      return;
+    }
+    setAviso("");
     setGuardado(true);
     onGuardar?.(dataUrl);
-  }, [vacio, onGuardar]);
+  };
 
   return (
-    <div className="inline-flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600">
-          <PenLine size={16} className="text-slate-400" />
+    <div className="firma" ref={contenedorRef}>
+      <div className="firma-cabecera">
+        <span className="firma-etiqueta">
+          <PenLine size={15} />
           {etiqueta}
         </span>
-        {guardado && (
-          <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+        {guardado && !guardando && (
+          <span className="firma-ok">
             <Check size={14} />
-            Firma guardada
+            Firma lista
           </span>
         )}
       </div>
 
-      <div
-        className={`relative rounded-lg border-2 border-dashed ${
-          deshabilitado
-            ? "border-slate-200 bg-slate-50"
-            : "border-slate-300 bg-slate-50/50"
-        }`}
-        style={{ width: ancho, height: alto }}
-      >
+      <div className={`firma-lienzo ${bloqueado ? "is-bloqueado" : ""}`}>
         <canvas
           ref={canvasRef}
-          className={`rounded-lg ${
-            deshabilitado ? "cursor-not-allowed" : "cursor-crosshair"
-          } touch-none`}
-          onMouseDown={iniciarTrazo}
-          onMouseMove={continuarTrazo}
-          onMouseUp={finalizarTrazo}
-          onMouseLeave={finalizarTrazo}
-          onTouchStart={iniciarTrazo}
-          onTouchMove={continuarTrazo}
-          onTouchEnd={finalizarTrazo}
+          role="img"
+          aria-label="Área para dibujar la firma"
+          onPointerDown={alPresionar}
+          onPointerMove={alMover}
+          onPointerUp={alSoltar}
+          onPointerCancel={alSoltar}
         />
-        {vacio && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <span className="text-sm text-slate-300">
-              Firme aquí con el mouse o el dedo
-            </span>
-          </div>
-        )}
+        {vacio && <span className="firma-guia">Firma aquí con el mouse, el dedo o un lápiz</span>}
+        <span className="firma-linea-base" aria-hidden="true" />
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={deshacer}
-          disabled={deshabilitado || vacio}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-        >
+      {aviso && (
+        <p className="firma-aviso" role="alert">
+          {aviso}
+        </p>
+      )}
+
+      <div className="firma-acciones">
+        <button type="button" onClick={deshacer} disabled={bloqueado || vacio} className="firma-btn">
           <RotateCcw size={14} />
           Deshacer
         </button>
-        <button
-          type="button"
-          onClick={limpiar}
-          disabled={deshabilitado || vacio}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-        >
+        <button type="button" onClick={limpiar} disabled={bloqueado || vacio} className="firma-btn">
           <Eraser size={14} />
           Limpiar
         </button>
         <button
           type="button"
           onClick={guardar}
-          disabled={deshabilitado || vacio}
-          className="ml-auto flex items-center gap-1.5 rounded-lg bg-slate-800 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={bloqueado || vacio}
+          className="firma-btn firma-btn-principal"
         >
-          <Check size={14} />
-          Guardar firma
+          {guardando ? <Loader2 size={14} className="firma-giro" /> : <Check size={14} />}
+          {guardando ? "Guardando..." : textoGuardar}
         </button>
       </div>
     </div>

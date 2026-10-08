@@ -1,9 +1,15 @@
 import {
-Card,
-Form,
-Button,
-Row,
-Col
+  Card,
+  Form,
+  Button,
+  Row,
+  Col,
+  Badge,
+  Modal,
+  Spinner,
+  Alert,
+  Nav,
+  Tab
 } from "react-bootstrap";
 
 import Sidebar from "../../components/farmacia/Sidebar";
@@ -13,824 +19,1249 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import "./Consultorios.css";
-import Table from "react-bootstrap/Table";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function AgregarConsultorio() {
+// ---------- Valores por defecto de cada formulario ----------
 
-const [consultorio,setConsultorio] = useState({
-nombre:"",
-numero:"",
-piso:"",
-descripcion:""
-});
-
-const [habitaciones,setHabitaciones] = useState([]);
-
-const [habitacion,setHabitacion] = useState({
-  numero:"",
-  piso:"",
-  tipo:"Individual",
-  estado:"Disponible",
-  descripcion:""
-});
-
-const [instrumentos,setInstrumentos] = useState([]);
-
-const [instrumento,setInstrumento] = useState({
-  nombre:"",
-  categoria:"",
-  cantidad:1,
-  estado:"Disponible",
-  descripcion:""
-});
-
-const [asignacion,setAsignacion] = useState({
-  consultorio_id:"",
-  instrumento_id:"",
-  cantidad:1
-});
-
-const [loading,setLoading] = useState(false);
-const [error,setError] = useState("");
-const [success,setSuccess] = useState("");
-const [inventario, setInventario] = useState([]);
-const [consultorios,setConsultorios] = useState([]);
-
-const handleChange=(e)=>{
-setConsultorio({
-...consultorio,
-[e.target.name]:e.target.value
-});
-};
-const guardarConsultorio = async () => {
-
-  try {
-
-    setLoading(true);
-    setError("");
-
-    const usuario = JSON.parse(
-      localStorage.getItem("usuario")
-    );
-
-    await axios.post(
-      `${API_URL}/consultorios`,
-      {
-        clinica_id: usuario.clinica_id,
-        nombre: consultorio.nombre,
-        numero: consultorio.numero,
-        piso: consultorio.piso,
-        descripcion: consultorio.descripcion
-      }
-    );
-
-    setSuccess("Consultorio registrado correctamente");
-
-    obtenerConsultorios();
-    setConsultorio({
-      nombre:"",
-      numero:"",
-      piso:"",
-      descripcion:""
-    });
-
-  } catch(err) {
-
-    console.error(err);
-
-    setError(
-      err.response?.data?.message ||
-      "Error al registrar"
-    );
-
-  } finally {
-    setLoading(false);
-  }
-
+const CONSULTORIO_VACIO = {
+  nombre: "",
+  numero: "",
+  piso: "",
+  descripcion: "",
+  estado: "Disponible"
 };
 
-const guardarHabitacion = async () => {
+const HABITACION_VACIA = {
+  numero: "",
+  piso: "",
+  tipo: "Individual",
+  estado: "Disponible",
+  descripcion: ""
+};
 
-  const usuario = JSON.parse(
-    localStorage.getItem("usuario")
+const INSTRUMENTO_VACIO = {
+  nombre: "",
+  categoria: "",
+  cantidad: 1,
+  estado: "Disponible",
+  descripcion: ""
+};
+
+const ASIGNACION_VACIA = {
+  consultorio_id: "",
+  instrumento_id: "",
+  cantidad: 1
+};
+
+// Colores de badge según el estado
+const ESTADO_COLOR = {
+  Disponible: "success",
+  Ocupado: "danger",
+  Ocupada: "danger",
+  Mantenimiento: "warning",
+  Limpieza: "info",
+  "En uso": "primary",
+  "Dañado": "dark"
+};
+
+function EstadoBadge({ estado }) {
+  if (!estado) return null;
+  return (
+    <Badge bg={ESTADO_COLOR[estado] || "secondary"}>{estado}</Badge>
   );
-
-  await axios.post(
-    `${API_URL}/habitaciones`,
-    {
-      ...habitacion,
-      clinica_id: usuario.clinica_id
-    }
-  );
-
-  obtenerHabitaciones();
-};
-
-
-const obtenerInstrumentos = async () => {
-
-  const response = await axios.get(
-    `${API_URL}/instrumentos`
-  );
-
-  setInstrumentos(response.data);
-};
-const obtenerHabitaciones = async () => {
-
-  const response = await axios.get(
-    `${API_URL}/habitaciones`
-  );
-
-  setHabitaciones(response.data);
-};
-
-
-const guardarInstrumento = async () => {
-
-  const usuario = JSON.parse(
-    localStorage.getItem("usuario")
-  );
-
-  await axios.post(
-    `${API_URL}/instrumentos`,
-    {
-      ...instrumento,
-      clinica_id: usuario.clinica_id
-    }
-  );
-
-  obtenerInstrumentos();
-};
-
-const obtenerInventario = async () => {
-
-  try {
-
-    const response = await axios.get(
-      `${API_URL}/consultorio-instrumentos/inventario`
-    );
-
-    setInventario(response.data);
-
-  } catch (error) {
-
-    console.error(error);
-
-  }
-
-};
-
-const obtenerConsultorios = async () => {
-
-  try {
-
-    const response = await axios.get(
-      `${API_URL}/consultorios`
-    );
-
-    setConsultorios(response.data);
-
-  } catch (error) {
-
-    console.error(error);
-
-  }
-
-};
-
-
-const asignarInstrumento = async () => {
-
-  await axios.post(
-    `${API_URL}/consultorio-instrumentos`,
-    asignacion
-  );
-
-  alert("Instrumento asignado");
-};
-
-useEffect(() => {
-
-  obtenerConsultorios();
-
-  obtenerHabitaciones();
-
-  obtenerInstrumentos();
-
-  obtenerInventario();
-
-
-}, []);
-
-return(
-<div className="home-layout">
-
-<Sidebar />
-
-<div className="home-content-modern">
-
-<Topbar />
-
-<div className="page-consultorio">
-
-<div className="consultorio-header">
-<h2>🏥 Registro de Consultorio</h2>
-<p>Configura los espacios médicos de tu clínica</p>
-</div>
-
-
-<Row className="mb-4">
-
-  <Col md={4}>
-    <Card className="text-center p-3">
-      <h2>{consultorios.length}</h2>
-      <small>Consultorios</small>
-    </Card>
-  </Col>
-
-  <Col md={4}>
-    <Card className="text-center p-3">
-      <h2>{habitaciones.length}</h2>
-      <small>Habitaciones</small>
-    </Card>
-  </Col>
-
-  <Col md={4}>
-    <Card className="text-center p-3">
-      <h2>{instrumentos.length}</h2>
-      <small>Instrumentos</small>
-    </Card>
-  </Col>
-
-</Row>
-
-<Row>
-
-<Col md={8}>
-
-<Card className="card-modern-consultorio p-4">
-
-<Row className="g-3">
-
-<Col md={6}>
-<Form.Label>Nombre</Form.Label>
-<Form.Control
-name="nombre"
-onChange={handleChange}
-className="form-control-modern"
-/>
-</Col>
-
-<Col md={3}>
-<Form.Label>Número</Form.Label>
-<Form.Control
-name="numero"
-onChange={handleChange}
-className="form-control-modern"
-/>
-</Col>
-
-<Col md={3}>
-<Form.Label>Piso</Form.Label>
-<Form.Control
-name="piso"
-onChange={handleChange}
-className="form-control-modern"
-/>
-</Col>
-
-<Col md={12}>
-<Form.Label>Descripción</Form.Label>
-<Form.Control
-as="textarea"
-rows={4}
-name="descripcion"
-onChange={handleChange}
-/>
-</Col>
-
-</Row>
-
-</Card>
-
-</Col>
-
-<Col md={4}>
-
-<div className="consultorio-preview">
-
-<h5>Vista previa</h5>
-
-<div className="consultorio-box">
-{consultorio.numero || "101"}
-</div>
-
-<h6>{consultorio.nombre || "Consultorio"}</h6>
-
-<p>{consultorio.descripcion || "Descripción..."}</p>
-
-</div>
-
-</Col>
-
-</Row>
-
-<div className="mt-4 text-end">
-<Button
-  className="btn-primary-modern"
-  onClick={guardarConsultorio}
-  disabled={loading}
->
-  {loading
-    ? "Guardando..."
-    : "Guardar Consultorio"}
-</Button>
-</div>
-{error && (
-  <div className="alert alert-danger">
-    {error}
-  </div>
-)}
-
-{success && (
-  <div className="alert alert-success">
-    {success}
-  </div>
-)}
-
-<Card className="card-modern-consultorio p-4 mt-4">
-
-  <div className="d-flex justify-content-between align-items-center mb-3">
-
-    <h4 className="mb-0">
-      Consultorios Registrados
-    </h4>
-
-    <span className="badge bg-primary">
-      {consultorios.length}
-    </span>
-
-  </div>
-
-  <div className="table-responsive">
-
-    <Table
-      hover
-      bordered={false}
-      className="table-modern align-middle"
-    >
-
-      <thead>
-
-        <tr>
-          <th>#</th>
-          <th>Nombre</th>
-          <th>Número</th>
-          <th>Piso</th>
-          <th>Descripción</th>
-        </tr>
-
-      </thead>
-
-      <tbody>
-
-        {consultorios.length > 0 ? (
-
-          consultorios.map((consultorio,index) => (
-
-            <tr key={consultorio.id}>
-
-              <td>{index + 1}</td>
-
-              <td>
-                <strong>
-                  {consultorio.nombre}
-                </strong>
-              </td>
-
-              <td>
-                {consultorio.numero}
-              </td>
-
-              <td>
-                {consultorio.piso}
-              </td>
-
-              <td>
-                {consultorio.descripcion}
-              </td>
-
-            </tr>
-
-          ))
-
-        ) : (
-
-          <tr>
-
-            <td
-              colSpan="5"
-              className="text-center py-4"
-            >
-              No hay consultorios registrados
-            </td>
-
-          </tr>
-
+}
+
+// Iniciales para el avatar circular de cada fila
+function inicial(texto) {
+  if (!texto) return "?";
+  return texto.trim().charAt(0).toUpperCase();
+}
+
+// Fila reutilizable para las listas de consultorios / habitaciones / instrumentos
+function ItemRow({ tone, avatar, title, subtitle, badge, onEdit, onDelete }) {
+  return (
+    <div className="item-row">
+      <div className={`item-avatar tone-${tone}`}>{avatar}</div>
+
+      <div className="item-info">
+        <div className="item-title">{title}</div>
+        {subtitle && <div className="item-subtitle">{subtitle}</div>}
+      </div>
+
+      <div className="item-badge">{badge}</div>
+
+      <div className="item-actions">
+        {onEdit && (
+          <button
+            type="button"
+            className="icon-btn icon-btn-edit"
+            title="Editar"
+            onClick={onEdit}
+          >
+            ✎
+          </button>
         )}
+        <button
+          type="button"
+          className="icon-btn icon-btn-delete"
+          title="Eliminar"
+          onClick={onDelete}
+        >
+          🗑
+        </button>
+      </div>
+    </div>
+  );
+}
 
-      </tbody>
+function ListaVacia({ icono, texto }) {
+  return (
+    <div className="lista-vacia">
+      <div className="lista-vacia-icono">{icono}</div>
+      <p>{texto}</p>
+    </div>
+  );
+}
 
-    </Table>
+export default function AgregarConsultorio() {
+  const [tabActivo, setTabActivo] = useState("consultorios");
 
-  </div>
+  // ---------- Consultorios ----------
+  const [consultorio, setConsultorio] = useState(CONSULTORIO_VACIO);
+  const [consultorios, setConsultorios] = useState([]);
+  const [editandoConsultorioId, setEditandoConsultorioId] = useState(null);
+  const [errorConsultorio, setErrorConsultorio] = useState("");
+  const [loadingConsultorio, setLoadingConsultorio] = useState(false);
 
-</Card>
+  // ---------- Habitaciones ----------
+  const [habitacion, setHabitacion] = useState(HABITACION_VACIA);
+  const [habitaciones, setHabitaciones] = useState([]);
+  const [editandoHabitacionId, setEditandoHabitacionId] = useState(null);
+  const [errorHabitacion, setErrorHabitacion] = useState("");
+  const [loadingHabitacion, setLoadingHabitacion] = useState(false);
 
+  // ---------- Instrumentos ----------
+  const [instrumento, setInstrumento] = useState(INSTRUMENTO_VACIO);
+  const [instrumentos, setInstrumentos] = useState([]);
+  const [editandoInstrumentoId, setEditandoInstrumentoId] = useState(null);
+  const [errorInstrumento, setErrorInstrumento] = useState("");
+  const [loadingInstrumento, setLoadingInstrumento] = useState(false);
 
+  // ---------- Asignación consultorio <-> instrumento ----------
+  const [asignacion, setAsignacion] = useState(ASIGNACION_VACIA);
+  const [inventario, setInventario] = useState([]);
+  const [errorAsignacion, setErrorAsignacion] = useState("");
+  const [loadingAsignacion, setLoadingAsignacion] = useState(false);
 
-<Card className="card-modern-consultorio p-4 mt-5">
+  // ---------- Mensaje de éxito global ----------
+  const [success, setSuccess] = useState("");
 
-<h4>🛏 Registro de Habitaciones</h4>
+  // ---------- Modal de confirmación de borrado ----------
+  const [confirmar, setConfirmar] = useState({
+    show: false,
+    tipo: null,
+    id: null,
+    nombre: ""
+  });
 
-<Row>
+  const mostrarExito = (mensaje) => {
+    setSuccess(mensaje);
+    setTimeout(() => setSuccess(""), 3000);
+  };
 
-  <Col md={3}>
-    <Form.Control
-      placeholder="Número"
-      onChange={(e)=>
-        setHabitacion({
-          ...habitacion,
-          numero:e.target.value
-        })
+  const obtenerUsuario = () => {
+    try {
+      return JSON.parse(localStorage.getItem("usuario"));
+    } catch {
+      return null;
+    }
+  };
+
+  // =========================================================
+  // CONSULTORIOS
+  // =========================================================
+
+  const obtenerConsultorios = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/consultorios`);
+      setConsultorios(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editarConsultorio = (item) => {
+    setTabActivo("consultorios");
+    setEditandoConsultorioId(item.id);
+    setConsultorio({
+      nombre: item.nombre || "",
+      numero: item.numero || "",
+      piso: item.piso || "",
+      descripcion: item.descripcion || "",
+      estado: item.estado || "Disponible"
+    });
+    setErrorConsultorio("");
+  };
+
+  const cancelarEdicionConsultorio = () => {
+    setEditandoConsultorioId(null);
+    setConsultorio(CONSULTORIO_VACIO);
+    setErrorConsultorio("");
+  };
+
+  const guardarConsultorio = async () => {
+    if (!consultorio.nombre.trim() || !consultorio.numero.trim()) {
+      setErrorConsultorio("El nombre y el número son obligatorios");
+      return;
+    }
+
+    try {
+      setLoadingConsultorio(true);
+      setErrorConsultorio("");
+
+      if (editandoConsultorioId) {
+        await axios.put(
+          `${API_URL}/consultorios/${editandoConsultorioId}`,
+          consultorio
+        );
+        mostrarExito("Consultorio actualizado correctamente");
+      } else {
+        const usuario = obtenerUsuario();
+
+        await axios.post(`${API_URL}/consultorios`, {
+          clinica_id: usuario?.clinica_id,
+          ...consultorio
+        });
+        mostrarExito("Consultorio registrado correctamente");
       }
-    />
-  </Col>
 
-  <Col md={2}>
-    <Form.Control
-      placeholder="Piso"
-      onChange={(e)=>
-        setHabitacion({
+      cancelarEdicionConsultorio();
+      obtenerConsultorios();
+    } catch (err) {
+      console.error(err);
+      setErrorConsultorio(
+        err.response?.data?.message || "Error al guardar el consultorio"
+      );
+    } finally {
+      setLoadingConsultorio(false);
+    }
+  };
+
+  const eliminarConsultorio = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/consultorios/${id}`);
+      mostrarExito("Consultorio eliminado");
+      if (editandoConsultorioId === id) cancelarEdicionConsultorio();
+      obtenerConsultorios();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =========================================================
+  // HABITACIONES
+  // =========================================================
+
+  const obtenerHabitaciones = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/habitaciones`);
+      setHabitaciones(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editarHabitacion = (item) => {
+    setTabActivo("habitaciones");
+    setEditandoHabitacionId(item.id);
+    setHabitacion({
+      numero: item.numero || "",
+      piso: item.piso || "",
+      tipo: item.tipo || "Individual",
+      estado: item.estado || "Disponible",
+      descripcion: item.descripcion || ""
+    });
+    setErrorHabitacion("");
+  };
+
+  const cancelarEdicionHabitacion = () => {
+    setEditandoHabitacionId(null);
+    setHabitacion(HABITACION_VACIA);
+    setErrorHabitacion("");
+  };
+
+  const guardarHabitacion = async () => {
+    if (!habitacion.numero.trim()) {
+      setErrorHabitacion("El número de habitación es obligatorio");
+      return;
+    }
+
+    try {
+      setLoadingHabitacion(true);
+      setErrorHabitacion("");
+
+      if (editandoHabitacionId) {
+        await axios.put(
+          `${API_URL}/habitaciones/${editandoHabitacionId}`,
+          habitacion
+        );
+        mostrarExito("Habitación actualizada correctamente");
+      } else {
+        const usuario = obtenerUsuario();
+
+        await axios.post(`${API_URL}/habitaciones`, {
           ...habitacion,
-          piso:e.target.value
-        })
+          clinica_id: usuario?.clinica_id
+        });
+        mostrarExito("Habitación registrada correctamente");
       }
-    />
-  </Col>
 
-  <Col md={3}>
-    <Form.Select
-      value={habitacion.tipo}
-      onChange={(e)=>
-        setHabitacion({
-          ...habitacion,
-          tipo:e.target.value
-        })
+      cancelarEdicionHabitacion();
+      obtenerHabitaciones();
+    } catch (err) {
+      console.error(err);
+      setErrorHabitacion(
+        err.response?.data?.message || "Error al guardar la habitación"
+      );
+    } finally {
+      setLoadingHabitacion(false);
+    }
+  };
+
+  const eliminarHabitacion = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/habitaciones/${id}`);
+      mostrarExito("Habitación eliminada");
+      if (editandoHabitacionId === id) cancelarEdicionHabitacion();
+      obtenerHabitaciones();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =========================================================
+  // INSTRUMENTOS
+  // =========================================================
+
+  const obtenerInstrumentos = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/instrumentos`);
+      setInstrumentos(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editarInstrumento = (item) => {
+    setTabActivo("instrumentos");
+    setEditandoInstrumentoId(item.id);
+    setInstrumento({
+      nombre: item.nombre || "",
+      categoria: item.categoria || "",
+      cantidad: item.cantidad ?? 1,
+      estado: item.estado || "Disponible",
+      descripcion: item.descripcion || ""
+    });
+    setErrorInstrumento("");
+  };
+
+  const cancelarEdicionInstrumento = () => {
+    setEditandoInstrumentoId(null);
+    setInstrumento(INSTRUMENTO_VACIO);
+    setErrorInstrumento("");
+  };
+
+  const guardarInstrumento = async () => {
+    if (!instrumento.nombre.trim()) {
+      setErrorInstrumento("El nombre del instrumento es obligatorio");
+      return;
+    }
+
+    try {
+      setLoadingInstrumento(true);
+      setErrorInstrumento("");
+
+      if (editandoInstrumentoId) {
+        await axios.put(
+          `${API_URL}/instrumentos/${editandoInstrumentoId}`,
+          instrumento
+        );
+        mostrarExito("Instrumento actualizado correctamente");
+      } else {
+        const usuario = obtenerUsuario();
+
+        await axios.post(`${API_URL}/instrumentos`, {
+          ...instrumento,
+          clinica_id: usuario?.clinica_id
+        });
+        mostrarExito("Instrumento registrado correctamente");
       }
-    >
-      <option value="Individual">Individual</option>
-      <option value="Compartida">Compartida</option>
-      <option value="Urgencias">Urgencias</option>
-      <option value="Quirófano">Quirófano</option>
-      <option value="UCI">UCI</option>
-    </Form.Select>
-  </Col>
-
-  <Col md={2}>
-    <Form.Select
-      value={habitacion.estado}
-      onChange={(e)=>
-        setHabitacion({
-          ...habitacion,
-          estado:e.target.value
-        })
-      }
-    >
-      <option value="Disponible">Disponible</option>
-      <option value="Ocupada">Ocupada</option>
-      <option value="Mantenimiento">Mantenimiento</option>
-      <option value="Limpieza">Limpieza</option>
-    </Form.Select>
-  </Col>
-
-  <Col md={2}>
-    <Button onClick={guardarHabitacion}>
-      Guardar
-    </Button>
-  </Col>
-
-  <Col md={12} className="mt-3">
-    <Form.Control
-      as="textarea"
-      rows={2}
-      placeholder="Descripción"
-      onChange={(e)=>
-        setHabitacion({
-          ...habitacion,
-          descripcion:e.target.value
-        })
-      }
-    />
-  </Col>
-
-</Row>
-
-</Card>
-
-
-
-
-
-
 
-<Card className="mt-4 p-4">
-
-<h5>Habitaciones</h5>
-
-<Table>
-
-<thead>
-
-<tr>
-<th>Nombre</th>
-<th>Número</th>
-<th>Tipo</th>
-<th>Estado</th>
-</tr>
-
-</thead>
-
-<tbody>
-  {habitaciones.map(h => (
-    <tr key={h.id}>
-      <td>{h.numero}</td>
-      <td>{h.piso}</td>
-      <td>{h.tipo}</td>
-      <td>{h.estado}</td>
-    </tr>
-  ))}
-</tbody>
-
-</Table>
-
-</Card>
-
-<Card className="card-modern-consultorio p-4 mt-5">
-
-<h4>🩺 Instrumentos Médicos</h4>
-
-<Row>
-
-<Col md={4}>
-<Form.Control
-placeholder="Nombre"
-onChange={(e)=>
-setInstrumento({
-...instrumento,
-nombre:e.target.value
-})
-}
-/>
-</Col>
-
-<Col md={3}>
-<Form.Control
-placeholder="Categoría"
-onChange={(e)=>
-setInstrumento({
-...instrumento,
-categoria:e.target.value
-})
-}
-/>
-</Col>
-
-<Col md={2}>
-<Form.Control
-type="number"
-placeholder="Cantidad"
-onChange={(e)=>
-setInstrumento({
-...instrumento,
-cantidad:e.target.value
-})
-}
-/>
-</Col>
-
-<Col md={3}>
-
-<Button
-onClick={guardarInstrumento}
->
-
-Guardar
-
-</Button>
-
-</Col>
-
-</Row>
-
-</Card>
-
-
-
-<Card className="mt-4 p-4">
-
-<h5>Instrumentos Registrados</h5>
-
-<Table>
-
-<thead>
-
-<tr>
-<th>Nombre</th>
-<th>Categoría</th>
-<th>Cantidad</th>
-<th>Estado</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{instrumentos.map(i=>(
-
-<tr key={i.id}>
-
-<td>{i.nombre}</td>
-
-<td>{i.categoria}</td>
-
-<td>{i.cantidad}</td>
-
-<td>{i.estado}</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</Table>
-
-</Card>
-
-
-<Card className="mt-5 p-4">
-
-<h4>🔗 Asignar Instrumentos</h4>
-
-<Row>
-
-<Col md={4}>
-
-<Form.Select
-onChange={(e)=>
-setAsignacion({
-...asignacion,
-consultorio_id:e.target.value
-})
-}
->
-
-<option>
-Seleccione Consultorio
-</option>
-
-{
-consultorios.map(c=>(
-<option
-key={c.id}
-value={c.id}
->
-{c.nombre}
-</option>
-))
-}
-
-</Form.Select>
-
-</Col>
-
-<Col md={4}>
-
-<Form.Select
-onChange={(e)=>
-setAsignacion({
-...asignacion,
-instrumento_id:e.target.value
-})
-}
->
-
-<option>
-Seleccione Instrumento
-</option>
-
-{
-instrumentos.map(i=>(
-<option
-key={i.id}
-value={i.id}
->
-{i.nombre}
-</option>
-))
-}
-
-</Form.Select>
-
-</Col>
-
-<Col md={2}>
-
-<Form.Control
-type="number"
-placeholder="Cantidad"
-onChange={(e)=>
-setAsignacion({
-...asignacion,
-cantidad:e.target.value
-})
-}
-/>
-
-</Col>
-
-<Col md={2}>
-
-<Button
-onClick={asignarInstrumento}
->
-
-Asignar
-
-</Button>
-
-</Col>
-
-</Row>
-
-</Card>
-
-
-
-<Card className="mt-5 p-4">
-
-<h4>🏥 Instrumentos por Consultorio</h4>
-
-<Table hover>
-
-<thead>
-
-<tr>
-  <th>Consultorio</th>
-  <th>Número</th>
-  <th>Instrumento</th>
-  <th>Categoría</th>
-  <th>Cantidad</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{
-inventario.map(item => (
-
-<tr key={item.id}>
-
-<td>{item.consultorio.nombre}</td>
-
-<td>{item.consultorio.numero}</td>
-
-<td>{item.instrumento.nombre}</td>
-
-<td>{item.instrumento.categoria}</td>
-
-<td>{item.cantidad}</td>
-
-</tr>
-
-))
-}
-
-</tbody>
-
-</Table>
-
-</Card>
-
-
-</div>
-
-</div>
-
-</div>
-);
+      cancelarEdicionInstrumento();
+      obtenerInstrumentos();
+    } catch (err) {
+      console.error(err);
+      setErrorInstrumento(
+        err.response?.data?.message || "Error al guardar el instrumento"
+      );
+    } finally {
+      setLoadingInstrumento(false);
+    }
+  };
+
+  const eliminarInstrumento = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/instrumentos/${id}`);
+      mostrarExito("Instrumento eliminado");
+      if (editandoInstrumentoId === id) cancelarEdicionInstrumento();
+      obtenerInstrumentos();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =========================================================
+  // ASIGNACIÓN CONSULTORIO <-> INSTRUMENTO
+  // =========================================================
+
+  const obtenerInventario = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/consultorio-instrumentos/inventario`
+      );
+      setInventario(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const asignarInstrumento = async () => {
+    if (!asignacion.consultorio_id || !asignacion.instrumento_id) {
+      setErrorAsignacion("Selecciona un consultorio y un instrumento");
+      return;
+    }
+
+    try {
+      setLoadingAsignacion(true);
+      setErrorAsignacion("");
+
+      await axios.post(`${API_URL}/consultorio-instrumentos`, asignacion);
+
+      mostrarExito("Instrumento asignado correctamente");
+      setAsignacion(ASIGNACION_VACIA);
+      obtenerInventario();
+    } catch (err) {
+      console.error(err);
+      setErrorAsignacion(
+        err.response?.data?.message || "Error al asignar el instrumento"
+      );
+    } finally {
+      setLoadingAsignacion(false);
+    }
+  };
+
+  const eliminarAsignacion = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/consultorio-instrumentos/${id}`);
+      mostrarExito("Asignación eliminada");
+      obtenerInventario();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // =========================================================
+  // MODAL DE CONFIRMACIÓN
+  // =========================================================
+
+  const pedirConfirmacion = (tipo, id, nombre) => {
+    setConfirmar({ show: true, tipo, id, nombre });
+  };
+
+  const cerrarConfirmacion = () => {
+    setConfirmar({ show: false, tipo: null, id: null, nombre: "" });
+  };
+
+  const confirmarEliminacion = async () => {
+    const { tipo, id } = confirmar;
+
+    if (tipo === "consultorio") await eliminarConsultorio(id);
+    if (tipo === "habitacion") await eliminarHabitacion(id);
+    if (tipo === "instrumento") await eliminarInstrumento(id);
+    if (tipo === "asignacion") await eliminarAsignacion(id);
+
+    cerrarConfirmacion();
+  };
+
+  useEffect(() => {
+    obtenerConsultorios();
+    obtenerHabitaciones();
+    obtenerInstrumentos();
+    obtenerInventario();
+  }, []);
+
+  return (
+    <div className="home-layout">
+      <Sidebar />
+
+      <div className="home-content-modern">
+        <Topbar />
+
+        <div className="page-consultorio">
+          <div className="consultorio-header">
+            <h2>🏥 Espacios y equipo médico</h2>
+            <p>Configura consultorios, habitaciones e instrumentos de tu clínica</p>
+          </div>
+
+          {success && (
+            <Alert
+              variant="success"
+              onClose={() => setSuccess("")}
+              dismissible
+              className="alerta-flotante"
+            >
+              {success}
+            </Alert>
+          )}
+
+          {/* ---------- Tarjetas resumen / accesos rápidos ---------- */}
+          <Row className="mb-4 g-3">
+            <Col md={4}>
+              <div
+                className={`stat-card tone-consultorio ${
+                  tabActivo === "consultorios" ? "activo" : ""
+                }`}
+                onClick={() => setTabActivo("consultorios")}
+              >
+                <div className="stat-icono">🏥</div>
+                <div>
+                  <h2>{consultorios.length}</h2>
+                  <small>Consultorios</small>
+                </div>
+              </div>
+            </Col>
+
+            <Col md={4}>
+              <div
+                className={`stat-card tone-habitacion ${
+                  tabActivo === "habitaciones" ? "activo" : ""
+                }`}
+                onClick={() => setTabActivo("habitaciones")}
+              >
+                <div className="stat-icono">🛏</div>
+                <div>
+                  <h2>{habitaciones.length}</h2>
+                  <small>Habitaciones</small>
+                </div>
+              </div>
+            </Col>
+
+            <Col md={4}>
+              <div
+                className={`stat-card tone-instrumento ${
+                  tabActivo === "instrumentos" ? "activo" : ""
+                }`}
+                onClick={() => setTabActivo("instrumentos")}
+              >
+                <div className="stat-icono">🩺</div>
+                <div>
+                  <h2>{instrumentos.length}</h2>
+                  <small>Instrumentos</small>
+                </div>
+              </div>
+            </Col>
+          </Row>
+
+          {/* ---------- Navegación por pestañas ---------- */}
+          <Tab.Container activeKey={tabActivo} onSelect={setTabActivo}>
+            <Nav variant="pills" className="tabs-modernas">
+              <Nav.Item>
+                <Nav.Link eventKey="consultorios">🏥 Consultorios</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="habitaciones">🛏 Habitaciones</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="instrumentos">🩺 Instrumentos</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="asignaciones">🔗 Asignaciones</Nav.Link>
+              </Nav.Item>
+            </Nav>
+
+            <Tab.Content>
+              {/* ================= CONSULTORIOS ================= */}
+              <Tab.Pane eventKey="consultorios">
+                <Row className="g-4">
+                  <Col lg={5}>
+                    <Card className="card-modern-consultorio p-4 form-card">
+                      {editandoConsultorioId && (
+                        <div className="modo-edicion">
+                          Editando consultorio
+                          <button
+                            type="button"
+                            onClick={cancelarEdicionConsultorio}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
+
+                      <h5 className="form-card-titulo">
+                        {editandoConsultorioId
+                          ? "Editar consultorio"
+                          : "Nuevo consultorio"}
+                      </h5>
+
+                      {errorConsultorio && (
+                        <Alert variant="danger" className="py-2">
+                          {errorConsultorio}
+                        </Alert>
+                      )}
+
+                      <Row className="g-3">
+                        <Col md={7}>
+                          <Form.Label>Nombre *</Form.Label>
+                          <Form.Control
+                            value={consultorio.nombre}
+                            onChange={(e) =>
+                              setConsultorio({
+                                ...consultorio,
+                                nombre: e.target.value
+                              })
+                            }
+                            placeholder="Ej. Consultorio 1"
+                          />
+                        </Col>
+
+                        <Col md={5}>
+                          <Form.Label>Número *</Form.Label>
+                          <Form.Control
+                            value={consultorio.numero}
+                            onChange={(e) =>
+                              setConsultorio({
+                                ...consultorio,
+                                numero: e.target.value
+                              })
+                            }
+                            placeholder="Ej. 101"
+                          />
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Piso</Form.Label>
+                          <Form.Control
+                            value={consultorio.piso}
+                            onChange={(e) =>
+                              setConsultorio({
+                                ...consultorio,
+                                piso: e.target.value
+                              })
+                            }
+                            placeholder="Ej. 1"
+                          />
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Estado</Form.Label>
+                          <Form.Select
+                            value={consultorio.estado}
+                            onChange={(e) =>
+                              setConsultorio({
+                                ...consultorio,
+                                estado: e.target.value
+                              })
+                            }
+                          >
+                            <option value="Disponible">Disponible</option>
+                            <option value="Ocupado">Ocupado</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Limpieza">Limpieza</option>
+                          </Form.Select>
+                        </Col>
+
+                        <Col md={12}>
+                          <Form.Label>Descripción</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={consultorio.descripcion}
+                            onChange={(e) =>
+                              setConsultorio({
+                                ...consultorio,
+                                descripcion: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+                      </Row>
+
+                      <div className="mt-4 d-flex justify-content-end">
+                        <Button
+                          className="btn-primary-modern"
+                          onClick={guardarConsultorio}
+                          disabled={loadingConsultorio}
+                        >
+                          {loadingConsultorio ? (
+                            <Spinner size="sm" animation="border" />
+                          ) : editandoConsultorioId ? (
+                            "Actualizar consultorio"
+                          ) : (
+                            "Guardar consultorio"
+                          )}
+                        </Button>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  <Col lg={7}>
+                    <Card className="card-modern-consultorio p-4 lista-card">
+                      <div className="seccion-header">
+                        <h5 className="mb-0">Consultorios registrados</h5>
+                        <span className="contador-pill">
+                          {consultorios.length}
+                        </span>
+                      </div>
+
+                      {consultorios.length > 0 ? (
+                        <div className="lista-items">
+                          {consultorios.map((c) => (
+                            <ItemRow
+                              key={c.id}
+                              tone="consultorio"
+                              avatar={inicial(c.nombre)}
+                              title={c.nombre}
+                              subtitle={`N.º ${c.numero || "—"} · Piso ${
+                                c.piso || "—"
+                              }`}
+                              badge={<EstadoBadge estado={c.estado} />}
+                              onEdit={() => editarConsultorio(c)}
+                              onDelete={() =>
+                                pedirConfirmacion(
+                                  "consultorio",
+                                  c.id,
+                                  c.nombre
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <ListaVacia
+                          icono="🏥"
+                          texto="Aún no hay consultorios registrados"
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
+              </Tab.Pane>
+
+              {/* ================= HABITACIONES ================= */}
+              <Tab.Pane eventKey="habitaciones">
+                <Row className="g-4">
+                  <Col lg={5}>
+                    <Card className="card-modern-consultorio p-4 form-card">
+                      {editandoHabitacionId && (
+                        <div className="modo-edicion">
+                          Editando habitación
+                          <button
+                            type="button"
+                            onClick={cancelarEdicionHabitacion}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
+
+                      <h5 className="form-card-titulo">
+                        {editandoHabitacionId
+                          ? "Editar habitación"
+                          : "Nueva habitación"}
+                      </h5>
+
+                      {errorHabitacion && (
+                        <Alert variant="danger" className="py-2">
+                          {errorHabitacion}
+                        </Alert>
+                      )}
+
+                      <Row className="g-3">
+                        <Col md={6}>
+                          <Form.Label>Número *</Form.Label>
+                          <Form.Control
+                            value={habitacion.numero}
+                            placeholder="Número"
+                            onChange={(e) =>
+                              setHabitacion({
+                                ...habitacion,
+                                numero: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Piso</Form.Label>
+                          <Form.Control
+                            value={habitacion.piso}
+                            placeholder="Piso"
+                            onChange={(e) =>
+                              setHabitacion({
+                                ...habitacion,
+                                piso: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Tipo</Form.Label>
+                          <Form.Select
+                            value={habitacion.tipo}
+                            onChange={(e) =>
+                              setHabitacion({
+                                ...habitacion,
+                                tipo: e.target.value
+                              })
+                            }
+                          >
+                            <option value="Individual">Individual</option>
+                            <option value="Compartida">Compartida</option>
+                            <option value="Urgencias">Urgencias</option>
+                            <option value="Quirófano">Quirófano</option>
+                            <option value="UCI">UCI</option>
+                          </Form.Select>
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Estado</Form.Label>
+                          <Form.Select
+                            value={habitacion.estado}
+                            onChange={(e) =>
+                              setHabitacion({
+                                ...habitacion,
+                                estado: e.target.value
+                              })
+                            }
+                          >
+                            <option value="Disponible">Disponible</option>
+                            <option value="Ocupada">Ocupada</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Limpieza">Limpieza</option>
+                          </Form.Select>
+                        </Col>
+
+                        <Col md={12}>
+                          <Form.Label>Descripción</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={habitacion.descripcion}
+                            placeholder="Descripción"
+                            onChange={(e) =>
+                              setHabitacion({
+                                ...habitacion,
+                                descripcion: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+                      </Row>
+
+                      <div className="mt-4 d-flex justify-content-end">
+                        <Button
+                          className="btn-primary-modern"
+                          onClick={guardarHabitacion}
+                          disabled={loadingHabitacion}
+                        >
+                          {loadingHabitacion ? (
+                            <Spinner size="sm" animation="border" />
+                          ) : editandoHabitacionId ? (
+                            "Actualizar habitación"
+                          ) : (
+                            "Guardar habitación"
+                          )}
+                        </Button>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  <Col lg={7}>
+                    <Card className="card-modern-consultorio p-4 lista-card">
+                      <div className="seccion-header">
+                        <h5 className="mb-0">Habitaciones registradas</h5>
+                        <span className="contador-pill">
+                          {habitaciones.length}
+                        </span>
+                      </div>
+
+                      {habitaciones.length > 0 ? (
+                        <div className="lista-items">
+                          {habitaciones.map((h) => (
+                            <ItemRow
+                              key={h.id}
+                              tone="habitacion"
+                              avatar={inicial(h.tipo)}
+                              title={`Habitación ${h.numero || "—"}`}
+                              subtitle={`${h.tipo || "—"} · Piso ${
+                                h.piso || "—"
+                              }`}
+                              badge={<EstadoBadge estado={h.estado} />}
+                              onEdit={() => editarHabitacion(h)}
+                              onDelete={() =>
+                                pedirConfirmacion(
+                                  "habitacion",
+                                  h.id,
+                                  `habitación ${h.numero}`
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <ListaVacia
+                          icono="🛏"
+                          texto="Aún no hay habitaciones registradas"
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
+              </Tab.Pane>
+
+              {/* ================= INSTRUMENTOS ================= */}
+              <Tab.Pane eventKey="instrumentos">
+                <Row className="g-4">
+                  <Col lg={5}>
+                    <Card className="card-modern-consultorio p-4 form-card">
+                      {editandoInstrumentoId && (
+                        <div className="modo-edicion">
+                          Editando instrumento
+                          <button
+                            type="button"
+                            onClick={cancelarEdicionInstrumento}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
+
+                      <h5 className="form-card-titulo">
+                        {editandoInstrumentoId
+                          ? "Editar instrumento"
+                          : "Nuevo instrumento"}
+                      </h5>
+
+                      {errorInstrumento && (
+                        <Alert variant="danger" className="py-2">
+                          {errorInstrumento}
+                        </Alert>
+                      )}
+
+                      <Row className="g-3">
+                        <Col md={7}>
+                          <Form.Label>Nombre *</Form.Label>
+                          <Form.Control
+                            value={instrumento.nombre}
+                            placeholder="Nombre"
+                            onChange={(e) =>
+                              setInstrumento({
+                                ...instrumento,
+                                nombre: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+
+                        <Col md={5}>
+                          <Form.Label>Categoría</Form.Label>
+                          <Form.Control
+                            value={instrumento.categoria}
+                            placeholder="Categoría"
+                            onChange={(e) =>
+                              setInstrumento({
+                                ...instrumento,
+                                categoria: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Cantidad</Form.Label>
+                          <Form.Control
+                            type="number"
+                            min={0}
+                            value={instrumento.cantidad}
+                            onChange={(e) =>
+                              setInstrumento({
+                                ...instrumento,
+                                cantidad: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+
+                        <Col md={6}>
+                          <Form.Label>Estado</Form.Label>
+                          <Form.Select
+                            value={instrumento.estado}
+                            onChange={(e) =>
+                              setInstrumento({
+                                ...instrumento,
+                                estado: e.target.value
+                              })
+                            }
+                          >
+                            <option value="Disponible">Disponible</option>
+                            <option value="En uso">En uso</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Dañado">Dañado</option>
+                          </Form.Select>
+                        </Col>
+
+                        <Col md={12}>
+                          <Form.Label>Descripción</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={instrumento.descripcion}
+                            onChange={(e) =>
+                              setInstrumento({
+                                ...instrumento,
+                                descripcion: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+                      </Row>
+
+                      <div className="mt-4 d-flex justify-content-end">
+                        <Button
+                          className="btn-primary-modern"
+                          onClick={guardarInstrumento}
+                          disabled={loadingInstrumento}
+                        >
+                          {loadingInstrumento ? (
+                            <Spinner size="sm" animation="border" />
+                          ) : editandoInstrumentoId ? (
+                            "Actualizar instrumento"
+                          ) : (
+                            "Guardar instrumento"
+                          )}
+                        </Button>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  <Col lg={7}>
+                    <Card className="card-modern-consultorio p-4 lista-card">
+                      <div className="seccion-header">
+                        <h5 className="mb-0">Instrumentos registrados</h5>
+                        <span className="contador-pill">
+                          {instrumentos.length}
+                        </span>
+                      </div>
+
+                      {instrumentos.length > 0 ? (
+                        <div className="lista-items">
+                          {instrumentos.map((i) => (
+                            <ItemRow
+                              key={i.id}
+                              tone="instrumento"
+                              avatar={inicial(i.nombre)}
+                              title={i.nombre}
+                              subtitle={`${i.categoria || "Sin categoría"} · Cant. ${
+                                i.cantidad ?? 0
+                              }`}
+                              badge={<EstadoBadge estado={i.estado} />}
+                              onEdit={() => editarInstrumento(i)}
+                              onDelete={() =>
+                                pedirConfirmacion(
+                                  "instrumento",
+                                  i.id,
+                                  i.nombre
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <ListaVacia
+                          icono="🩺"
+                          texto="Aún no hay instrumentos registrados"
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
+              </Tab.Pane>
+
+              {/* ================= ASIGNACIONES ================= */}
+              <Tab.Pane eventKey="asignaciones">
+                <Row className="g-4">
+                  <Col lg={5}>
+                    <Card className="card-modern-consultorio p-4 form-card">
+                      <h5 className="form-card-titulo">
+                        Asignar instrumento a consultorio
+                      </h5>
+
+                      {errorAsignacion && (
+                        <Alert variant="danger" className="py-2">
+                          {errorAsignacion}
+                        </Alert>
+                      )}
+
+                      <Row className="g-3">
+                        <Col md={12}>
+                          <Form.Label>Consultorio</Form.Label>
+                          <Form.Select
+                            value={asignacion.consultorio_id}
+                            onChange={(e) =>
+                              setAsignacion({
+                                ...asignacion,
+                                consultorio_id: e.target.value
+                              })
+                            }
+                          >
+                            <option value="">Seleccione consultorio</option>
+                            {consultorios.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.nombre} (#{c.numero})
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Col>
+
+                        <Col md={12}>
+                          <Form.Label>Instrumento</Form.Label>
+                          <Form.Select
+                            value={asignacion.instrumento_id}
+                            onChange={(e) =>
+                              setAsignacion({
+                                ...asignacion,
+                                instrumento_id: e.target.value
+                              })
+                            }
+                          >
+                            <option value="">Seleccione instrumento</option>
+                            {instrumentos.map((i) => (
+                              <option key={i.id} value={i.id}>
+                                {i.nombre}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </Col>
+
+                        <Col md={12}>
+                          <Form.Label>Cantidad</Form.Label>
+                          <Form.Control
+                            type="number"
+                            min={1}
+                            value={asignacion.cantidad}
+                            onChange={(e) =>
+                              setAsignacion({
+                                ...asignacion,
+                                cantidad: e.target.value
+                              })
+                            }
+                          />
+                        </Col>
+                      </Row>
+
+                      <div className="mt-4 d-flex justify-content-end">
+                        <Button
+                          className="btn-primary-modern"
+                          onClick={asignarInstrumento}
+                          disabled={loadingAsignacion}
+                        >
+                          {loadingAsignacion ? (
+                            <Spinner size="sm" animation="border" />
+                          ) : (
+                            "Asignar instrumento"
+                          )}
+                        </Button>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  <Col lg={7}>
+                    <Card className="card-modern-consultorio p-4 lista-card">
+                      <div className="seccion-header">
+                        <h5 className="mb-0">Instrumentos por consultorio</h5>
+                        <span className="contador-pill">
+                          {inventario.length}
+                        </span>
+                      </div>
+
+                      {inventario.length > 0 ? (
+                        <div className="lista-items">
+                          {inventario.map((item) => (
+                            <ItemRow
+                              key={item.id}
+                              tone="asignacion"
+                              avatar={inicial(item.instrumento?.nombre)}
+                              title={item.instrumento?.nombre}
+                              subtitle={`${item.consultorio?.nombre} (#${
+                                item.consultorio?.numero
+                              }) · Cant. ${item.cantidad}`}
+                              badge={
+                                <Badge bg="secondary">
+                                  {item.instrumento?.categoria || "—"}
+                                </Badge>
+                              }
+                              onEdit={null}
+                              onDelete={() =>
+                                pedirConfirmacion(
+                                  "asignacion",
+                                  item.id,
+                                  `${item.instrumento?.nombre} en ${item.consultorio?.nombre}`
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <ListaVacia
+                          icono="🔗"
+                          texto="Todavía no hay instrumentos asignados"
+                        />
+                      )}
+                    </Card>
+                  </Col>
+                </Row>
+              </Tab.Pane>
+            </Tab.Content>
+          </Tab.Container>
+        </div>
+      </div>
+
+      {/* ================= MODAL CONFIRMACIÓN ================= */}
+
+      <Modal
+        show={confirmar.show}
+        onHide={cerrarConfirmacion}
+        centered
+        className="modal-modern"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Seguro que quieres eliminar <strong>{confirmar.nombre}</strong>?
+          Esta acción no se puede deshacer.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cerrarConfirmacion}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={confirmarEliminacion}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
 }

@@ -77,6 +77,10 @@ export default function Sidebar() {
   <i className="bi bi-arrow-left-right"></i>
   Altas y bajas
 </Nav.Link>
+<Nav.Link as={NavLink} to="/farmacia/ingresos-egresos" style={linkStyle}>
+  <i className="bi bi-clipboard2-pulse"></i>
+  Ingresos y Egresos
+</Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/inventario" style={linkStyle}>
           <i className="bi bi-box-seam"></i>
