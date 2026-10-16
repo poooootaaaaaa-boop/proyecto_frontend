@@ -42,6 +42,10 @@ export default function HomeFarmacia() {
   const [busqueda, setBusqueda] = useState("");
   const ultimaRecetaId = useRef(null);
 
+  // 🔹 Estado para el token de Metabase y referencia del contenedor
+  const [metabaseToken, setMetabaseToken] = useState(null);
+  const dashboardRef = useRef(null);
+
   // Modales
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -49,6 +53,7 @@ export default function HomeFarmacia() {
 
   useEffect(() => {
     fetchRecetas(page);
+    fetchMetabaseToken(); // 🔹 Cargar token de Metabase al iniciar
   }, [page]);
 
   useEffect(() => {
@@ -59,6 +64,18 @@ export default function HomeFarmacia() {
     return () => clearInterval(interval);
   }, [page]);
 
+  // 🔹 Efecto para inyectar dinámicamente el componente de Metabase cuando llegue el token
+  useEffect(() => {
+    if (metabaseToken && dashboardRef.current) {
+      dashboardRef.current.innerHTML = ""; // Limpiar por si acaso
+      const dashboardElement = document.createElement('metabase-dashboard');
+      dashboardElement.setAttribute('token', metabaseToken);
+      dashboardElement.setAttribute('with-title', 'true');
+      dashboardElement.setAttribute('with-downloads', 'true');
+      dashboardRef.current.appendChild(dashboardElement);
+    }
+  }, [metabaseToken]);
+
   useEffect(() => {
     if ("Notification" in window) {
       if (Notification.permission !== "granted") {
@@ -66,6 +83,18 @@ export default function HomeFarmacia() {
       }
     }
   }, []);
+
+  // 🔹 Función para obtener el token seguro desde Laravel
+  const fetchMetabaseToken = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/metabase-token`);
+      if (res.data.token) {
+        setMetabaseToken(res.data.token);
+      }
+    } catch (error) {
+      console.error("Error al obtener el token de Metabase:", error);
+    }
+  };
 
   const fetchRecetas = async (pageNumber = 1) => {
     try {
@@ -115,7 +144,6 @@ export default function HomeFarmacia() {
     setPage(value);
   };
 
-  // 🔹 Abrir Editar
   const openModal = (receta) => {
     setRecetaSeleccionada({ ...receta });
     setShowModal(true);
@@ -126,7 +154,6 @@ export default function HomeFarmacia() {
     setRecetaSeleccionada(null);
   };
 
-  // 🔹 Abrir Eliminar
   const openDeleteModal = (receta) => {
     setRecetaSeleccionada(receta);
     setShowDeleteModal(true);
@@ -164,7 +191,6 @@ export default function HomeFarmacia() {
     closeDeleteModal();
   };
 
-  // Procesamiento de medicamentos
   const meds = recetaSeleccionada?.medicamentos
     ? recetaSeleccionada.medicamentos.split(";;").map((med) => {
         const [nombre, presentacion, requiere_receta, stock, precio] = med.split("|");
@@ -180,7 +206,6 @@ export default function HomeFarmacia() {
 
   const total = meds.reduce((acc, m) => acc + (m.precio || 0), 0);
 
-  // Filtrado local para búsqueda en tiempo real
   const recetasFiltradas = (recetas || []).filter((r) => {
     const query = busqueda.toLowerCase();
     return (
@@ -203,7 +228,6 @@ export default function HomeFarmacia() {
       <div className="home-content-modern">
         <Topbar />
 
-        {/* ALERTA FLOTANTE / SNACKBAR */}
         <Snackbar
           open={!!notificacion}
           autoHideDuration={4000}
@@ -216,7 +240,6 @@ export default function HomeFarmacia() {
         </Snackbar>
 
         <div className="home-container">
-          {/* ENCABEZADO Y BÚSQUEDA */}
           <header className="pharmacy-header">
             <div>
               <div className="header-badge">
@@ -241,7 +264,6 @@ export default function HomeFarmacia() {
 
           {/* CUERPO EN GRID */}
           <div className="pharmacy-grid">
-            {/* TABLA PRINCIPAL DE RECETAS */}
             <div className="main-card-container">
               <div className="card-header-flex">
                 <div>
@@ -274,7 +296,6 @@ export default function HomeFarmacia() {
                           key={receta.id}
                           className={receta.estado === "entregado" ? "row-disabled" : ""}
                         >
-                          {/* PACIENTE */}
                           <td>
                             <div className="patient-profile">
                               <img
@@ -290,7 +311,6 @@ export default function HomeFarmacia() {
                             </div>
                           </td>
 
-                          {/* DOCTOR */}
                           <td>
                             <div className="doctor-info">
                               <MedicalServicesRoundedIcon fontSize="small" className="doc-icon" />
@@ -298,7 +318,6 @@ export default function HomeFarmacia() {
                             </div>
                           </td>
 
-                          {/* HORA */}
                           <td>
                             <div className="time-badge">
                               <AccessTimeRoundedIcon fontSize="inherit" />
@@ -306,7 +325,6 @@ export default function HomeFarmacia() {
                             </div>
                           </td>
 
-                          {/* ESTADO */}
                           <td>
                             <span
                               className={`status-chip ${
@@ -325,7 +343,6 @@ export default function HomeFarmacia() {
                             </span>
                           </td>
 
-                          {/* ACCIONES */}
                           <td className="text-center">
                             <div className="actions-cell">
                               <Tooltip title="Editar / Ver Detalle" arrow>
@@ -358,7 +375,6 @@ export default function HomeFarmacia() {
                 </table>
               </div>
 
-              {/* PAGINACIÓN */}
               <div className="pagination-wrapper">
                 <Pagination
                   count={pagination.last_page || 1}
@@ -372,7 +388,6 @@ export default function HomeFarmacia() {
 
             {/* SIDEBAR DE ACCIONES Y ESTADÍSTICAS */}
             <aside className="quick-sidebar">
-              {/* ACCIONES */}
               <div className="sidebar-card">
                 <h4 className="sidebar-title">Gestión Rápida</h4>
                 <div className="buttons-stack">
@@ -394,7 +409,6 @@ export default function HomeFarmacia() {
                 </div>
               </div>
 
-              {/* MÉTRICAS */}
               <div className="sidebar-card metric">
                 <div className="metric-icon-box amber">
                   <PendingActionsRoundedIcon />
@@ -416,6 +430,13 @@ export default function HomeFarmacia() {
               </div>
             </aside>
           </div>
+
+          {/* 🔹 SECCIÓN DEL DASHBOARD DE METABASE */}
+          <div style={{ marginTop: "30px", background: "#fff", padding: "20px", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}>
+            <h3 style={{ marginBottom: "15px" }}>Estadísticas Globales de Farmacia</h3>
+            <div ref={dashboardRef}></div>
+          </div>
+
         </div>
       </div>
 
@@ -448,7 +469,6 @@ export default function HomeFarmacia() {
         <DialogContent style={{ padding: "16px 0" }}>
           {recetaSeleccionada && (
             <div className="modal-body-custom">
-              {/* DATOS GENERALES */}
               <div className="info-summary-box">
                 <div className="summary-item">
                   <PersonRoundedIcon className="summary-icon" />
@@ -475,7 +495,6 @@ export default function HomeFarmacia() {
                 </div>
               </div>
 
-              {/* LISTA DE MEDICAMENTOS */}
               <div className="meds-section">
                 <h4 className="meds-title">Medicamentos Prescritos</h4>
 
@@ -518,13 +537,11 @@ export default function HomeFarmacia() {
                 )}
               </div>
 
-              {/* TOTAL ESTIMADO */}
               <div className="total-price-box">
                 <span>Total Estimado:</span>
                 <strong className="total-amount">${total.toFixed(2)}</strong>
               </div>
 
-              {/* CAMBIO DE ESTADO */}
               <div className="status-selector-box">
                 <label className="select-label">Estado de la Orden</label>
                 <select
@@ -539,7 +556,6 @@ export default function HomeFarmacia() {
                 </select>
               </div>
 
-              {/* ACCIONES DEL MODAL */}
               <div className="modal-actions-wrapper">
                 <button type="button" className="btn-modal-cancel" onClick={closeModal}>
                   Cerrar

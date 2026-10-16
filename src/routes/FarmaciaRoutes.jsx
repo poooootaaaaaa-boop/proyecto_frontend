@@ -16,18 +16,12 @@ import ConfigurarPagoDoctor from "../pages/farmacia/ConfigurarPagoDoctor";
 import AsignarDoctorConsultorio from "../pages/farmacia/AsignarDoctorConsultorio";
 import ManifestoResiduo from "../pages/farmacia/ManifestoResiduo";
 import MedicinasCaducacadas from "../pages/farmacia/MedicinasCaducacadas";
-
-
 import DocumentoControlAlimento from "../pages/farmacia/DocumentoControlAlimento";
-
 import ReporteHabitacion from "../pages/farmacia/ReporteHabitacion";
-
 import PruebaConsentimientoFirma from "../pages/farmacia/PruebaConsentimientoFirma";
-import GestionIngresosEgresos from "../pages/farmacia/GestionIngresosEgresos"; // nuevo: ingresos/altas/historial/reportes
-
-import DocumentoReporte  from "../pages/farmacia/DocumentoReporte";
+import GestionIngresosEgresos from "../pages/farmacia/GestionIngresosEgresos";
+import DocumentoReporte from "../pages/farmacia/DocumentoReporte";
 import ControlAlimientos from "../pages/farmacia/ControlAlimientos";
-
 export default function FarmaciaRoutes(){
     return(
         <Routes>
