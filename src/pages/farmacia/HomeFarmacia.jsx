@@ -54,7 +54,7 @@ export default function HomeFarmacia() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchRecetas(page);
-    }, 5000); // Cada 5 segundos
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [page]);
@@ -115,7 +115,6 @@ export default function HomeFarmacia() {
     setPage(value);
   };
 
-  // 🔹 Abrir Editar
   const openModal = (receta) => {
     setRecetaSeleccionada({ ...receta });
     setShowModal(true);
@@ -126,7 +125,6 @@ export default function HomeFarmacia() {
     setRecetaSeleccionada(null);
   };
 
-  // 🔹 Abrir Eliminar
   const openDeleteModal = (receta) => {
     setRecetaSeleccionada(receta);
     setShowDeleteModal(true);
@@ -164,7 +162,6 @@ export default function HomeFarmacia() {
     closeDeleteModal();
   };
 
-  // Procesamiento de medicamentos
   const meds = recetaSeleccionada?.medicamentos
     ? recetaSeleccionada.medicamentos.split(";;").map((med) => {
         const [nombre, presentacion, requiere_receta, stock, precio] = med.split("|");
@@ -180,7 +177,6 @@ export default function HomeFarmacia() {
 
   const total = meds.reduce((acc, m) => acc + (m.precio || 0), 0);
 
-  // Filtrado local para búsqueda en tiempo real
   const recetasFiltradas = (recetas || []).filter((r) => {
     const query = busqueda.toLowerCase();
     return (
@@ -216,9 +212,9 @@ export default function HomeFarmacia() {
         </Snackbar>
 
         <div className="home-container">
-          {/* ENCABEZADO Y BÚSQUEDA */}
+          {/* ENCABEZADO Y BÚSQUEDA REDISEÑADO */}
           <header className="pharmacy-header">
-            <div>
+            <div className="header-titles">
               <div className="header-badge">
                 <LocalPharmacyRoundedIcon fontSize="small" />
                 <span>Módulo de Dispensación</span>
@@ -231,7 +227,7 @@ export default function HomeFarmacia() {
               <SearchIcon className="search-icon" />
               <input
                 type="search"
-                placeholder="Buscar paciente o doctor..."
+                placeholder="Buscar por paciente o doctor..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 className="modern-search-input"
@@ -247,6 +243,9 @@ export default function HomeFarmacia() {
                 <div>
                   <h3>Próximas Recetas</h3>
                   <p className="card-subtext">Monitoreo y despacho de órdenes de hoy</p>
+                </div>
+                <div className="header-pill-counter">
+                  <span>{recetasFiltradas.length} Registros</span>
                 </div>
               </div>
 
@@ -265,7 +264,10 @@ export default function HomeFarmacia() {
                     {recetasFiltradas.length === 0 ? (
                       <tr>
                         <td colSpan="5" className="empty-table-td">
-                          No hay recetas registradas para mostrar.
+                          <div className="empty-state-content">
+                            <MedicationRoundedIcon style={{ fontSize: 48, opacity: 0.3, marginBottom: 8 }} />
+                            <p>No hay recetas registradas para mostrar.</p>
+                          </div>
                         </td>
                       </tr>
                     ) : (
@@ -317,6 +319,7 @@ export default function HomeFarmacia() {
                                   : "danger"
                               }`}
                             >
+                              <span className="status-dot"></span>
                               {receta.estado === "entregado"
                                 ? "Entregado"
                                 : receta.estado === "pendiente"
@@ -334,7 +337,7 @@ export default function HomeFarmacia() {
                                   className="btn-action-icon edit"
                                   onClick={() => openModal(receta)}
                                 >
-                                  <EditNoteRoundedIcon />
+                                  <EditNoteRoundedIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
 
@@ -345,7 +348,7 @@ export default function HomeFarmacia() {
                                     className="btn-action-icon check"
                                     onClick={() => cambiarEstado(receta.id, "entregado")}
                                   >
-                                    <CheckCircleRoundedIcon />
+                                    <CheckCircleRoundedIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
                               )}
@@ -425,27 +428,30 @@ export default function HomeFarmacia() {
         onClose={closeModal}
         PaperProps={{
           style: {
-            borderRadius: "20px",
-            padding: "8px",
-            maxWidth: "520px",
+            borderRadius: "24px",
+            padding: "4px",
+            maxWidth: "540px",
             width: "100%",
+            boxShadow: "0 24px 48px rgba(0,0,0,0.15)",
           },
         }}
       >
         <div className="modal-header-custom">
           <div className="dialog-title-wrapper">
-            <MedicationRoundedIcon className="dialog-title-icon" />
+            <div className="dialog-icon-container">
+              <MedicationRoundedIcon />
+            </div>
             <div>
               <h3>Detalle de Receta</h3>
               <p>Revisión e inventario de medicamentos prescritos</p>
             </div>
           </div>
-          <IconButton onClick={closeModal} size="small">
+          <IconButton onClick={closeModal} size="small" className="modal-close-btn">
             <CloseRoundedIcon />
           </IconButton>
         </div>
 
-        <DialogContent style={{ padding: "16px 0" }}>
+        <DialogContent style={{ padding: "20px 24px" }}>
           {recetaSeleccionada && (
             <div className="modal-body-custom">
               {/* DATOS GENERALES */}
@@ -485,7 +491,7 @@ export default function HomeFarmacia() {
                   meds.map((m, i) => (
                     <details key={i} className="med-accordion">
                       <summary className="med-accordion-summary">
-                        <span>{m.nombre}</span>
+                        <span className="med-name-bullet">{m.nombre}</span>
                         <ExpandMoreRoundedIcon fontSize="small" />
                       </summary>
 
@@ -559,29 +565,32 @@ export default function HomeFarmacia() {
         onClose={closeDeleteModal}
         PaperProps={{
           style: {
-            borderRadius: "20px",
-            padding: "8px",
-            maxWidth: "400px",
+            borderRadius: "24px",
+            padding: "4px",
+            maxWidth: "420px",
             width: "100%",
+            boxShadow: "0 24px 48px rgba(0,0,0,0.15)",
           },
         }}
       >
         <div className="modal-header-custom">
           <div className="dialog-title-wrapper danger">
-            <ReportProblemRoundedIcon className="dialog-title-icon red" />
+            <div className="dialog-icon-container red-bg">
+              <ReportProblemRoundedIcon className="red" />
+            </div>
             <div>
               <h3>Eliminar Receta</h3>
               <p>Confirmación de borrado</p>
             </div>
           </div>
-          <IconButton onClick={closeDeleteModal} size="small">
+          <IconButton onClick={closeDeleteModal} size="small" className="modal-close-btn">
             <CloseRoundedIcon />
           </IconButton>
         </div>
 
-        <DialogContent style={{ padding: "16px 0" }}>
+        <DialogContent style={{ padding: "20px 24px" }}>
           <div className="delete-modal-content">
-            <p>
+            <p className="delete-warning-text">
               ¿Estás seguro de que deseas eliminar la receta del paciente{" "}
               <strong>{recetaSeleccionada?.paciente}</strong>? Esta acción no se puede deshacer.
             </p>

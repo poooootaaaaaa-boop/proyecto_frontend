@@ -14,8 +14,6 @@ import {
 } from "@mui/material";
 
 // Icons
-import MoveToInboxRoundedIcon from "@mui/icons-material/MoveToInboxRounded";
-import OutboxRoundedIcon from "@mui/icons-material/OutboxRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import AccessTimeFilledRoundedIcon from "@mui/icons-material/AccessTimeFilledRounded";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
@@ -89,8 +87,6 @@ export default function DashboardFarmacia() {
 
   const dataMostrar = medicamentoSeleccionado ? inventarioFiltrado : inventarioCritico;
 
-  const entradasMes = movimientos.filter((m) => m.tipo === "entrada").reduce((acc, m) => acc + m.cantidad, 0);
-  const salidasMes = movimientos.filter((m) => m.tipo === "salida").reduce((acc, m) => acc + m.cantidad, 0);
   const productosBajos = inventario.filter((p) => p.stock < p.minimo);
   const proximosCaducar = inventario.filter((p) => p.caducaEn <= 15);
 
@@ -222,24 +218,8 @@ export default function DashboardFarmacia() {
             </div>
           </header>
 
-          {/* TARJETAS KPI / MÉTRICAS */}
-          <section className="stats-grid">
-            <div className="stat-card-modern blue">
-              <div className="stat-icon-wrapper"><MoveToInboxRoundedIcon /></div>
-              <div className="stat-data">
-                <small>Entradas del Mes</small>
-                <h3>{entradasMes}</h3>
-              </div>
-            </div>
-
-            <div className="stat-card-modern indigo">
-              <div className="stat-icon-wrapper"><OutboxRoundedIcon /></div>
-              <div className="stat-data">
-                <small>Salidas del Mes</small>
-                <h3>{salidasMes}</h3>
-              </div>
-            </div>
-
+          {/* TARJETAS KPI / MÉTRICAS (SIN ENTRADAS NI SALIDAS) */}
+          <section className="stats-grid stats-grid-3">
             <div className="stat-card-modern amber">
               <div className="stat-icon-wrapper"><WarningAmberRoundedIcon /></div>
               <div className="stat-data">
