@@ -1,9 +1,10 @@
 import { Card, Form, Button, Row, Col, Modal, Alert } from "react-bootstrap";
 import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Human from "@vladmandic/human";
 const API_URL = import.meta.env.VITE_API_URL;
 export default function AgregarDoctor() {
 
@@ -23,6 +24,168 @@ const [doctor, setDoctor] = useState({
   anios_exp: "",
   telefono: "",
 });
+
+// Registro facial
+const [mostrarCamara, setMostrarCamara] = useState(false);
+const [rostroDetectado, setRostroDetectado] = useState(false);
+const [mensajeRostro, setMensajeRostro] = useState(
+  "Coloca tu rostro frente a la cámara"
+);
+const [faceEmbedding, setFaceEmbedding] = useState(null);
+
+const videoRef = useRef(null);
+const streamRef = useRef(null);
+const humanRef = useRef(null);
+const deteccionActivaRef = useRef(false);
+
+
+useEffect(() => {
+  const human = new Human({
+    modelBasePath: "https://vladmandic.github.io/human-models/models/",
+    face: {
+      enabled: true,
+      detector: { enabled: true },
+      mesh: { enabled: true },
+      description: { enabled: true },
+      antispoof: { enabled: true },
+      liveness: { enabled: true },
+    },
+    body: { enabled: false },
+    hand: { enabled: false },
+    object: { enabled: false },
+  });
+
+  humanRef.current = human;
+
+  human.load()
+    .then(() => human.warmup())
+    .catch((err) => {
+      console.error("Error cargando Human:", err);
+      setError("No se pudieron cargar los modelos faciales.");
+    });
+
+  return () => {
+    detenerCamara();
+  };
+}, []);
+
+const iniciarCamara = async () => {
+  try {
+    setError("");
+    setFaceEmbedding(null);
+    setRostroDetectado(false);
+    setMensajeRostro("Coloca tu rostro frente a la cámara");
+
+    if (!humanRef.current) {
+      setError("El reconocimiento facial todavía está cargando.");
+      return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+      },
+    });
+
+    streamRef.current = stream;
+    setMostrarCamara(true);
+
+    // Espera a que React monte el elemento video.
+    requestAnimationFrame(() => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(console.error);
+      }
+    });
+  } catch (err) {
+    console.error("Error iniciando cámara:", err);
+    setError("No se pudo acceder a la cámara. Revisa los permisos.");
+  }
+};
+
+const detenerCamara = () => {
+  deteccionActivaRef.current = false;
+
+  if (streamRef.current) {
+    streamRef.current.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }
+
+  if (videoRef.current) {
+    videoRef.current.pause();
+    videoRef.current.srcObject = null;
+  }
+
+  setMostrarCamara(false);
+};
+
+const detectarRostro = async () => {
+  if (!videoRef.current || !humanRef.current) {
+    return;
+  }
+
+  if (videoRef.current.readyState < 2) {
+    setError("Espera a que la cámara esté lista.");
+    return;
+  }
+
+  try {
+    setMensajeRostro("Analizando rostro...");
+
+    const resultado = await humanRef.current.detect(videoRef.current);
+
+    if (!resultado.face || resultado.face.length === 0) {
+      setRostroDetectado(false);
+      setFaceEmbedding(null);
+      setMensajeRostro("No se detectó ningún rostro.");
+      return;
+    }
+
+    if (resultado.face.length !== 1) {
+      setRostroDetectado(false);
+      setFaceEmbedding(null);
+      setMensajeRostro("Debe aparecer una sola persona en la cámara.");
+      return;
+    }
+
+    const rostro = resultado.face[0];
+
+    if (!rostro.embedding || rostro.embedding.length === 0) {
+      setRostroDetectado(false);
+      setFaceEmbedding(null);
+      setMensajeRostro("No se pudo obtener la información facial. Intenta de nuevo.");
+      return;
+    }
+
+    setFaceEmbedding(Array.from(rostro.embedding));
+    setRostroDetectado(true);
+    setMensajeRostro("Rostro registrado correctamente.");
+  } catch (err) {
+    console.error("Error detectando rostro:", err);
+    setError("Ocurrió un error al analizar el rostro.");
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const handleChange = (e) => {
     setDoctor({
@@ -75,10 +238,15 @@ const guardarDoctor = async () => {
     formData.append("cedula_profesional", doctor.cedula_profesional);
     formData.append("anios_exp", doctor.anios_exp);
     formData.append("telefono", doctor.telefono);
-
     if (imagen) {
       formData.append("imagen", imagen);
     }
+    if (faceEmbedding) {
+        formData.append(
+          "face_embedding",
+          JSON.stringify(faceEmbedding)
+        );
+      }
 
     const response = await axios.post(
       `${API_URL}/doctores`,
@@ -91,6 +259,7 @@ const guardarDoctor = async () => {
     );
 
     cerrarModal();
+    detenerCamara();
     navigate("/farmacia/doctores");
 
   } catch (err) {
@@ -243,6 +412,71 @@ const guardarDoctor = async () => {
           </Row>
 
           <div className="d-flex justify-content-end gap-3 mt-4">
+
+          
+
+          <Card className="card-modern p-4 mt-3">
+              <h6 className="mb-3">Registro facial del doctor</h6>
+
+              <p>
+                Registra el rostro del doctor para permitir el acceso mediante
+                reconocimiento facial.
+              </p>
+
+              {!mostrarCamara && (
+                <Button
+                  variant="outline-primary"
+                  onClick={iniciarCamara}
+                >
+                  Activar cámara
+                </Button>
+              )}
+
+              {mostrarCamara && (
+                <div className="text-center">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    style={{
+                      width: "100%",
+                      maxWidth: "420px",
+                      aspectRatio: "4 / 3",
+                      objectFit: "cover",
+                      transform: "scaleX(-1)",
+                      borderRadius: "12px",
+                      backgroundColor: "#000",
+                    }}
+                  />
+
+                  <p className="mt-3">{mensajeRostro}</p>
+
+                  <div className="d-flex justify-content-center gap-2">
+                    <Button
+                      variant="success"
+                      onClick={detectarRostro}
+                    >
+                      Capturar rostro
+                    </Button>
+
+                    <Button
+                      variant="secondary"
+                      onClick={detenerCamara}
+                    >
+                      Apagar cámara
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {rostroDetectado && faceEmbedding && (
+                <Alert variant="success" className="mt-3 mb-0">
+                  Rostro listo para guardar. Se obtuvo una representación facial
+                  de {faceEmbedding.length} valores.
+                </Alert>
+              )}
+            </Card>
 
             <Button
               variant="light"

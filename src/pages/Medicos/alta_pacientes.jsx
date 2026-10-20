@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Axios from "axios";
 
@@ -16,7 +16,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import KeyRoundedIcon from "@mui/icons-material/KeyRounded";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
-
+import Human from "@vladmandic/human";
 import "./AltaPacientes.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -56,6 +56,191 @@ function Alta_pacientes({ data, setData }) {
     password: "",
   });
   const [copiado, setCopiado] = useState(false);
+
+      // Estados para el registro facial
+    const [mostrarCamara, setMostrarCamara] = useState(false);
+    const [rostroDetectado, setRostroDetectado] = useState(false);
+    const [rostroRegistrado, setRostroRegistrado] = useState(false);
+    const [mensajeRostro, setMensajeRostro] = useState("");
+
+    // Referencias para la cámara y Human
+    const videoRef = useRef(null);
+    const streamRef = useRef(null);
+    const humanRef = useRef(null);
+    const embeddingRef = useRef(null);
+
+
+
+
+
+
+
+
+
+
+    useEffect(() => {
+  const inicializarHuman = async () => {
+    try {
+      const config = {
+        backend: "webgl",
+        modelBasePath:
+          "https://vladmandic.github.io/human-models/models/",
+
+        face: {
+          enabled: true,
+          detector: {
+            rotation: true,
+            return: true,
+          },
+          mesh: { enabled: true },
+          description: { enabled: true },
+          iris: { enabled: false },
+          emotion: { enabled: false },
+          age: { enabled: false },
+          gender: { enabled: false },
+          antispoof: { enabled: true },
+          liveness: { enabled: true },
+        },
+
+        body: { enabled: false },
+        hand: { enabled: false },
+        object: { enabled: false },
+        gesture: { enabled: false },
+        segmentation: { enabled: false },
+      };
+
+      const human = new Human(config);
+
+      humanRef.current = human;
+
+      await human.load();
+      await human.warmup();
+
+      console.log("Human cargado en alta de pacientes");
+    } catch (error) {
+      console.error("Error cargando Human:", error);
+    }
+  };
+
+  inicializarHuman();
+
+  return () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  };
+}, []);
+
+
+// Abrir cámara frontal
+const abrirCamara = async () => {
+  try {
+    setMensajeRostro("");
+    setRostroDetectado(false);
+
+    embeddingRef.current = null;
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false,
+    });
+
+    streamRef.current = stream;
+    setMostrarCamara(true);
+  } catch (error) {
+    console.error("Error accediendo a la cámara:", error);
+    setMensajeRostro(
+      "No se pudo acceder a la cámara. Verifica los permisos."
+    );
+  }
+};
+
+// Detectar rostro y generar embedding
+const detectarRostroPaciente = async () => {
+  const human = humanRef.current;
+  const video = videoRef.current;
+
+  if (
+    !human ||
+    !video ||
+    video.readyState < 2
+  ) {
+    return;
+  }
+
+  try {
+    const resultado = await human.detect(video);
+
+    if (resultado.face && resultado.face.length > 0) {
+      const rostro = resultado.face[0];
+
+      if (rostro.embedding?.length === 1024) {
+        embeddingRef.current = Array.from(rostro.embedding);
+
+        setRostroDetectado(true);
+        setMensajeRostro("Rostro detectado correctamente.");
+      } else {
+        setRostroDetectado(false);
+        setMensajeRostro(
+          "No se pudo generar el registro facial. Intenta nuevamente."
+        );
+      }
+    } else {
+      embeddingRef.current = null;
+      setRostroDetectado(false);
+      setMensajeRostro("Coloca tu rostro frente a la cámara.");
+    }
+  } catch (error) {
+    console.error("Error detectando rostro:", error);
+    setMensajeRostro("Ocurrió un error al detectar el rostro.");
+  }
+};
+
+// Confirmar registro facial
+const confirmarRostro = () => {
+  if (!embeddingRef.current || !rostroDetectado) {
+    setMensajeRostro("Primero coloca tu rostro frente a la cámara.");
+    return;
+  }
+
+  setRostroRegistrado(true);
+  setMensajeRostro("Rostro registrado correctamente.");
+
+  cerrarCamara();
+};
+
+// Cerrar cámara y detener el video
+const cerrarCamara = () => {
+  if (streamRef.current) {
+    streamRef.current.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }
+
+  setMostrarCamara(false);
+  setRostroDetectado(false);
+};
+
+// Detectar automáticamente mientras la cámara esté abierta
+useEffect(() => {
+  if (!mostrarCamara) return;
+
+  const intervalo = setInterval(() => {
+    detectarRostroPaciente();
+  }, 1000);
+
+  return () => clearInterval(intervalo);
+}, [mostrarCamara]);
+
+
+
+
+
+
+
+
+
+
 
   // Función para validar campos obligatorios localmente
   const validarFormulario = () => {
@@ -100,6 +285,10 @@ function Alta_pacientes({ data, setData }) {
       tipoSangre: tipoSangre || null,
       alergias: alergias.trim() || null,
       padecimientoHeredofamiliar: padecimientoHeredofamiliar.trim() || null,
+
+      face_embedding: embeddingRef.current
+    ? JSON.stringify(embeddingRef.current)
+    : null,
     };
 
     if (typeof setData === "function") {
@@ -455,6 +644,35 @@ function Alta_pacientes({ data, setData }) {
               </div>
             </div>
 
+            {/* Sección de registro facial */}
+<div className="glass-card">
+  <div className="card-section-title">
+    <PersonIcon className="section-icon" />
+    <div>
+      <h3>Reconocimiento Facial</h3>
+      <p>Registrar el rostro del paciente</p>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    className="btn-submit"
+    onClick={abrirCamara}
+  >
+    Registrar rostro
+  </button>
+
+  {rostroRegistrado && (
+    <p style={{ color: "green", marginTop: "12px" }}>
+      ✓ Rostro registrado correctamente
+    </p>
+  )}
+
+  {mensajeRostro && !mostrarCamara && (
+    <p style={{ marginTop: "10px" }}>{mensajeRostro}</p>
+  )}
+</div>
+
             {/* Panel de Botones */}
             <div className="action-panel">
               <Link to="/Medicos/lista_paciente" className="btn-cancel">
@@ -535,6 +753,70 @@ function Alta_pacientes({ data, setData }) {
               </div>
             </DialogContent>
           </Dialog>
+          {/* Modal de reconocimiento facial */}
+<Dialog
+  open={mostrarCamara}
+  onClose={cerrarCamara}
+  fullWidth
+  maxWidth="sm"
+>
+  <DialogContent>
+    <div style={{ textAlign: "center", padding: "10px" }}>
+      <h2>Registrar rostro del paciente</h2>
+
+      <p>
+        Coloca el rostro frente a la cámara y mira directamente hacia ella.
+      </p>
+
+      <video
+        ref={(elemento) => {
+          videoRef.current = elemento;
+
+          if (elemento && streamRef.current) {
+            elemento.srcObject = streamRef.current;
+          }
+        }}
+        autoPlay
+        muted
+        playsInline
+        style={{
+          width: "100%",
+          maxWidth: "420px",
+          borderRadius: "12px",
+          backgroundColor: "#000",
+          transform: "scaleX(-1)",
+        }}
+      />
+
+      <p
+        style={{
+          color: rostroDetectado ? "green" : "#555",
+          marginTop: "12px",
+        }}
+      >
+        {mensajeRostro || "Esperando detección facial..."}
+      </p>
+
+      <button
+        type="button"
+        className="btn-submit"
+        onClick={confirmarRostro}
+        disabled={!rostroDetectado}
+        style={{ marginRight: "8px" }}
+      >
+        Confirmar rostro
+      </button>
+
+      <button
+        type="button"
+        className="btn-cancel"
+        onClick={cerrarCamara}
+      >
+        Cerrar cámara
+      </button>
+    </div>
+  </DialogContent>
+</Dialog>
         </div>
       )}
     </Layout_Medicos>
