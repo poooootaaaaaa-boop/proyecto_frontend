@@ -62,12 +62,14 @@ function Alta_pacientes({ data, setData }) {
     const [rostroDetectado, setRostroDetectado] = useState(false);
     const [rostroRegistrado, setRostroRegistrado] = useState(false);
     const [mensajeRostro, setMensajeRostro] = useState("");
+    const [estadoFaceId, setEstadoFaceId] = useState(null);
 
     // Referencias para la cámara y Human
     const videoRef = useRef(null);
     const streamRef = useRef(null);
     const humanRef = useRef(null);
     const embeddingRef = useRef(null);
+    const guardandoRef = useRef(false);
 
 
 
@@ -136,10 +138,10 @@ function Alta_pacientes({ data, setData }) {
 // Abrir cámara frontal
 const abrirCamara = async () => {
   try {
-    setMensajeRostro("");
+    setMensajeRostro("Coloca el rostro frente a la cámara.");
     setRostroDetectado(false);
-
-    embeddingRef.current = null;
+    guardandoRef.current = false;
+    setEstadoFaceId(null);
 
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
@@ -156,7 +158,17 @@ const abrirCamara = async () => {
   }
 };
 
-// Detectar rostro y generar embedding
+// Re-capturar rostro por si salió mal
+const recapturarRostro = () => {
+  embeddingRef.current = null;
+  guardandoRef.current = false;
+  setRostroDetectado(false);
+  setRostroRegistrado(false);
+  setEstadoFaceId(null);
+  setMensajeRostro("Coloca el rostro frente a la cámara.");
+};
+
+// Detectar rostro y generar embedding automáticamente
 const detectarRostroPaciente = async () => {
   const human = humanRef.current;
   const video = videoRef.current;
@@ -164,7 +176,8 @@ const detectarRostroPaciente = async () => {
   if (
     !human ||
     !video ||
-    video.readyState < 2
+    video.readyState < 2 ||
+    guardandoRef.current
   ) {
     return;
   }
@@ -175,11 +188,21 @@ const detectarRostroPaciente = async () => {
     if (resultado.face && resultado.face.length > 0) {
       const rostro = resultado.face[0];
 
-      if (rostro.embedding?.length === 1024) {
+      if (rostro.embedding) {
+        guardandoRef.current = true;
         embeddingRef.current = Array.from(rostro.embedding);
 
         setRostroDetectado(true);
-        setMensajeRostro("Rostro detectado correctamente.");
+        setRostroRegistrado(true);
+        setMensajeRostro("Rostro guardado correctamente.");
+
+        // Animación Face ID idéntica al login
+        setEstadoFaceId("loading");
+        await new Promise((r) => setTimeout(r, 400));
+        setEstadoFaceId("success");
+
+        await new Promise((r) => setTimeout(r, 1600));
+        setEstadoFaceId(null);
       } else {
         setRostroDetectado(false);
         setMensajeRostro(
@@ -187,9 +210,10 @@ const detectarRostroPaciente = async () => {
         );
       }
     } else {
-      embeddingRef.current = null;
-      setRostroDetectado(false);
-      setMensajeRostro("Coloca tu rostro frente a la cámara.");
+      if (!guardandoRef.current) {
+        setRostroDetectado(false);
+        setMensajeRostro("Coloca el rostro frente a la cámara.");
+      }
     }
   } catch (error) {
     console.error("Error detectando rostro:", error);
@@ -212,6 +236,8 @@ const confirmarRostro = () => {
 
 // Cerrar cámara y detener el video
 const cerrarCamara = () => {
+  guardandoRef.current = false;
+  setEstadoFaceId(null);
   if (streamRef.current) {
     streamRef.current.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
@@ -223,14 +249,14 @@ const cerrarCamara = () => {
 
 // Detectar automáticamente mientras la cámara esté abierta
 useEffect(() => {
-  if (!mostrarCamara) return;
+  if (!mostrarCamara || guardandoRef.current) return;
 
   const intervalo = setInterval(() => {
     detectarRostroPaciente();
-  }, 1000);
+  }, 700);
 
   return () => clearInterval(intervalo);
-}, [mostrarCamara]);
+}, [mostrarCamara, rostroRegistrado]);
 
 
 
@@ -650,7 +676,7 @@ useEffect(() => {
     <PersonIcon className="section-icon" />
     <div>
       <h3>Reconocimiento Facial</h3>
-      <p>Registrar el rostro del paciente</p>
+      <p>Registrar el rostro del paciente para acceso biométrico</p>
     </div>
   </div>
 
@@ -659,17 +685,21 @@ useEffect(() => {
     className="btn-submit"
     onClick={abrirCamara}
   >
-    Registrar rostro
+    {rostroRegistrado ? "Actualizar rostro" : "Registrar rostro"}
   </button>
 
   {rostroRegistrado && (
-    <p style={{ color: "green", marginTop: "12px" }}>
-      ✓ Rostro registrado correctamente
-    </p>
+    <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginTop: "12px", background: "rgba(34, 197, 94, 0.1)", border: "1px solid rgba(34, 197, 94, 0.3)", padding: "8px 14px", borderRadius: "10px", color: "#166534", fontSize: "13px", fontWeight: "600" }}>
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+        <circle cx="10" cy="10" r="9" stroke="#16a34a" strokeWidth="2" fill="none" />
+        <path d="M6 10 L9 13 L14 7" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      Rostro guardado correctamente
+    </div>
   )}
 
-  {mensajeRostro && !mostrarCamara && (
-    <p style={{ marginTop: "10px" }}>{mensajeRostro}</p>
+  {mensajeRostro && !mostrarCamara && !rostroRegistrado && (
+    <p style={{ marginTop: "10px", color: "#64748b", fontSize: "13px" }}>{mensajeRostro}</p>
   )}
 </div>
 
@@ -754,24 +784,56 @@ useEffect(() => {
             </DialogContent>
           </Dialog>
           {/* Modal de reconocimiento facial */}
+          {/* Modal de reconocimiento facial biométrico */}
 <Dialog
   open={mostrarCamara}
   onClose={cerrarCamara}
-  fullWidth
-  maxWidth="sm"
+  PaperProps={{
+    style: {
+      borderRadius: "24px",
+      padding: "24px",
+      maxWidth: "480px",
+      width: "100%",
+      backgroundColor: "#ffffff",
+      boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.25)",
+      overflow: "hidden",
+    },
+  }}
 >
-  <DialogContent>
-    <div style={{ textAlign: "center", padding: "10px" }}>
-      <h2>Registrar rostro del paciente</h2>
+  <div className="biometric-modal-header">
+    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <div className="biometric-card-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M 3 7 V 5 A 2 2 0 0 1 5 3 H 7" />
+          <path d="M 17 3 H 19 A 2 2 0 0 1 21 5 V 7" />
+          <path d="M 21 17 V 19 A 2 2 0 0 1 19 21 H 17" />
+          <path d="M 7 21 H 5 A 2 2 0 0 1 3 19 V 17" />
+          <circle cx="9" cy="10" r="1" fill="#2563eb" />
+          <circle cx="15" cy="10" r="1" fill="#2563eb" />
+          <path d="M 9.5 15 C 10.5 16.2 13.5 16.2 14.5 15" />
+        </svg>
+      </div>
+      <div>
+        <h3 className="biometric-modal-title">Registrar rostro del paciente</h3>
+        <p className="biometric-modal-subtitle">Centra el rostro del paciente dentro del visor</p>
+      </div>
+    </div>
+    <button
+      type="button"
+      className="biometric-modal-close"
+      onClick={cerrarCamara}
+      disabled={!!estadoFaceId}
+      title="Cerrar"
+    >
+      ✕
+    </button>
+  </div>
 
-      <p>
-        Coloca el rostro frente a la cámara y mira directamente hacia ella.
-      </p>
-
+  <div className="biometric-camera-wrapper text-center">
+    <div className={`camera-viewfinder-reg ${rostroDetectado ? "is-detected" : ""}`}>
       <video
         ref={(elemento) => {
           videoRef.current = elemento;
-
           if (elemento && streamRef.current) {
             elemento.srcObject = streamRef.current;
           }
@@ -779,43 +841,105 @@ useEffect(() => {
         autoPlay
         muted
         playsInline
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          borderRadius: "12px",
-          backgroundColor: "#000",
-          transform: "scaleX(-1)",
-        }}
+        className="camera-video-reg"
       />
 
-      <p
-        style={{
-          color: rostroDetectado ? "green" : "#555",
-          marginTop: "12px",
-        }}
-      >
-        {mensajeRostro || "Esperando detección facial..."}
-      </p>
+      {estadoFaceId && (
+        <div className="faceid-overlay">
+          <div className="faceid-card">
+            {estadoFaceId === "loading" && (
+              <>
+                <div className="faceid-icon-container">
+                  <div className="faceid-pulse-ring"></div>
+                  <div className="faceid-scanner-laser"></div>
+                  <svg viewBox="0 0 100 100" className="faceid-svg">
+                    <path d="M 22 36 V 26 A 12 12 0 0 1 34 14 H 44" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                    <path d="M 56 14 H 66 A 12 12 0 0 1 78 26 V 36" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                    <path d="M 78 64 V 74 A 12 12 0 0 1 66 86 H 56" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                    <path d="M 44 86 H 34 A 12 12 0 0 1 22 74 V 64" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                    <circle cx="37" cy="42" r="4.5" fill="#30d158" />
+                    <circle cx="63" cy="42" r="4.5" fill="#30d158" />
+                    <path d="M 50 42 V 55 A 4 4 0 0 1 46 59 H 45" fill="none" stroke="#30d158" strokeWidth="4.5" strokeLinecap="round" />
+                    <path d="M 37 68 Q 50 78 63 68" fill="none" stroke="#30d158" strokeWidth="5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <h3 className="faceid-title">Face ID</h3>
+                <p className="faceid-subtitle">Guardando rostro...</p>
+                <div className="faceid-bar-loader">
+                  <div className="faceid-bar-fill"></div>
+                </div>
+              </>
+            )}
+
+            {estadoFaceId === "success" && (
+              <>
+                <div className="faceid-success-circle">
+                  <svg viewBox="0 0 60 60" className="faceid-check-svg">
+                    <path
+                      d="M 16 31 L 26 41 L 44 20"
+                      fill="none"
+                      stroke="#30d158"
+                      strokeWidth="5.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="faceid-check-path"
+                    />
+                  </svg>
+                </div>
+                <h3 className="faceid-title">Face ID</h3>
+                <p className="faceid-subtitle" style={{ color: "#30d158", fontWeight: "600", marginTop: "4px" }}>
+                  Rostro guardado
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="viewfinder-hud-reg">
+        <div className={`viewfinder-badge-reg ${rostroDetectado ? "detected" : "searching"}`}>
+          <span className={`badge-dot-reg ${rostroDetectado ? "green" : "pulse"}`}></span>
+          {rostroDetectado ? "Rostro detectado" : "Buscando rostro..."}
+        </div>
+      </div>
+
+      <div className="viewfinder-target-reg">
+        <span className="target-corner-reg tl"></span>
+        <span className="target-corner-reg tr"></span>
+        <span className="target-corner-reg bl"></span>
+        <span className="target-corner-reg br"></span>
+      </div>
+    </div>
+
+    <p className="camera-status-msg-reg">
+      {mensajeRostro || (rostroDetectado ? "✓ Rostro detectado y enfocado" : "Coloca el rostro frente a la cámara")}
+    </p>
+
+    <div className="camera-controls-reg">
+      {rostroRegistrado && (
+        <button
+          type="button"
+          className="btn-recapture-face"
+          onClick={recapturarRostro}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M 1 4 v 6 h 6" />
+            <path d="M 3.51 15 a 9 9 0 1 0 2.13 -9.36 L 1 10" />
+          </svg>
+          Volver a capturar
+        </button>
+      )}
 
       <button
         type="button"
-        className="btn-submit"
-        onClick={confirmarRostro}
-        disabled={!rostroDetectado}
-        style={{ marginRight: "8px" }}
-      >
-        Confirmar rostro
-      </button>
-
-      <button
-        type="button"
-        className="btn-cancel"
+        className="btn-stop-camera"
         onClick={cerrarCamara}
+        disabled={!!estadoFaceId}
       >
-        Cerrar cámara
+        {rostroRegistrado ? "Listo / Cerrar cámara" : "Cerrar cámara"}
       </button>
     </div>
-  </DialogContent>
+  </div>
 </Dialog>
         </div>
       )}

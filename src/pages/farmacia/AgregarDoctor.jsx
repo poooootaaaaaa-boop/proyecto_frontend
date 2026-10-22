@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Human from "@vladmandic/human";
+import "./AgregarDoctor.css";
 const API_URL = import.meta.env.VITE_API_URL;
 export default function AgregarDoctor() {
 
@@ -32,6 +33,7 @@ const [mensajeRostro, setMensajeRostro] = useState(
   "Coloca tu rostro frente a la cámara"
 );
 const [faceEmbedding, setFaceEmbedding] = useState(null);
+const [estadoFaceId, setEstadoFaceId] = useState(null);
 
 const videoRef = useRef(null);
 const streamRef = useRef(null);
@@ -73,7 +75,9 @@ const iniciarCamara = async () => {
   try {
     setError("");
     setFaceEmbedding(null);
+    setEstadoFaceId(null);
     setRostroDetectado(false);
+    deteccionActivaRef.current = false;
     setMensajeRostro("Coloca tu rostro frente a la cámara");
 
     if (!humanRef.current) {
@@ -108,6 +112,7 @@ const iniciarCamara = async () => {
 
 const detenerCamara = () => {
   deteccionActivaRef.current = false;
+  setEstadoFaceId(null);
 
   if (streamRef.current) {
     streamRef.current.getTracks().forEach((track) => track.stop());
@@ -122,32 +127,38 @@ const detenerCamara = () => {
   setMostrarCamara(false);
 };
 
+const recapturarRostro = () => {
+  setFaceEmbedding(null);
+  setRostroDetectado(false);
+  setEstadoFaceId(null);
+  deteccionActivaRef.current = false;
+  setMensajeRostro("Coloca tu rostro frente a la cámara");
+};
+
 const detectarRostro = async () => {
-  if (!videoRef.current || !humanRef.current) {
+  if (!videoRef.current || !humanRef.current || deteccionActivaRef.current || faceEmbedding) {
     return;
   }
 
   if (videoRef.current.readyState < 2) {
-    setError("Espera a que la cámara esté lista.");
     return;
   }
 
   try {
-    setMensajeRostro("Analizando rostro...");
-
+    deteccionActivaRef.current = true;
     const resultado = await humanRef.current.detect(videoRef.current);
 
     if (!resultado.face || resultado.face.length === 0) {
       setRostroDetectado(false);
-      setFaceEmbedding(null);
-      setMensajeRostro("No se detectó ningún rostro.");
+      setMensajeRostro("Coloca tu rostro frente a la cámara");
+      deteccionActivaRef.current = false;
       return;
     }
 
     if (resultado.face.length !== 1) {
       setRostroDetectado(false);
-      setFaceEmbedding(null);
       setMensajeRostro("Debe aparecer una sola persona en la cámara.");
+      deteccionActivaRef.current = false;
       return;
     }
 
@@ -155,19 +166,44 @@ const detectarRostro = async () => {
 
     if (!rostro.embedding || rostro.embedding.length === 0) {
       setRostroDetectado(false);
-      setFaceEmbedding(null);
-      setMensajeRostro("No se pudo obtener la información facial. Intenta de nuevo.");
+      setMensajeRostro("Analizando rostro...");
+      deteccionActivaRef.current = false;
       return;
     }
 
-    setFaceEmbedding(Array.from(rostro.embedding));
+    // Rostro detectado: guardar embedding
+    const embeddingArr = Array.from(rostro.embedding);
+    setFaceEmbedding(embeddingArr);
     setRostroDetectado(true);
-    setMensajeRostro("Rostro registrado correctamente.");
+    setMensajeRostro("Rostro guardado correctamente.");
+
+    // Animación Face ID con texto 'Rostro guardado'
+    setEstadoFaceId("loading");
+    await new Promise((r) => setTimeout(r, 400));
+    setEstadoFaceId("success");
+
+    await new Promise((r) => setTimeout(r, 1600));
+    setEstadoFaceId(null);
+
   } catch (err) {
     console.error("Error detectando rostro:", err);
-    setError("Ocurrió un error al analizar el rostro.");
+    deteccionActivaRef.current = false;
   }
 };
+
+useEffect(() => {
+  if (!mostrarCamara || faceEmbedding) {
+    return;
+  }
+
+  const intervalo = setInterval(() => {
+    detectarRostro();
+  }, 700);
+
+  return () => {
+    clearInterval(intervalo);
+  };
+}, [mostrarCamara, faceEmbedding]);
 
 
 
@@ -411,73 +447,176 @@ const guardarDoctor = async () => {
 
           </Row>
 
-          <div className="d-flex justify-content-end gap-3 mt-4">
+          {/* Card de Registro Facial Biométrico */}
+          <Card className="card-modern biometric-register-card p-4 mt-4">
+            <div className="biometric-card-header">
+              <div className="biometric-card-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0047cc" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M 3 7 V 5 A 2 2 0 0 1 5 3 H 7" />
+                  <path d="M 17 3 H 19 A 2 2 0 0 1 21 5 V 7" />
+                  <path d="M 21 17 V 19 A 2 2 0 0 1 19 21 H 17" />
+                  <path d="M 7 21 H 5 A 2 2 0 0 1 3 19 V 17" />
+                  <circle cx="9" cy="10" r="1" fill="#0047cc" />
+                  <circle cx="15" cy="10" r="1" fill="#0047cc" />
+                  <path d="M 9.5 15 C 10.5 16.2 13.5 16.2 14.5 15" />
+                </svg>
+              </div>
+              <div className="biometric-card-text">
+                <h6 className="biometric-card-title">Registro facial del doctor</h6>
+                <p className="biometric-card-desc">
+                  Registre el rostro del médico para permitir el acceso mediante reconocimiento facial.
+                </p>
+              </div>
+            </div>
 
-          
-
-          <Card className="card-modern p-4 mt-3">
-              <h6 className="mb-3">Registro facial del doctor</h6>
-
-              <p>
-                Registra el rostro del doctor para permitir el acceso mediante
-                reconocimiento facial.
-              </p>
-
-              {!mostrarCamara && (
-                <Button
-                  variant="outline-primary"
+            {!mostrarCamara && (
+              <div className="biometric-inactive-box">
+                <div className="biometric-inactive-icon">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#0047cc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M 23 19 A 2 2 0 0 1 21 21 H 3 A 2 2 0 0 1 1 19 V 8 A 2 2 0 0 1 3 6 H 7 L 9 3 H 15 L 17 6 H 21 A 2 2 0 0 1 23 8 Z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                </div>
+                <p style={{ color: "#64748b", fontSize: "14px", marginBottom: "8px" }}>
+                  La cámara se encuentra inactiva
+                </p>
+                <button
+                  type="button"
+                  className="btn-activate-camera"
                   onClick={iniciarCamara}
                 >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="23 7 16 12 23 17 23 7" />
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                  </svg>
                   Activar cámara
-                </Button>
-              )}
+                </button>
+              </div>
+            )}
 
-              {mostrarCamara && (
-                <div className="text-center">
+            {mostrarCamara && (
+              <div className="biometric-camera-wrapper text-center">
+                <div className={`camera-viewfinder-reg ${rostroDetectado ? "is-detected" : ""}`}>
                   <video
                     ref={videoRef}
                     autoPlay
                     muted
                     playsInline
-                    style={{
-                      width: "100%",
-                      maxWidth: "420px",
-                      aspectRatio: "4 / 3",
-                      objectFit: "cover",
-                      transform: "scaleX(-1)",
-                      borderRadius: "12px",
-                      backgroundColor: "#000",
-                    }}
+                    className="camera-video-reg"
                   />
 
-                  <p className="mt-3">{mensajeRostro}</p>
+                  {estadoFaceId && (
+                    <div className="faceid-overlay">
+                      <div className="faceid-card">
+                        {estadoFaceId === "loading" && (
+                          <>
+                            <div className="faceid-icon-container">
+                              <div className="faceid-pulse-ring"></div>
+                              <div className="faceid-scanner-laser"></div>
+                              <svg viewBox="0 0 100 100" className="faceid-svg">
+                                <path d="M 22 36 V 26 A 12 12 0 0 1 34 14 H 44" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                                <path d="M 56 14 H 66 A 12 12 0 0 1 78 26 V 36" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                                <path d="M 78 64 V 74 A 12 12 0 0 1 66 86 H 56" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                                <path d="M 44 86 H 34 A 12 12 0 0 1 22 74 V 64" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                                <circle cx="37" cy="42" r="4.5" fill="#30d158" />
+                                <circle cx="63" cy="42" r="4.5" fill="#30d158" />
+                                <path d="M 50 42 V 55 A 4 4 0 0 1 46 59 H 45" fill="none" stroke="#30d158" strokeWidth="4.5" strokeLinecap="round" />
+                                <path d="M 37 68 Q 50 78 63 68" fill="none" stroke="#30d158" strokeWidth="5" strokeLinecap="round" />
+                              </svg>
+                            </div>
+                            <h3 className="faceid-title">Face ID</h3>
+                            <p className="faceid-subtitle">Guardando rostro...</p>
+                            <div className="faceid-bar-loader">
+                              <div className="faceid-bar-fill"></div>
+                            </div>
+                          </>
+                        )}
 
-                  <div className="d-flex justify-content-center gap-2">
-                    <Button
-                      variant="success"
-                      onClick={detectarRostro}
-                    >
-                      Capturar rostro
-                    </Button>
+                        {estadoFaceId === "success" && (
+                          <>
+                            <div className="faceid-success-circle">
+                              <svg viewBox="0 0 60 60" className="faceid-check-svg">
+                                <path
+                                  d="M 16 31 L 26 41 L 44 20"
+                                  fill="none"
+                                  stroke="#30d158"
+                                  strokeWidth="5.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="faceid-check-path"
+                                />
+                              </svg>
+                            </div>
+                            <h3 className="faceid-title">Face ID</h3>
+                            <p className="faceid-subtitle" style={{ color: "#30d158", fontWeight: "600", marginTop: "4px" }}>
+                              Rostro guardado
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-                    <Button
-                      variant="secondary"
-                      onClick={detenerCamara}
-                    >
-                      Apagar cámara
-                    </Button>
+                  <div className="viewfinder-hud-reg">
+                    <div className={`viewfinder-badge-reg ${rostroDetectado ? "detected" : "searching"}`}>
+                      <span className={`badge-dot-reg ${rostroDetectado ? "green" : "pulse"}`}></span>
+                      {rostroDetectado ? "Rostro detectado" : "Buscando rostro..."}
+                    </div>
+                  </div>
+
+                  <div className="viewfinder-target-reg">
+                    <span className="target-corner-reg tl"></span>
+                    <span className="target-corner-reg tr"></span>
+                    <span className="target-corner-reg bl"></span>
+                    <span className="target-corner-reg br"></span>
                   </div>
                 </div>
-              )}
 
-              {rostroDetectado && faceEmbedding && (
-                <Alert variant="success" className="mt-3 mb-0">
-                  Rostro listo para guardar. Se obtuvo una representación facial
-                  de {faceEmbedding.length} valores.
-                </Alert>
-              )}
-            </Card>
+                <p className="camera-status-msg-reg">
+                  {mensajeRostro}
+                </p>
 
+                <div className="camera-controls-reg">
+                  {faceEmbedding && (
+                    <button
+                      type="button"
+                      className="btn-recapture-face"
+                      onClick={recapturarRostro}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M 1 4 v 6 h 6" />
+                        <path d="M 3.51 15 a 9 9 0 1 0 2.13 -9.36 L 1 10" />
+                      </svg>
+                      Volver a capturar
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="btn-stop-camera"
+                    onClick={detenerCamara}
+                  >
+                    {faceEmbedding ? "Cerrar cámara" : "Apagar cámara"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {rostroDetectado && faceEmbedding && (
+              <div className="biometric-success-alert">
+                <svg viewBox="0 0 20 20" width="20" height="20" fill="none">
+                  <circle cx="10" cy="10" r="9" stroke="#16a34a" strokeWidth="2" fill="none" />
+                  <path d="M6 10 L9 13 L14 7" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span>
+                  <strong>Rostro guardado correctamente.</strong> Representación facial biométrica de {faceEmbedding.length} valores lista.
+                </span>
+              </div>
+            )}
+          </Card>
+
+          {/* Botones de acción del formulario */}
+          <div className="d-flex justify-content-end gap-3 mt-4 mb-4">
             <Button
               variant="light"
               onClick={() => navigate("/farmacia/doctores")}
@@ -491,7 +630,6 @@ const guardarDoctor = async () => {
             >
               Agregar
             </Button>
-
           </div>
 
         </div>

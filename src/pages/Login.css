@@ -169,3 +169,459 @@
     width: 50%;
   }
 }
+
+/* CAMERA BIOMETRIC MODAL */
+.camera-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.camera-modal-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  overflow: hidden;
+}
+
+.camera-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.camera-modal-title-group {
+  text-align: left;
+}
+
+.camera-modal-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.camera-modal-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.camera-modal-close {
+  background: #f3f4f6;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4b5563;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.camera-modal-close:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.camera-modal-close:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Viewfinder */
+.camera-viewfinder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #0f172a;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Biometric HUD overlay */
+.viewfinder-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.viewfinder-badge {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s;
+}
+
+.viewfinder-badge.detected {
+  background: rgba(34, 197, 94, 0.25);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+}
+
+.viewfinder-badge.searching {
+  background: rgba(0, 0, 0, 0.6);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.badge-dot.green {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: dotPulse 1.2s infinite;
+}
+
+.badge-dot.pulse {
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+  animation: dotPulse 1.5s infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Face target reticle / brackets */
+.viewfinder-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65%;
+  height: 75%;
+  border-radius: 20px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.target-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: rgba(255, 255, 255, 0.5);
+  border-style: solid;
+  transition: all 0.3s;
+}
+
+.camera-viewfinder.is-detected .target-corner {
+  border-color: #22c55e;
+  filter: drop-shadow(0 0 6px #22c55e);
+}
+
+.target-corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+.target-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+.target-corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+.target-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+/* Status message banner */
+.camera-status-msg {
+  min-height: 22px;
+  margin: 12px 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.camera-status-msg.error {
+  color: #ef4444;
+}
+
+/* Modal Action Buttons */
+.camera-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-verify-face {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #0047cc, #0059ff);
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 71, 204, 0.28);
+  transition: all 0.2s ease;
+}
+
+.btn-verify-face:hover:not(:disabled) {
+  background: linear-gradient(135deg, #003bb5, #004ecc);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 71, 204, 0.35);
+}
+
+.btn-verify-face:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-cancel-face {
+  width: 100%;
+  padding: 11px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-face:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.btn-cancel-face:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* FACE ID ANIMATION (GREEN) */
+.faceid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 15, 20, 0.92);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  border-radius: 24px;
+  animation: faceidFadeIn 0.25s ease-out;
+}
+
+@keyframes faceidFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+.faceid-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 24px;
+  background: #15191e;
+  border: 1px solid rgba(48, 209, 88, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(48, 209, 88, 0.15);
+  width: 250px;
+}
+
+.faceid-icon-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faceid-svg {
+  width: 78px;
+  height: 78px;
+  color: #30d158;
+  filter: drop-shadow(0 0 10px rgba(48, 209, 88, 0.5));
+}
+
+.faceid-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(48, 209, 88, 0.45);
+  animation: faceidRotate 4s linear infinite;
+}
+
+@keyframes faceidRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.faceid-scanner-laser {
+  position: absolute;
+  left: 12%;
+  width: 76%;
+  height: 3px;
+  background: #30d158;
+  box-shadow: 0 0 12px #30d158, 0 0 4px #30d158;
+  border-radius: 2px;
+  z-index: 5;
+  animation: faceidScan 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes faceidScan {
+  0% { top: 20%; opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { top: 80%; opacity: 0.3; }
+}
+
+.faceid-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.faceid-subtitle {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.faceid-bar-loader {
+  width: 110px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.faceid-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: #30d158;
+  box-shadow: 0 0 10px #30d158;
+  border-radius: 99px;
+  animation: faceidBar 1.2s ease-in-out infinite;
+}
+
+@keyframes faceidBar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Face ID Success Checkmark */
+.faceid-success-circle {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 4px solid #30d158;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(48, 209, 88, 0.4), inset 0 0 15px rgba(48, 209, 88, 0.2);
+  animation: faceidPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.faceid-check-svg {
+  width: 50px;
+  height: 50px;
+}
+
+.faceid-check-path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: faceidDrawCheck 0.45s ease forwards 0.15s;
+}
+
+@keyframes faceidDrawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes faceidPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Face ID Failure Circle */
+.faceid-error-circle {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 4px solid #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4), inset 0 0 15px rgba(239, 68, 68, 0.2);
+  animation: faceidPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.faceid-error-svg {
+  width: 44px;
+  height: 44px;
+}
+
+.faceid-error-path {
+  stroke-dasharray: 45;
+  stroke-dashoffset: 45;
+  animation: faceidDrawCheck 0.4s ease forwards 0.15s;
+}
+

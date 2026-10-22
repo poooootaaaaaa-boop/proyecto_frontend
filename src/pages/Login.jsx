@@ -17,12 +17,13 @@ export default function Login() {
   const [mostrarCamara, setMostrarCamara] = useState(false);
   const [rostroDetectado, setRostroDetectado] = useState(false);
   const [mensajeRostro, setMensajeRostro] = useState("");
+  const [estadoFaceId, setEstadoFaceId] = useState(null);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const humanRef = useRef(null);
   const embeddingRef = useRef(null);
-  
+  const verificandoRef = useRef(false);
 
 
   useEffect(() => {
@@ -145,7 +146,7 @@ const abrirCamara = async () => {
 };
 
 const detectarRostro = async () => {
-  if (!humanRef.current || !videoRef.current) {
+  if (!humanRef.current || !videoRef.current || verificandoRef.current) {
     return;
   }
 
@@ -167,6 +168,12 @@ const detectarRostro = async () => {
 
         setRostroDetectado(true);
         setMensajeRostro("Rostro detectado correctamente.");
+
+        // Iniciar verificación y animación automáticamente sin presionar botón
+        if (!verificandoRef.current) {
+          verificandoRef.current = true;
+          iniciarLoginRostro(embeddingRef.current);
+        }
       }
     } else {
       embeddingRef.current = null;
@@ -181,24 +188,29 @@ const detectarRostro = async () => {
 };
 
 
-const iniciarLoginRostro = async () => {
-  if (!embeddingRef.current) {
+const iniciarLoginRostro = async (embeddingDirecto) => {
+  const embeddingAUsar = embeddingDirecto || embeddingRef.current;
+  if (!embeddingAUsar) {
+    verificandoRef.current = false;
     setMensajeRostro(
       "Primero coloca tu rostro frente a la cámara."
     );
     return;
   }
 
+  verificandoRef.current = true;
+
   try {
+    setEstadoFaceId("loading");
     setMensajeRostro("Verificando rostro...");
 
     console.log(
       "Enviando embedding al backend:",
-      embeddingRef.current
+      embeddingAUsar
     );
 
     const response = await loginWithFace(
-      embeddingRef.current
+      embeddingAUsar
     );
 
     console.log(
@@ -219,6 +231,10 @@ const iniciarLoginRostro = async () => {
     );
 
     setMensajeRostro("✓ Rostro reconocido correctamente.");
+    setEstadoFaceId("success");
+
+    // Esperar a que se aprecie la animación verde de Face ID
+    await new Promise((resolve) => setTimeout(resolve, 1400));
 
     // Apagar cámara antes de cambiar de página
     cerrarCamara();
@@ -239,27 +255,30 @@ const iniciarLoginRostro = async () => {
     }
 
   } catch (err) {
+    const errorMsg =
+      err.response?.data?.mensaje ||
+      (err.response
+        ? "Rostro no reconocido."
+        : "No se pudo conectar con el servidor.");
+
+    setMensajeRostro(errorMsg);
+    setEstadoFaceId("error");
 
     console.error(
       "Error en login facial:",
       err
     );
 
-    if (err.response) {
-      setMensajeRostro(
-        err.response.data?.mensaje ||
-        "Rostro no reconocido."
-      );
-    } else {
-      setMensajeRostro(
-        "No se pudo conectar con el servidor."
-      );
-    }
+    // Permitir ver animación de fallo antes de reintentar
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    setEstadoFaceId(null);
+    verificandoRef.current = false;
   }
 };
 
 
 const cerrarCamara = () => {
+  verificandoRef.current = false;
   if (streamRef.current) {
     streamRef.current.getTracks().forEach((track) => {
       track.stop();
@@ -271,6 +290,7 @@ const cerrarCamara = () => {
   setMostrarCamara(false);
   setRostroDetectado(false);
   setMensajeRostro("");
+  setEstadoFaceId(null);
 };
 
 
@@ -471,71 +491,141 @@ const handleLogin = async () => {
         </div>
       </div>
 
-              {mostrarCamara && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.8)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 9999,
-            }}
-          >
-            <div
-              style={{
-                background: "white",
-                padding: "20px",
-                borderRadius: "15px",
-                textAlign: "center",
-              }}
-            >
+        {mostrarCamara && (
+          <div className="camera-modal-backdrop">
+            <div className="camera-modal-card">
+              {estadoFaceId && (
+                <div className="faceid-overlay">
+                  <div className="faceid-card">
+                    {estadoFaceId === "loading" && (
+                      <>
+                        <div className="faceid-icon-container">
+                          <div className="faceid-pulse-ring"></div>
+                          <div className="faceid-scanner-laser"></div>
+                          <svg viewBox="0 0 100 100" className="faceid-svg">
+                            <path d="M 22 36 V 26 A 12 12 0 0 1 34 14 H 44" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                            <path d="M 56 14 H 66 A 12 12 0 0 1 78 26 V 36" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                            <path d="M 78 64 V 74 A 12 12 0 0 1 66 86 H 56" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                            <path d="M 44 86 H 34 A 12 12 0 0 1 22 74 V 64" fill="none" stroke="#30d158" strokeWidth="5.5" strokeLinecap="round" />
+                            <circle cx="37" cy="42" r="4.5" fill="#30d158" />
+                            <circle cx="63" cy="42" r="4.5" fill="#30d158" />
+                            <path d="M 50 42 V 55 A 4 4 0 0 1 46 59 H 45" fill="none" stroke="#30d158" strokeWidth="4.5" strokeLinecap="round" />
+                            <path d="M 37 68 Q 50 78 63 68" fill="none" stroke="#30d158" strokeWidth="5" strokeLinecap="round" />
+                          </svg>
+                        </div>
+                        <h3 className="faceid-title">Face ID</h3>
+                        <p className="faceid-subtitle">Verificando rostro...</p>
+                        <div className="faceid-bar-loader">
+                          <div className="faceid-bar-fill"></div>
+                        </div>
+                      </>
+                    )}
 
-              <h3>Reconocimiento facial</h3>
+                    {estadoFaceId === "success" && (
+                      <>
+                        <div className="faceid-success-circle">
+                          <svg viewBox="0 0 60 60" className="faceid-check-svg">
+                            <path
+                              d="M 16 31 L 26 41 L 44 20"
+                              fill="none"
+                              stroke="#30d158"
+                              strokeWidth="5.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="faceid-check-path"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="faceid-title">Face ID</h3>
+                        <p className="faceid-subtitle" style={{ color: "#30d158", fontWeight: "600", marginTop: "4px" }}>
+                          Inicio de sesión exitoso
+                        </p>
+                      </>
+                    )}
 
-              <video
-                ref={videoRef}
-                autoPlay
-                muted
-                playsInline
-                style={{
-                  width: "400px",
-                  maxWidth: "90vw",
-                  borderRadius: "10px",
-                }}
-              />
-
-              <p>
-                {mensajeRostro || "Coloca tu rostro frente a la cámara"}
-              </p>
-
-              {rostroDetectado && (
-                <p style={{ color: "green" }}>
-                  ✓ Rostro detectado
-                </p>
+                    {estadoFaceId === "error" && (
+                      <>
+                        <div className="faceid-error-circle">
+                          <svg viewBox="0 0 50 50" className="faceid-error-svg">
+                            <path
+                              d="M 15 15 L 35 35 M 35 15 L 15 35"
+                              fill="none"
+                              stroke="#ef4444"
+                              strokeWidth="5"
+                              strokeLinecap="round"
+                              className="faceid-error-path"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="faceid-title">Face ID</h3>
+                        <p className="faceid-subtitle" style={{ color: "#ef4444", fontWeight: "600", marginTop: "4px" }}>
+                          Inicio de sesión fallido
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
               )}
 
-              <button
-                type="button"
-                onClick={iniciarLoginRostro}
-                className="login-btn"
-                disabled={!rostroDetectado}
-                style={{ marginBottom: "10px" }}
-              >
-                🔐 Verificar rostro
-              </button>
+              <div className="camera-modal-header">
+                <div className="camera-modal-title-group">
+                  <h3 className="camera-modal-title">
+                    <span className="material-symbols-outlined" style={{ fontSize: "22px", color: "#0047cc" }}>
+                      face
+                    </span>
+                    Reconocimiento facial
+                  </h3>
+                  <p className="camera-modal-subtitle">Centra tu rostro dentro del visor</p>
+                </div>
+                <button
+                  type="button"
+                  className="camera-modal-close"
+                  onClick={cerrarCamara}
+                  disabled={!!estadoFaceId}
+                  title="Cerrar cámara"
+                >
+                  ✕
+                </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={cerrarCamara}
-                className="login-btn"
-              >
-                Cerrar cámara
-              </button>
+              <div className={`camera-viewfinder ${rostroDetectado ? "is-detected" : ""}`}>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="camera-video"
+                />
+
+                <div className="viewfinder-hud">
+                  <div className={`viewfinder-badge ${rostroDetectado ? "detected" : "searching"}`}>
+                    <span className={`badge-dot ${rostroDetectado ? "green" : "pulse"}`}></span>
+                    {rostroDetectado ? "Rostro detectado" : "Buscando rostro..."}
+                  </div>
+                </div>
+
+                <div className="viewfinder-target">
+                  <span className="target-corner tl"></span>
+                  <span className="target-corner tr"></span>
+                  <span className="target-corner bl"></span>
+                  <span className="target-corner br"></span>
+                </div>
+              </div>
+
+              <p className={`camera-status-msg ${mensajeRostro && !rostroDetectado ? "error" : ""}`}>
+                {mensajeRostro || (rostroDetectado ? "✓ Rostro detectado y enfocado" : "Coloca tu rostro frente a la cámara")}
+              </p>
+
+              <div className="camera-btn-group">
+                <button
+                  type="button"
+                  onClick={cerrarCamara}
+                  className="btn-cancel-face"
+                  disabled={!!estadoFaceId}
+                >
+                  Cerrar cámara
+                </button>
+              </div>
 
             </div>
           </div>

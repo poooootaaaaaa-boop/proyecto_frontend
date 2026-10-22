@@ -1,0 +1,450 @@
+/* BIOMETRIC REGISTRATION STYLING (LIKE LOGIN) */
+.biometric-register-card {
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  background: #ffffff;
+}
+
+/* Espaciado amplio para que no esté achocado el título */
+.biometric-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 4px;
+}
+
+.biometric-card-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 14px;
+  background: rgba(0, 71, 204, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0047cc;
+}
+
+.biometric-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.biometric-card-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.biometric-card-desc {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Empty / Inactive state */
+.biometric-inactive-box {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 18px;
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.biometric-inactive-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0047cc;
+  margin-bottom: 14px;
+}
+
+.btn-activate-camera {
+  padding: 11px 24px;
+  background: linear-gradient(135deg, #0047cc, #0059ff);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0, 71, 204, 0.25);
+  transition: all 0.2s ease;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.btn-activate-camera:hover {
+  background: linear-gradient(135deg, #003bb5, #004ecc);
+  transform: translateY(-1px);
+}
+
+/* Active camera container */
+.biometric-camera-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Viewfinder (same as login) */
+.camera-viewfinder-reg {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 4 / 3;
+  background: #0f172a;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video-reg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  display: block;
+}
+
+/* HUD overlay */
+.viewfinder-hud-reg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.viewfinder-badge-reg {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s;
+}
+
+.viewfinder-badge-reg.detected {
+  background: rgba(34, 197, 94, 0.25);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+}
+
+.viewfinder-badge-reg.searching {
+  background: rgba(0, 0, 0, 0.6);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.badge-dot-reg {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.badge-dot-reg.green {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: dotPulseReg 1.2s infinite;
+}
+
+.badge-dot-reg.pulse {
+  background: #3b82f6;
+  box-shadow: 0 0 8px #3b82f6;
+  animation: dotPulseReg 1.5s infinite;
+}
+
+@keyframes dotPulseReg {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Target reticle / brackets */
+.viewfinder-target-reg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65%;
+  height: 75%;
+  border-radius: 20px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.target-corner-reg {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: rgba(255, 255, 255, 0.5);
+  border-style: solid;
+  transition: all 0.3s;
+}
+
+.camera-viewfinder-reg.is-detected .target-corner-reg {
+  border-color: #22c55e;
+  filter: drop-shadow(0 0 6px #22c55e);
+}
+
+.target-corner-reg.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+.target-corner-reg.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+.target-corner-reg.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+.target-corner-reg.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+/* Status message */
+.camera-status-msg-reg {
+  min-height: 22px;
+  margin: 14px 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Controls */
+.camera-controls-reg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-recapture-face {
+  padding: 10px 22px;
+  background: #ffffff;
+  border: 1px solid #0047cc;
+  color: #0047cc;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 71, 204, 0.1);
+}
+
+.btn-recapture-face:hover {
+  background: rgba(0, 71, 204, 0.06);
+  transform: translateY(-1px);
+}
+
+.btn-stop-camera {
+  padding: 10px 22px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-stop-camera:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Success notification */
+.biometric-success-alert {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #15803d;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* FACE ID ANIMATION OVERLAY (SAME AS LOGIN) */
+.faceid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 15, 20, 0.92);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  border-radius: 18px;
+  animation: faceidFadeIn 0.25s ease-out;
+}
+
+@keyframes faceidFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.faceid-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  background: #15191e;
+  border: 1px solid rgba(48, 209, 88, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(48, 209, 88, 0.15);
+  width: 240px;
+}
+
+.faceid-icon-container {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faceid-svg {
+  width: 74px;
+  height: 74px;
+  color: #30d158;
+  filter: drop-shadow(0 0 10px rgba(48, 209, 88, 0.5));
+}
+
+.faceid-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(48, 209, 88, 0.45);
+  animation: faceidRotate 4s linear infinite;
+}
+
+@keyframes faceidRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.faceid-scanner-laser {
+  position: absolute;
+  left: 12%;
+  width: 76%;
+  height: 3px;
+  background: #30d158;
+  box-shadow: 0 0 12px #30d158, 0 0 4px #30d158;
+  border-radius: 2px;
+  z-index: 5;
+  animation: faceidScan 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes faceidScan {
+  0% { top: 20%; opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { top: 80%; opacity: 0.3; }
+}
+
+.faceid-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.faceid-subtitle {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.faceid-bar-loader {
+  width: 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.faceid-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: #30d158;
+  box-shadow: 0 0 10px #30d158;
+  border-radius: 99px;
+  animation: faceidBar 1.2s ease-in-out infinite;
+}
+
+@keyframes faceidBar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Face ID Success Checkmark */
+.faceid-success-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid #30d158;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(48, 209, 88, 0.4), inset 0 0 15px rgba(48, 209, 88, 0.2);
+  animation: faceidPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.faceid-check-svg {
+  width: 48px;
+  height: 48px;
+}
+
+.faceid-check-path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: faceidDrawCheck 0.45s ease forwards 0.15s;
+}
+
+@keyframes faceidDrawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes faceidPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
