@@ -81,6 +81,10 @@ export default function Sidebar() {
   <i className="bi bi-clipboard2-pulse"></i>
   Ingresos y Egresos
 </Nav.Link>
+<Nav.Link as={NavLink} to="/farmacia/insumos-estancia" style={linkStyle}>
+  <i className="bi bi-prescription2"></i>
+  Insumos de estancia
+</Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/inventario" style={linkStyle}>
           <i className="bi bi-box-seam"></i>

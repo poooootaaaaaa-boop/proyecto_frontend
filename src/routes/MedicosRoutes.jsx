@@ -17,6 +17,7 @@ import DoctorAttendance from "../pages/Medicos/DoctorAttendance";
 
 
 import DocumentoOrden from "../pages/Medicos/documento-orden";
+import Estancias from "../pages/Medicos/Estancias";
 
 import { useLocation } from "react-router-dom";
 
@@ -42,6 +43,7 @@ export default function MedicosRoute(){
           
           <Route path="/consulta" element={<Consulta data={pacientes} setData={setPacientes} dataPacientes={dataPacientes} />} />{/* solo agregue esto dataPacientes={dataPacientes} */}
           <Route path="/historial" element={<Historial data={pacientes} />} />
+          <Route path="estancias" element={<Estancias />} />
            
 
     

@@ -1,0 +1,207 @@
+.insumos-layout {
+  --ink: #172b36;
+  --muted: #63747c;
+  --line: #dbe4e6;
+  --teal: #0f766e;
+  display: flex;
+  min-height: 100vh;
+  background: #f2f6f5;
+  color: var(--ink);
+}
+
+.insumos-main {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  padding: 34px clamp(18px, 3vw, 42px);
+  min-width: 0;
+}
+
+.insumos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.insumos-eyebrow {
+  color: #087e78;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.insumos-header h1 {
+  margin: 5px 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.insumos-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.insumos-primary,
+.insumos-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.insumos-primary {
+  color: white;
+  background: #126e70;
+}
+
+.insumos-primary:hover { background: #0c5c5f; }
+.insumos-primary:disabled { opacity: .55; cursor: wait; }
+
+.insumos-secondary {
+  color: #344b55;
+  background: white;
+  border-color: var(--line);
+}
+
+.insumos-tabs { display: flex; gap: 4px; margin: 0 0 18px; border-bottom: 1px solid var(--line); }
+.insumos-tabs button { padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; color: var(--muted); background: transparent; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
+.insumos-tabs button.is-active { color: var(--teal); border-bottom-color: var(--teal); }
+
+.insumos-message {
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  border: 1px solid;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.insumos-message.is-ok { color: #17694c; background: #eaf6f0; border-color: #c8e8d8; }
+.insumos-message.is-error { color: #a23832; background: #fff0ed; border-color: #f0d0c9; }
+
+.insumos-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.insumos-search {
+  width: min(420px, 100%);
+  position: relative;
+}
+
+.insumos-search svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7b8d95;
+}
+
+.insumos-search input,
+.insumos-category select,
+.insumos-field input,
+.insumos-field select,
+.insumos-field textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  color: var(--ink);
+  background: white;
+  border: 1px solid #cbd8db;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.insumos-search input { padding-left: 36px; }
+.insumos-search input:focus,
+.insumos-category select:focus,
+.insumos-field input:focus,
+.insumos-field select:focus,
+.insumos-field textarea:focus { outline: 2px solid #b5dedd; border-color: var(--teal); }
+
+.insumos-category { width: 220px; display: grid; gap: 5px; color: var(--muted); font-size: 12px; }
+.insumos-count { margin: 0 0 11px auto; color: var(--muted); font-size: 12px; }
+
+.insumos-table-wrap { overflow-x: auto; background: white; border: 1px solid var(--line); border-radius: 7px; }
+.insumos-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.insumos-table th { padding: 12px 15px; background: #eaf1f0; color: #4f646b; text-align: left; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
+.insumos-table td { padding: 13px 15px; border-top: 1px solid #edf1f1; font-size: 13px; }
+.insumos-table tr.is-inactive td { color: #89979b; }
+.insumos-name { color: var(--ink); font-weight: 650; }
+.insumos-empty { padding: 34px !important; text-align: center; color: var(--muted); }
+.insumos-status { display: inline-flex; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 650; }
+.insumos-status.is-active { background: #e3f4ec; color: #17694c; }
+.insumos-status.is-inactive { background: #eef1f2; color: #69787d; }
+.insumos-actions { display: flex; justify-content: flex-end; gap: 5px; }
+.insumos-actions button,
+.insumos-dialog-head > button { display: inline-grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 5px; color: #3e6067; background: white; cursor: pointer; }
+
+.insumos-overlay { position: fixed; inset: 0; z-index: 2500; display: grid; place-items: center; padding: 20px; background: rgb(16 35 42 / 48%); }
+.insumos-dialog { width: min(540px, 100%); padding: 24px; background: white; border-radius: 8px; box-shadow: 0 24px 70px rgb(11 32 37 / 24%); }
+.insumos-dialog-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.insumos-dialog-head small { color: var(--teal); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.insumos-dialog-head h2 { margin: 4px 0 0; font-size: 21px; }
+.insumos-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.insumos-field { display: grid; gap: 6px; color: #465d65; font-size: 12px; font-weight: 650; }
+.insumos-full { grid-column: 1 / -1; }
+.insumos-active { display: flex; align-items: center; gap: 8px; align-self: end; color: #465d65; font-size: 12px; }
+.insumos-active input { width: 16px; height: 16px; accent-color: var(--teal); }
+.insumos-dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
+
+.estancia-registro { display: grid; gap: 17px; }
+.estancia-selector-row { display: flex; align-items: end; gap: 12px; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 7px; }
+.estancia-selector-row .insumos-field { width: min(480px, 100%); }
+.estancia-selector-row .insumos-secondary { gap: 7px; }
+.estancia-paciente-resumen { display: grid; grid-template-columns: 1.3fr 2fr 1fr; gap: 14px; padding: 15px 17px; background: #eaf3f1; border-left: 3px solid var(--teal); }
+.estancia-paciente-resumen div { min-width: 0; }
+.estancia-paciente-resumen span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; }
+.estancia-paciente-resumen strong { display: block; overflow-wrap: anywhere; color: var(--ink); font-size: 13px; }
+.estancia-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.estancia-form { display: grid; align-content: start; gap: 13px; min-width: 0; padding: 17px; background: white; border: 1px solid var(--line); border-radius: 7px; }
+.estancia-form h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; color: var(--ink); font-size: 15px; }
+.estancia-form h2 svg { color: var(--teal); }
+.estancia-form .insumos-field span { display: flex; align-items: center; gap: 5px; }
+.insumos-field textarea { min-height: 72px; resize: vertical; }
+.estancia-vitales-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.estancia-form > .insumos-primary { justify-self: start; }
+.estancia-add-consumo { justify-self: start; }
+.estancia-consumos-pendientes { display: grid; gap: 9px; padding-top: 12px; border-top: 1px solid var(--line); }
+.estancia-consumos-pendientes > strong { color: var(--ink); font-size: 12px; }
+.estancia-consumo-pendiente { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 10px; background: #f3f7f6; border: 1px solid var(--line); border-radius: 5px; color: #344b55; font-size: 12px; }
+.estancia-consumo-pendiente span { min-width: 0; overflow-wrap: anywhere; }
+.estancia-consumo-pendiente small { display: block; margin-top: 3px; color: var(--muted); }
+.estancia-consumo-pendiente button { display: inline-grid; flex: 0 0 auto; place-items: center; width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 4px; color: #8d3d35; background: white; cursor: pointer; }
+.estancia-consumos-pendientes > .insumos-primary { justify-self: start; margin-top: 3px; }
+.estancia-empty { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 90px; padding: 18px; color: var(--muted); text-align: center; font-size: 13px; background: white; border: 1px dashed #cbd9dc; border-radius: 7px; }
+.estancia-spin { animation: estancia-spin .8s linear infinite; }
+@keyframes estancia-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .insumos-header { align-items: flex-start; flex-direction: column; }
+  .insumos-toolbar { flex-wrap: wrap; align-items: stretch; }
+  .insumos-search, .insumos-category { width: 100%; }
+  .insumos-count { margin: 0; }
+  .insumos-main { padding-top: 64px; }
+  .estancia-form-grid { grid-template-columns: 1fr; }
+  .estancia-paciente-resumen { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 460px) {
+  .insumos-form-grid { grid-template-columns: 1fr; }
+  .insumos-full { grid-column: auto; }
+  .insumos-dialog { padding: 18px; }
+  .estancia-selector-row { align-items: stretch; flex-direction: column; }
+  .estancia-selector-row .insumos-field { width: 100%; }
+  .estancia-vitales-grid { grid-template-columns: 1fr; }
+}

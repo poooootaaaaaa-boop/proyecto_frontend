@@ -24,7 +24,7 @@ import {
   Building2,
   UserRound,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import FirmaElectronica from "../../components/multiusos/FirmaElectronica.jsx";
 
 import "./PruebaConsentimientoFirma.css";
@@ -102,6 +102,8 @@ const formatoBytes = (n) => {
 
 export default function PruebaConsentimientoFirma() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const esIngresoDesdeCrud = location.state?.modo === "ingreso";
   const [formatos, setFormatos] = useState([]);
   const [cargandoFormatos, setCargandoFormatos] = useState(true);
   const [pacientes, setPacientes] = useState([]);
@@ -111,7 +113,10 @@ export default function PruebaConsentimientoFirma() {
   const [habitaciones, setHabitaciones] = useState([]);
   const [cargandoHabitaciones, setCargandoHabitaciones] = useState(true);
 
-  const [form, setForm] = useState(formInicial);
+  const [form, setForm] = useState(() => ({
+    ...formInicial,
+    tipo_hospitalizacion: esIngresoDesdeCrud ? "general" : "",
+  }));
   const [conHospitalizacion, setConHospitalizacion] = useState(true);
   const [vigilancia, setVigilancia] = useState([]);
   const [busquedaDoctor, setBusquedaDoctor] = useState("");
@@ -136,6 +141,12 @@ export default function PruebaConsentimientoFirma() {
 
   const [mensaje, setMensaje] = useState(null); // { tipo: 'ok' | 'error', texto }
   const mostrarMensaje = useCallback((tipo, texto) => setMensaje({ tipo, texto }), []);
+
+  useEffect(() => {
+    if (!esIngresoDesdeCrud) return;
+    setConHospitalizacion(true);
+    setForm((prev) => ({ ...prev, tipo_hospitalizacion: prev.tipo_hospitalizacion || "general" }));
+  }, [esIngresoDesdeCrud]);
 
   // ---- Cargas iniciales ----
   const cargarFormatos = useCallback(async () => {
@@ -322,7 +333,12 @@ export default function PruebaConsentimientoFirma() {
       const res = await api.post("/consentimientos", payload);
       aplicarDetalle(res.data.data);
       setVersionFirmas((v) => v + 1);
-      mostrarMensaje("ok", "Consentimiento creado. Firma abajo o imprime el PDF para que lo firme el paciente.");
+      mostrarMensaje(
+        "ok",
+        esIngresoDesdeCrud
+          ? "Ingreso registrado. El consentimiento y los PDFs de ingreso se generaron aquí; puedes completar las firmas abajo."
+          : "Consentimiento creado. Firma abajo o imprime el PDF para que lo firme el paciente."
+      );
     } catch (err) {
       mostrarMensaje("error", errorTexto(err, "Error al crear el consentimiento."));
     } finally {
@@ -472,8 +488,12 @@ export default function PruebaConsentimientoFirma() {
             <FilePenLine size={22} />
           </div>
           <div>
-            <h2>Consentimientos y hospitalización</h2>
-            <p>Crea el formato, indica el internamiento, reúne las tres firmas e imprime el PDF para el paciente.</p>
+            <h2>{esIngresoDesdeCrud ? "Registrar ingreso hospitalario" : "Consentimientos y hospitalización"}</h2>
+            <p>
+              {esIngresoDesdeCrud
+                ? "Completa los datos del internamiento y genera aquí el consentimiento y el PDF de ingreso."
+                : "Crea el formato, indica el internamiento, reúne las tres firmas e imprime el PDF para el paciente."}
+            </p>
           </div>
         </header>
 
@@ -744,7 +764,7 @@ export default function PruebaConsentimientoFirma() {
                           {cargandoHabitaciones ? (
                             <Cargando texto="Cargando habitaciones..." />
                           ) : (
-                            <select value={form.habitacion_id} onChange={actualizarCampo("habitacion_id")} className="consent-input">
+                            <select required={esIngresoDesdeCrud} value={form.habitacion_id} onChange={actualizarCampo("habitacion_id")} className="consent-input">
                               <option value="">Asignar después</option>
                               {habitacionesDisponibles.map((h) => (
                                 <option key={h.id} value={h.id}>

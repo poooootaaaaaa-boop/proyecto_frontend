@@ -10,6 +10,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 
 import LogoutModal from "../../components/farmacia/LogoutModal";
 //import "./Layout.css";
@@ -162,6 +163,16 @@ const sidebarContent = (
         fullWidth
       >
         TRATAMIENTOS
+      </Button>
+
+      <Button
+        component={Link}
+        to="/Medicos/estancias"
+        startIcon={<LocalHospitalIcon />}
+        sx={buttonStyle}
+        fullWidth
+      >
+        ESTANCIAS
       </Button>
 
     </div>
