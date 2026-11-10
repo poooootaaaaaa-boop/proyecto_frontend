@@ -132,9 +132,9 @@ export default function DocumentoReporte() {
           {/* ── HEADER ── */}
           <div className="rh-header">
             <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-              <div className="rh-logo-box">ST</div>
+              <div className="rh-logo-box">CS</div>
               <div className="rh-logo-txt">
-                <strong>SOLUCIONES<br />TECNOLÓGICAS</strong>S.A. de C.V.
+                <strong>CLINISERVIS<br /></strong>S.A. de C.V.
               </div>
             </div>
             <div className="rh-title-block">
@@ -254,7 +254,9 @@ export default function DocumentoReporte() {
             <div className="rh-firma" style={{ flex: 1 }}>
               <label>Revisado por:</label>
               <div className="rh-firma-line" />
-              <div className="rh-firma-sub">___________________________</div>
+              <div className="rh-firma-sub">
+              {reporte.doctor_nombre || "___________________________"}
+            </div>
             </div>
             <div
               className="rh-sello"
