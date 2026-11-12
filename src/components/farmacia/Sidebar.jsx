@@ -153,6 +153,11 @@ export default function Sidebar() {
 
       <div style={{ marginTop: "auto" }}>
         <hr style={{ borderColor: "rgba(255,255,255,0.3)" }} />
+        {/* 🌟 NUEVO BOTÓN: MEJORAR PLAN */}
+        <Nav.Link as={NavLink} to="/Medicos/planes" style={linkStyle}>
+          <i className="bi bi-star-fill" style={{ color: "#ffd700" }}></i>
+          Mejorar Plan
+        </Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/configuracion" style={linkStyle}>
           <i className="bi bi-gear"></i>
