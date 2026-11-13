@@ -1,0 +1,239 @@
+/* ===== WeekSchedule ===== */
+.ws-container {
+  --ws-primary: #1e6f8c;
+  --ws-primary-soft: #e3f1f6;
+  --ws-border: #e2e8ec;
+  --ws-text: #1c2b33;
+  --ws-muted: #7a8a93;
+  --ws-booked-bg: #f1f3f5;
+  --ws-booked-text: #9aa5ab;
+  --ws-radius: 10px;
+  --ws-row-height: 64px;
+
+  width: 100%;
+  color: var(--ws-text);
+}
+
+.ws-header {
+  margin-bottom: 16px;
+}
+
+.ws-card.MuiPaper-root {
+  border: 1px solid var(--ws-border);
+  border-radius: 14px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+/* ----- Barra de semana ----- */
+.ws-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ws-border);
+}
+
+/* ----- Grid ----- */
+.ws-scroll {
+  overflow-x: auto;
+}
+
+.ws-grid {
+  display: grid;
+  grid-template-columns: 90px repeat(var(--ws-days, 5), minmax(120px, 1fr));
+  min-width: 680px;
+}
+
+.ws-hours-col,
+.ws-day-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-day-col {
+  border-left: 1px solid var(--ws-border);
+}
+
+/* ----- Columna de horas ----- */
+.ws-hour-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--ws-row-height);
+  font-size: 12px;
+  color: var(--ws-muted);
+  border-top: 1px solid var(--ws-border);
+}
+
+.ws-hour-cell.ws-header-cell {
+  height: 56px;
+  border-top: none;
+  font-weight: 600;
+}
+
+/* ----- Encabezado de día ----- */
+.ws-day-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  font-size: 12px;
+  color: var(--ws-muted);
+}
+
+.ws-day-header span {
+  text-transform: capitalize;
+}
+
+.ws-day-header strong {
+  font-size: 18px;
+  color: var(--ws-text);
+}
+
+/* ----- Slots ----- */
+.ws-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: var(--ws-row-height);
+  margin: 0;
+  border-top: 1px solid var(--ws-border);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ws-slot-hour {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ws-slot-action {
+  font-size: 11px;
+  color: var(--ws-primary);
+}
+
+.ws-slot:hover {
+  background: var(--ws-primary-soft);
+}
+
+.ws-slot:focus-visible {
+  outline: 2px solid var(--ws-primary);
+  outline-offset: -2px;
+}
+
+.ws-slot.selected {
+  background: var(--ws-primary);
+  color: #fff;
+}
+
+.ws-slot.selected .ws-slot-action {
+  color: #fff;
+}
+
+/* Ocupado */
+.ws-slot.booked {
+  background: var(--ws-booked-bg);
+  cursor: not-allowed;
+}
+
+.ws-slot.booked:hover {
+  background: var(--ws-booked-bg);
+}
+
+.ws-slot-occupied {
+  font-size: 12px;
+  color: var(--ws-booked-text);
+}
+
+/* Deshabilitado (pasado o bloqueado) */
+.ws-slot.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ws-slot.disabled:hover {
+  background: transparent;
+}
+
+/* Solo lectura (agenda del doctor / clínica) */
+.ws-slot.readonly {
+  cursor: default;
+}
+
+.ws-slot.readonly:hover {
+  background: transparent;
+}
+
+.ws-slot.readonly.booked:hover {
+  background: var(--ws-booked-bg);
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 600px) {
+  .ws-bar {
+    padding: 8px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-slot {
+    transition: none;
+  }
+}
+
+/* ----- Filtro por rangos de horas ----- */
+.ws-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--ws-border);
+  overflow-x: auto;
+}
+
+.ws-filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ws-muted);
+  white-space: nowrap;
+}
+
+.ws-filter .MuiToggleButton-root.ws-filter-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 12px;
+  text-transform: none;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--ws-text);
+}
+
+.ws-filter-num {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ws-filter-range {
+  font-size: 10px;
+  color: var(--ws-muted);
+}
+
+.ws-filter .MuiToggleButton-root.ws-filter-btn.Mui-selected {
+  background: var(--ws-primary);
+  color: #fff;
+}
+
+.ws-filter .MuiToggleButton-root.ws-filter-btn.Mui-selected .ws-filter-range {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ws-filter .MuiToggleButton-root.ws-filter-btn.Mui-selected:hover {
+  background: var(--ws-primary);
+}

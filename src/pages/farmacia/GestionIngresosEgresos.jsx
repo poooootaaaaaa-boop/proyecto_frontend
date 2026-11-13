@@ -119,6 +119,7 @@ export default function GestionIngresosEgresos() {
     notas_alta: "",
     requiere_cita: false,
     fecha_cita: "",
+     doctor_cita_id: "", 
     medicamentos_receta: [],
   });
   const [formAlta, setFormAlta] = useState(formAltaInicial());
@@ -239,38 +240,40 @@ export default function GestionIngresosEgresos() {
     setFormAlta(formAltaInicial());
   };
 
-  const confirmarAlta = async (e) => {
-    e.preventDefault();
-    if (!modalAlta) return;
-    setMensaje(null);
-    setGuardandoAlta(true);
-    try {
-      const { requiere_cita, fecha_cita, medicamentos_receta, ...datosAlta } = formAlta;
-      await axios.post(`${API_URL}/hospitalizaciones/${modalAlta.id}/alta`, {
-        ...datosAlta,
-        tratamiento_egreso: datosAlta.tratamiento_egreso || null,
-        medicamentos_egreso: datosAlta.medicamentos_egreso || null,
-        recomendaciones: datosAlta.recomendaciones || null,
-        proxima_consulta: requiere_cita ? fecha_cita.slice(0, 10) : datosAlta.proxima_consulta || null,
-        notas_alta: datosAlta.notas_alta || null,
-        medicamentos: medicamentos_receta.filter((medicamento) => medicamento.medicamento_id),
-        cita_seguimiento: requiere_cita
-          ? {
-              fecha_inicio: fecha_cita,
-              fecha_fin: fechaMasMinutosLocal(fecha_cita, 30),
-            }
-          : null,
-      });
-      mostrarMensaje("ok", "Alta registrada. La habitación quedó libre para limpieza.");
-      setModalAlta(null);
-      cargarActivos();
-      cargarHabitaciones();
-    } catch (err) {
-      mostrarMensaje("error", errorTexto(err, "No se pudo registrar el alta."));
-    } finally {
-      setGuardandoAlta(false);
-    }
-  };
+const confirmarAlta = async (e) => {
+  e.preventDefault();
+  if (!modalAlta) return;
+  setMensaje(null);
+  setGuardandoAlta(true);
+  try {
+    const { requiere_cita, fecha_cita, doctor_cita_id, medicamentos_receta, ...datosAlta } = formAlta;
+    await axios.post(`${API_URL}/hospitalizaciones/${modalAlta.id}/alta`, {
+      ...datosAlta,
+      tratamiento_egreso: datosAlta.tratamiento_egreso || null,
+      medicamentos_egreso: datosAlta.medicamentos_egreso || null,
+      recomendaciones: datosAlta.recomendaciones || null,
+      proxima_consulta: requiere_cita ? fecha_cita.slice(0, 10) : datosAlta.proxima_consulta || null,
+      notas_alta: datosAlta.notas_alta || null,
+      medicamentos: medicamentos_receta.filter((medicamento) => medicamento.medicamento_id),
+      cita_seguimiento: requiere_cita
+        ? {
+            doctor_id: Number(doctor_cita_id),
+            paciente_id: modalAlta.paciente_id,
+            fecha_inicio: fecha_cita,
+            fecha_fin: fechaMasMinutosLocal(fecha_cita, 30),
+          }
+        : null,
+    });
+    mostrarMensaje("ok", "Alta registrada. La habitación quedó libre para limpieza.");
+    setModalAlta(null);
+    cargarActivos();
+    cargarHabitaciones();
+  } catch (err) {
+    mostrarMensaje("error", errorTexto(err, "No se pudo registrar el alta."));
+  } finally {
+    setGuardandoAlta(false);
+  }
+};
 
   const agregarMedicamentoAlta = () =>
     setFormAlta((form) => ({ ...form, medicamentos_receta: [...form.medicamentos_receta, medicamentoInicial()] }));
@@ -1170,26 +1173,58 @@ export default function GestionIngresosEgresos() {
               </label>
 
               <label className="ie-check">
-                <input
-                  type="checkbox"
-                  checked={formAlta.requiere_cita}
-                  onChange={(e) => setFormAlta((f) => ({ ...f, requiere_cita: e.target.checked }))}
-                />
-                Programar nueva cita de seguimiento
-              </label>
+  <input
+    type="checkbox"
+    checked={formAlta.requiere_cita}
+    onChange={(e) =>
+      setFormAlta((f) => ({
+        ...f,
+        requiere_cita: e.target.checked,
+        doctor_cita_id: e.target.checked ? f.doctor_cita_id || f.doctor_alta_id : "",
+        fecha_cita: e.target.checked ? f.fecha_cita : "",
+      }))
+    }
+  />
+  Programar nueva cita de seguimiento
+</label>
               {formAlta.requiere_cita && (
-                <label className="ie-field">
-                  Fecha y hora de seguimiento
-                  <input
-                    type="datetime-local"
-                    required
-                    min={fechaMasMinutosLocal(formAlta.fecha_salida, 1)}
-                    value={formAlta.fecha_cita}
-                    onChange={(e) => setFormAlta((f) => ({ ...f, fecha_cita: e.target.value }))}
-                    className="ie-input"
-                  />
-                </label>
-              )}
+  <>
+    <label className="ie-field">
+      Doctor de la cita de seguimiento
+      {cargandoDoctores ? (
+        <span className="ie-loading">
+          <Loader2 size={13} className="ie-spin" /> Cargando...
+        </span>
+      ) : (
+        <select
+          required
+          value={formAlta.doctor_cita_id}
+          onChange={(e) => setFormAlta((f) => ({ ...f, doctor_cita_id: e.target.value }))}
+          className="ie-input"
+        >
+          <option value="">Selecciona un doctor</option>
+          {doctores.map((d) => (
+            <option key={d.id} value={d.id}>
+              {nombreDoctor(d)}
+            </option>
+          ))}
+        </select>
+      )}
+    </label>
+
+    <label className="ie-field">
+      Fecha y hora de seguimiento
+      <input
+        type="datetime-local"
+        required
+        min={fechaMasMinutosLocal(formAlta.fecha_salida, 1)}
+        value={formAlta.fecha_cita}
+        onChange={(e) => setFormAlta((f) => ({ ...f, fecha_cita: e.target.value }))}
+        className="ie-input"
+      />
+    </label>
+  </>
+)}
 
               <label className="ie-field">
                 Notas adicionales (opcional)

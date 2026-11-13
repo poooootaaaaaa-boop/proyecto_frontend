@@ -68,11 +68,6 @@ export default function Sidebar() {
           Recetas Médicas
         </Nav.Link>
 
-        <Nav.Link as={NavLink} to="/farmacia/control-alimentos" style={linkStyle}>
-          <i className="bi bi-clipboard2-pulse"></i>
-          Control de alimentos
-        </Nav.Link>
-
 <Nav.Link as={NavLink} to="/farmacia/prueba" style={linkStyle}>
   <i className="bi bi-arrow-left-right"></i>
   Altas y bajas
@@ -144,9 +139,9 @@ export default function Sidebar() {
           Reporte Habitacion
         </Nav.Link>
 
-        <Nav.Link as={NavLink} to="/farmacia/control-alimentos" style={linkStyle}>
+        <Nav.Link as={NavLink} to="/farmacia/gestion-personal" style={linkStyle}>
           <i class="bi bi-card-list"></i>
-          Control de alimentos
+          Gestion Personal
         </Nav.Link>
 
       </Nav>
