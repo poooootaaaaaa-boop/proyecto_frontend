@@ -191,6 +191,98 @@
   color: #64748b;
 }
 
+.ie-document-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ie-document-filters .ie-field {
+  width: 240px;
+}
+
+.ie-document-filters .ie-search {
+  width: min(360px, 100%);
+}
+
+.ie-prescriptions {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 14px;
+}
+
+.ie-prescriptions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ie-prescriptions-header h4,
+.ie-transfer-signatures h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.ie-prescription-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) 36px;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.ie-prescription-instructions {
+  grid-column: span 2;
+}
+
+.ie-prescription-remove {
+  align-self: end;
+  margin-bottom: 2px;
+}
+
+.ie-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.ie-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+}
+
+.ie-guardian-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ie-transfer-signatures {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 14px;
+}
+
+.ie-signature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ie-signature-field {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
 /* ===== Tabla ===== */
 .ie-table-wrap {
   overflow-x: auto;
@@ -310,6 +402,32 @@
 @media (max-width: 900px) {
   .ie-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .ie-document-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ie-document-filters .ie-field,
+  .ie-document-filters .ie-search {
+    width: 100%;
+  }
+
+  .ie-prescription-row,
+  .ie-guardian-fields,
+  .ie-signature-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ie-prescription-instructions {
+    grid-column: auto;
+  }
+
+  .ie-prescription-remove {
+    justify-self: end;
   }
 }
 

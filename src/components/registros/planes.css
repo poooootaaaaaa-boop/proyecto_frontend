@@ -17,11 +17,34 @@
 
 /* HERO */
 
+.planes-topbar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 24px 0;
+}
+
+.back-button {
+  color: #1e293b !important;
+  border-color: #dbe3ee !important;
+  background: #fff !important;
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.back-button:hover {
+  border-color: #1976d2 !important;
+  color: #1976d2 !important;
+  background: #f8fbff !important;
+}
+
 .hero-section {
   max-width: 900px;
   margin: auto;
   text-align: center;
-  padding: 80px 20px 50px;
+  padding: 36px 20px 48px;
 }
 
 .hero-logo {
@@ -88,17 +111,12 @@
   transform: scale(1.03) translateY(-8px);
 }
 
-.popular-badge {
+.popular-badge,
+.owned-badge {
   position: absolute;
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-
-  background: linear-gradient(
-    90deg,
-    #1976d2,
-    #42a5f5
-  );
 
   color: white;
   padding: 8px 18px;
@@ -106,6 +124,48 @@
 
   font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.popular-badge {
+  background: linear-gradient(
+    90deg,
+    #1976d2,
+    #42a5f5
+  );
+}
+
+.owned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0f766e;
+}
+
+.owned-badge.unavailable {
+  background: #64748b;
+}
+
+.plan-card.is-owned {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: none;
+}
+
+.plan-card.is-owned:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.plan-card.is-owned .plan-icon {
+  background: #94a3b8;
+}
+
+.plan-card.is-owned h2,
+.plan-card.is-owned .price,
+.plan-card.is-owned .currency {
+  color: #64748b;
 }
 
 /* ICONO */
@@ -171,15 +231,17 @@
 
 /* FEATURES */
 
-.features {
+.plan-card .features {
   list-style: none;
   padding: 0;
   margin: 0 0 25px;
+  background: none;
+  text-align: center;
 
   flex-grow: 1;
 }
 
-.features li {
+.plan-card .features li {
   padding: 12px 0;
   text-align: center;
   border-bottom: 1px solid #edf2f7;
@@ -188,7 +250,7 @@
   font-size: 14px;
 }
 
-.features li:last-child {
+.plan-card .features li:last-child {
   border-bottom: none;
 }
 
@@ -221,6 +283,15 @@
 
 .buy-button:hover {
   transform: translateY(-2px);
+}
+
+.buy-button.locked,
+.buy-button.locked:hover,
+.buy-button.locked.Mui-disabled {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* RESPONSIVE */

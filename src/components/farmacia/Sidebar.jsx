@@ -68,11 +68,6 @@ export default function Sidebar() {
           Recetas Médicas
         </Nav.Link>
 
-        <Nav.Link as={NavLink} to="/farmacia/control-alimentos" style={linkStyle}>
-          <i className="bi bi-clipboard2-pulse"></i>
-          Control de alimentos
-        </Nav.Link>
-
 <Nav.Link as={NavLink} to="/farmacia/prueba" style={linkStyle}>
   <i className="bi bi-arrow-left-right"></i>
   Altas y bajas
@@ -80,6 +75,10 @@ export default function Sidebar() {
 <Nav.Link as={NavLink} to="/farmacia/ingresos-egresos" style={linkStyle}>
   <i className="bi bi-clipboard2-pulse"></i>
   Ingresos y Egresos
+</Nav.Link>
+<Nav.Link as={NavLink} to="/farmacia/insumos-estancia" style={linkStyle}>
+  <i className="bi bi-prescription2"></i>
+  Insumos de estancia
 </Nav.Link>
 
         <Nav.Link as={NavLink} to="/farmacia/inventario" style={linkStyle}>
@@ -115,6 +114,11 @@ export default function Sidebar() {
   Asistencias
 </Nav.Link>
 
+        <Nav.Link as={NavLink} to="/farmacia/sesiones-doctores" style={linkStyle}>
+          <i className="bi bi-clock-history"></i>
+          Entradas y salidas
+        </Nav.Link>
+
         <Nav.Link as={NavLink} to="/farmacia/agregar-consultorios" style={linkStyle}>
           <i className="bi bi-person-badge"></i>
           Consultorios
@@ -140,9 +144,9 @@ export default function Sidebar() {
           Reporte Habitacion
         </Nav.Link>
 
-        <Nav.Link as={NavLink} to="/farmacia/control-alimentos" style={linkStyle}>
+        <Nav.Link as={NavLink} to="/farmacia/gestion-personal" style={linkStyle}>
           <i class="bi bi-card-list"></i>
-          Control de alimentos
+          Gestion Personal
         </Nav.Link>
 
       </Nav>

@@ -27,6 +27,9 @@ import GestionIngresosEgresos from "../pages/farmacia/GestionIngresosEgresos"; /
 
 import DocumentoReporte  from "../pages/farmacia/DocumentoReporte";
 import ControlAlimientos from "../pages/farmacia/ControlAlimientos";
+import InsumosEstancia from "../pages/farmacia/InsumosEstancia";
+import GetionPersonal from "../pages/farmacia/GestionPersonal";
+import HistorialSesionesDoctores from "../pages/farmacia/HistorialSesionesDoctores";
 
 export default function FarmaciaRoutes(){
     return(
@@ -38,6 +41,7 @@ export default function FarmaciaRoutes(){
             <Route path="manifesto-residuo" element={<ManifestoResiduo />} /> /* nuevo*/
             <Route path="medicinas-caducadas" element={<MedicinasCaducacadas />} /> /* nuevo*/
             <Route path="ingresos-egresos" element={<GestionIngresosEgresos />} /> /* nuevo*/
+            <Route path="insumos-estancia" element={<InsumosEstancia />} />
 
             <Route path="Home" element={<HomeFarmacia />}/>
             <Route path="RecetasMedicas" element={<Recetas />}/>
@@ -55,6 +59,8 @@ export default function FarmaciaRoutes(){
             <Route path="prueba-consentimiento-firma" element={<PruebaConsentimientoFirma />} />
             <Route path="documento-reporte" element={<DocumentoReporte />} />
             <Route path="control-alimentos" element={<ControlAlimientos />} />
+            <Route path="gestion-personal" element={<GetionPersonal />} />
+            <Route path="sesiones-doctores" element={<HistorialSesionesDoctores />} />
         </Routes>
     );
 }

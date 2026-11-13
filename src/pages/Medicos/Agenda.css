@@ -162,3 +162,34 @@
   font-weight: 700 !important;
   color: #0f172a !important;
 }
+
+
+
+/*NUEVO*/
+.agenda-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.agenda-view-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.agenda-toggle-label {
+  margin-left: 6px;
+  text-transform: none;
+  font-weight: 600;
+}
+
+/* En móvil solo se muestran los iconos */
+@media (max-width: 520px) {
+  .agenda-toggle-label {
+    display: none;
+  }
+}
+/*NUEVO*/

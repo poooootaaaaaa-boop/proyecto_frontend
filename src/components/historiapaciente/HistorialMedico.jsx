@@ -40,6 +40,7 @@ export default function HistorialMedico() {
   const [paciente, setPaciente] = useState(null);
   const [consultas, setConsultas] = useState([]);
   const [recetas, setRecetas] = useState([]);
+  const [estancias, setEstancias] = useState([]);
   const [labFiles, setLabFiles] = useState([]);
   const [consultaSeleccionada, setConsultaSeleccionada] = useState(null);
 
@@ -57,17 +58,19 @@ export default function HistorialMedico() {
     setLoading(true);
     setError(null);
     try {
-      const [perfilRes, consultasRes, recetasRes, archivosRes] = await Promise.all([
+      const [perfilRes, consultasRes, recetasRes, archivosRes, estanciasRes] = await Promise.all([
         axios.get(`${API_URL}/perfil/${pacienteId}`),
         axios.get(`${API_URL}/consultas/${pacienteId}`),
         axios.get(`${API_URL}/recetas/paciente/${pacienteId}`),
         axios.get(`${API_URL}/expediente-archivos/paciente/${pacienteId}`),
+        axios.get(`${API_URL}/hospitalizaciones/paciente/${pacienteId}/estancias`),
       ]);
 
       setPaciente(perfilRes.data);
       setConsultas(consultasRes.data || []);
       setRecetas(recetasRes.data || []);
       setLabFiles(archivosRes.data || []);
+      setEstancias(estanciasRes.data?.data || []);
     } catch (err) {
       console.error(err);
       setError("No se pudo cargar el historial médico. Intenta de nuevo.");
@@ -131,6 +134,42 @@ export default function HistorialMedico() {
       headStyles: { fillColor: [56, 142, 60] },
     });
 
+    let estanciaY = doc.lastAutoTable.finalY + 12;
+    for (const estancia of estancias) {
+      doc.setFontSize(13);
+      doc.text(`Estancia hospitalaria #${estancia.id}`, 20, estanciaY);
+      autoTable(doc, {
+        startY: estanciaY + 4,
+        head: [["Fecha", "Insumo", "Categoría", "Cantidad", "Precio unitario", "Subtotal"]],
+        body: (estancia.consumos || []).map((consumo) => [
+          consumo.fecha_hora || "-",
+          consumo.insumo?.nombre || "Insumo",
+          consumo.insumo?.categoria || "-",
+          `${consumo.cantidad} ${consumo.insumo?.unidad_medida || ""}`,
+          `$${Number(consumo.precio_unitario || 0).toFixed(2)}`,
+          `$${Number(consumo.subtotal || 0).toFixed(2)}`,
+        ]),
+        theme: "grid",
+        headStyles: { fillColor: [13, 119, 114] },
+      });
+      estanciaY = doc.lastAutoTable.finalY + 6;
+      const procedimientos = (estancia.registros || []).filter((registro) => registro.tipo === "procedimiento");
+      if (procedimientos.length) {
+        doc.setFontSize(11);
+        doc.text("Procedimientos realizados", 20, estanciaY);
+        autoTable(doc, {
+          startY: estanciaY + 3,
+          head: [["Fecha", "Procedimiento", "Costo"]],
+          body: procedimientos.map((registro) => [registro.fecha_hora || "-", registro.descripcion, `$${Number(registro.costo || 0).toFixed(2)}`]),
+          theme: "grid",
+          headStyles: { fillColor: [165, 105, 35] },
+        });
+        estanciaY = doc.lastAutoTable.finalY + 6;
+      }
+      doc.text(`Costo total de estancia: $${Number(estancia.costo_total || 0).toFixed(2)}`, 20, estanciaY);
+      estanciaY += 12;
+    }
+
     const pageHeight = doc.internal.pageSize.height;
     doc.setFontSize(9);
     doc.setTextColor(120);
@@ -179,6 +218,20 @@ export default function HistorialMedico() {
   const abrirModalConsulta = (consulta) => {
     setConsultaSeleccionada(consulta);
     setOpenConsultaModal(true);
+  };
+
+  const descargarReporteEstancia = async (estanciaId) => {
+    try {
+      const response = await axios.get(`${API_URL}/hospitalizaciones/${estanciaId}/reporte-final/pdf`, { responseType: "blob" });
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `reporte-estancia-${estanciaId}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "No se pudo descargar el reporte final de estancia.");
+    }
   };
 
   // ===== SUBIDA DE ARCHIVOS (real, contra ExpedienteArchivoController) =====
@@ -362,6 +415,47 @@ export default function HistorialMedico() {
             ))}
           </Grid>
         )}
+      </Box>
+
+      {/* HISTORIAL CONSULTAS */}
+      <Box className="section-container">
+        <Paper className="custom-card table-paper">
+          <Box className="section-header" sx={{ p: 3, pb: 0 }}>
+            <MedicationIcon />
+            <Typography variant="h6">Insumos consumidos durante estancias</Typography>
+          </Box>
+          {estancias.length === 0 ? (
+            <Typography color="text.secondary" sx={{ p: 3 }}>No hay estancias hospitalarias registradas.</Typography>
+          ) : estancias.map((estancia) => (
+            <Box key={estancia.id} sx={{ p: 3, pt: 2 }}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1} sx={{ mb: 1 }}>
+                <Typography fontWeight={700}>Estancia #{estancia.id} · {estancia.estado} · Hab. {estancia.habitacion?.numero || "—"}</Typography>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Chip label={`Total estancia ${Number(estancia.costo_total || 0).toLocaleString("es-MX", { style: "currency", currency: "MXN" })}`} color="primary" variant="outlined" />
+                  {estancia.estado === "Alta" && <Button size="small" variant="outlined" startIcon={<DownloadIcon />} onClick={() => descargarReporteEstancia(estancia.id)}>Reporte PDF</Button>}
+                </Box>
+              </Box>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead><TableRow><TableCell>Fecha</TableCell><TableCell>Insumo</TableCell><TableCell>Categoría</TableCell><TableCell>Cantidad</TableCell><TableCell align="right">Precio unitario</TableCell><TableCell align="right">Subtotal</TableCell></TableRow></TableHead>
+                  <TableBody>
+                    {(estancia.consumos || []).length === 0 ? <TableRow><TableCell colSpan={6}>Sin consumos registrados.</TableCell></TableRow> : estancia.consumos.map((consumo) => (
+                      <TableRow key={consumo.id}>
+                        <TableCell>{consumo.fecha_hora ? new Date(consumo.fecha_hora).toLocaleString("es-MX") : "—"}</TableCell>
+                        <TableCell>{consumo.insumo?.nombre || "Insumo"}</TableCell>
+                        <TableCell>{consumo.insumo?.categoria || "—"}</TableCell>
+                        <TableCell>{consumo.cantidad} {consumo.insumo?.unidad_medida}</TableCell>
+                        <TableCell align="right">{Number(consumo.precio_unitario || 0).toLocaleString("es-MX", { style: "currency", currency: "MXN" })}</TableCell>
+                        <TableCell align="right">{Number(consumo.subtotal || 0).toLocaleString("es-MX", { style: "currency", currency: "MXN" })}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              {(estancia.registros || []).length > 0 && <Box sx={{ mt: 2 }}><Typography fontWeight={700} variant="subtitle2">Evolución y actividades</Typography>{estancia.registros.map((registro) => <Typography key={registro.id} variant="body2" sx={{ mt: .5 }}>{new Date(registro.fecha_hora).toLocaleString("es-MX")} · {registro.tipo}: {registro.descripcion}{registro.tipo === "procedimiento" ? ` · ${Number(registro.costo || 0).toLocaleString("es-MX", { style: "currency", currency: "MXN" })}` : ""}</Typography>)}</Box>}
+            </Box>
+          ))}
+        </Paper>
       </Box>
 
       {/* HISTORIAL CONSULTAS */}

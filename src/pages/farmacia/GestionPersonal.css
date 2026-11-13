@@ -1,0 +1,375 @@
+/* ============================================================
+   CLIC-384 · Gestión de Personal
+   Usa la paleta de dashboardFarmacia.css (azul #2563eb, slate)
+   ============================================================ */
+
+.gp-page {
+  padding: 0 1.5rem 2rem;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.gp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---------- Pestañas ---------- */
+.gp-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 6px;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.gp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding: 9px 16px;
+  border-radius: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.gp-tab:hover {
+  background: #f1f5f9;
+}
+
+.gp-tab.activa {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ---------- Panel ---------- */
+.gp-panel {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+}
+
+.gp-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.gp-title {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.gp-aviso {
+  margin-bottom: 1rem;
+}
+
+.gp-muted {
+  color: #64748b;
+}
+
+.gp-wrap {
+  max-width: 260px;
+  white-space: normal;
+}
+
+.gp-section {
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+
+/* ---------- Tabla ---------- */
+.gp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.gp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.gp-table thead th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.gp-table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  color: #1e293b;
+}
+
+.gp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gp-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.gp-acciones {
+  white-space: nowrap;
+}
+
+.gp-acciones .btn + .btn {
+  margin-left: 4px;
+}
+
+/* ---------- Persona / avatar ---------- */
+.gp-persona {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.gp-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Estado vacío ---------- */
+.gp-empty {
+  text-align: center;
+  color: #94a3b8;
+  padding: 2.5rem 1rem;
+}
+
+.gp-empty i {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.gp-empty p {
+  margin: 0;
+}
+
+/* ---------- Horarios ---------- */
+.gp-horarios th,
+.gp-horarios td {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.gp-turno {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin: 1px 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gp-dia-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.gp-dia-row:last-child {
+  border-bottom: none;
+}
+
+.gp-dia-nombre {
+  font-weight: 600;
+  padding-top: 4px;
+}
+
+.gp-dia-bloques {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.gp-bloque {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gp-bloque .form-control {
+  width: 130px;
+}
+
+/* ---------- Saldo de vacaciones ---------- */
+.gp-saldo {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.gp-saldo small {
+  display: block;
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.gp-saldo strong {
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.gp-saldo-disp strong {
+  color: #16a34a;
+  font-size: 1.1rem;
+}
+
+/* ---------- Historial laboral ---------- */
+.gp-resumen-emp {
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+
+.gp-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 6px;
+  position: relative;
+}
+
+.gp-timeline::before {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.gp-tl-item {
+  display: flex;
+  gap: 14px;
+  position: relative;
+  padding: 0 0 18px;
+}
+
+.gp-tl-icono {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #ffffff;
+  z-index: 1;
+}
+
+.gp-tl-icono.blue   { background: #dbeafe; color: #2563eb; }
+.gp-tl-icono.indigo { background: #e0e7ff; color: #4f46e5; }
+.gp-tl-icono.amber  { background: #fef3c7; color: #d97706; }
+.gp-tl-icono.red    { background: #fee2e2; color: #dc2626; }
+.gp-tl-icono.green  { background: #dcfce7; color: #16a34a; }
+.gp-tl-icono.gray   { background: #f1f5f9; color: #64748b; }
+
+.gp-tl-cuerpo {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 0;
+}
+
+.gp-tl-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.gp-tl-fecha {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .gp-page {
+    padding: 0 0.75rem 1.5rem;
+  }
+
+  .gp-panel {
+    padding: 0.9rem;
+  }
+
+  .gp-dia-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .gp-saldo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gp-bloque .form-control {
+    width: 110px;
+  }
+}
