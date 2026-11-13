@@ -1,21 +1,22 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Axios from "axios";
-import { Link } from "react-router-dom";
-import Sidebar from "../../components/farmacia/Sidebar";
 import { useNavigate } from "react-router-dom";
-import SlimSelect from 'slim-select';
+import Sidebar from "../../components/farmacia/Sidebar";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function ReporteHabitacion() {
-
     const navigate = useNavigate();
 
+    // Estados para catálogos
     const [listaCuartos, setListaCuartos] = useState([]);
     const [listaInstrumentos, setListaInstrumentos] = useState([]);
+    const [listaDoctores, setListaDoctores] = useState([]);
+    const [listaReportes, setListaReportes] = useState([]);
 
-    // Un const independiente para cada campo
+    // Estados del formulario individual
     const [cuartoSeleccionado, setCuartoSeleccionado] = useState('');
+    const [doctorSeleccionado, setDoctorSeleccionado] = useState('');
     const [instrumentoSeleccionado, setInstrumentoSeleccionado] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [foto, setFoto] = useState(null);
@@ -23,14 +24,31 @@ function ReporteHabitacion() {
     const [costo, setCosto] = useState('');
     const [prioridad, setPrioridad] = useState('');
 
-    const [reportes, setReportes] = useState([]);
+    // Reportes agregados localmente antes de enviar en lote
+    const [reportesLocales, setReportesLocales] = useState([]);
 
+    // Carga inicial de datos
+    useEffect(() => {
+        const cargarDatosIniciales = async () => {
+            try {
+                const [resHabitaciones, resInstrumentos, resDoctores, resReportes] = await Promise.all([
+                    Axios.get(`${API_URL}/habitaciones`),
+                    Axios.get(`${API_URL}/instrumentos`),
+                    Axios.get(`${API_URL}/doctores-completo`),
+                    Axios.get(`${API_URL}/reportes-completo`)
+                ]);
 
-    const [listaDoctores, setListaDoctores] = useState([]);
-    const [doctorSeleccionado, setDoctorSeleccionado] = useState('');
+                setListaCuartos(resHabitaciones.data || []);
+                setListaInstrumentos(resInstrumentos.data || []);
+                setListaDoctores(resDoctores.data || []);
+                setListaReportes(resReportes.data || []);
+            } catch (error) {
+                console.error("Error cargando datos iniciales:", error);
+            }
+        };
 
-    const [listaReportes, setListaReportes] = useState([]);
-
+        cargarDatosIniciales();
+    }, []);
 
     const obtenerReportes = async () => {
         try {
@@ -41,253 +59,40 @@ function ReporteHabitacion() {
         }
     };
 
-    console.log(obtenerReportes);
-
-
-    const reportesBack = listaReportes.map((reporte) => (
-        <li
-            key={reporte.id}
-            style={{
-                listStyle: 'none',
-                backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '10px',
-                padding: '20px',
-                marginBottom: '15px',
-                width: '100%',
-                boxSizing: 'border-box'
-            }}
-        >
-            <p>
-                <strong>Descripción:</strong> {reporte.descripcion}
-            </p>
-
-            <strong>Reportado por:</strong>
-            <p>
-                {reporte.doctor_nombre ||
-                    reporte.doctor?.usuario?.nombre ||
-                    reporte.usuario?.nombre ||
-                    listaDoctores.find(
-                        (doc) => String(doc.id) === String(reporte.doctor_id)
-                    )?.usuario?.nombre ||
-                    "Doctor no identificado"}
-            </p>
-
-
-            <p>
-                <strong>Estado:</strong> {reporte.status || "Sin estado"}
-            </p>
-
-            {reporte.status === "pendiente" && (
-                <button
-                    type="button"
-                    onClick={() => cambiarStatus(reporte.id)}
-                    style={{
-                        backgroundColor: '#16a34a',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        padding: '9px 15px',
-                        marginRight: '10px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Aprobar
-                </button>
-            )}
-
-            <button
-                type="button"
-                onClick={() => verReporte(reporte)}
-                style={{
-                    backgroundColor: '#2563eb',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '9px 15px',
-                    cursor: 'pointer'
-                }}
-            >
-                Ver reporte
-            </button>
-        </li>
-    ));
-
-
-
     const cambiarStatus = async (id) => {
         try {
-            await Axios.put(
-                `${API_URL}/reporte-habitacion/${id}/status`,
-                { status: "aprobado" }
-            );
+            await Axios.put(`${API_URL}/reporte-habitacion/${id}/status`, { status: "aprobado" });
 
-            // Actualiza el estado en pantalla inmediatamente
             setListaReportes((reportesActuales) =>
                 reportesActuales.map((reporte) =>
-                    reporte.id === id
-                        ? { ...reporte, status: "aprobado" }
-                        : reporte
+                    reporte.id === id ? { ...reporte, status: "aprobado" } : reporte
                 )
             );
 
             alert("Reporte aprobado correctamente");
-
-            // Sincroniza la lista con la base de datos
             await obtenerReportes();
-
         } catch (error) {
             console.error("Error actualizando el estado:", error);
-            alert(
-                error.response?.data?.mensaje ||
-                "No se pudo actualizar el estado"
-            );
+            alert(error.response?.data?.mensaje || "No se pudo actualizar el estado");
         }
     };
 
     const verReporte = (reporte) => {
-        const instrumento = listaInstrumentos.find(
-            (ins) => String(ins.id) === String(reporte.instrumento_id)
-        );
-
-        const doctor = listaDoctores.find(
-            (doc) => String(doc.id) === String(reporte.doctor_id)
-        );
+        const instrumento = listaInstrumentos.find((ins) => String(ins.id) === String(reporte.instrumento_id));
+        const doctor = listaDoctores.find((doc) => String(doc.id) === String(reporte.doctor_id));
 
         const reporteCompleto = {
             ...reporte,
-
-            instrumento_nombre:
-                reporte.instrumento?.nombre ||
-                reporte.instrumento_nombre ||
-                instrumento?.nombre ||
-                `Instrumento #${reporte.instrumento_id}`,
-
-            doctor_nombre:
-                reporte.doctor_nombre ||
-                reporte.doctor?.usuario?.nombre ||
-                doctor?.usuario?.nombre ||
-                doctor?.nombre ||
-                "Doctor no identificado",
+            instrumento_nombre: reporte.instrumento?.nombre || reporte.instrumento_nombre || instrumento?.nombre || `Instrumento #${reporte.instrumento_id}`,
+            doctor_nombre: reporte.doctor_nombre || reporte.doctor?.usuario?.nombre || doctor?.usuario?.nombre || doctor?.nombre || "Doctor no identificado",
         };
 
         navigate("/farmacia/documento-reporte", {
-            state: {
-                reporte: reporteCompleto,
-                reportes: [reporteCompleto],
-            },
+            state: { reporte: reporteCompleto, reportes: [reporteCompleto] },
         });
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    const obtenerDoctores = async () => {
-        try {
-            const response = await Axios.get(`${API_URL}/doctores-completo`);
-            setListaDoctores(response.data || []);
-        } catch (error) {
-            console.error("Error cargando doctores:", error);
-        }
-    };
-
-
-
-
-    // 1. Declaras tus funciones asíncronas para traer los datos de la BD
-    const obtenerHabitaciones = async () => {
-        try {
-            const response = await Axios.get(`${API_URL}/habitaciones`);
-            // Usamos el set que definiste para tus cuartos/habitaciones
-            setListaCuartos(response.data || []);
-        } catch (error) {
-            console.error("Error cargando habitaciones:", error);
-        }
-    };
-
-    const obtenerInstrumentos = async () => {
-        try {
-            const response = await Axios.get(`${API_URL}/instrumentos`);
-            // Usamos el set que definiste para tus instrumentos
-            setListaInstrumentos(response.data || []);
-        } catch (error) {
-            console.error("Error cargando instrumentos:", error);
-        }
-    };
-
-    // 2. Tu useEffect queda súper corto y limpio: solo las llama al iniciar
-    useEffect(() => {
-        obtenerHabitaciones();
-        obtenerInstrumentos();
-        obtenerDoctores();
-        obtenerReportes();
-    }, []); // Arreglo vacío para que se ejecute solo una vez
-
-
-
-    const agregarReporte = () => {
-
-        if (!cuartoSeleccionado || !doctorSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
-            alert('Por favor, llena todos los campos antes de agregar el reporte.');
-            return;
-        }
-
-        const doctorSeleccionadoObj = listaDoctores.find(
-            (doctor) => String(doctor.id) === String(doctorSeleccionado)
-        );
-
-        const nuevoReporte = {
-
-            cuarto_id: cuartoSeleccionado,
-            doctor_id: doctorSeleccionado,
-            doctor_nombre: doctorSeleccionadoObj?.usuario?.nombre || "",
-
-
-            instrumento_id: instrumentoSeleccionado,
-            instrumento_nombre: listaInstrumentos.find(
-                (instrumento) => String(instrumento.id) === String(instrumentoSeleccionado)
-            )?.nombre || `Instrumento #${instrumentoSeleccionado}`,
-            descripcion: descripcion,
-            foto: foto,
-            fecha_registro: fechaRegistro,
-            costo: costo,
-            prioridad: prioridad
-
-        };
-
-        setReportes([...reportes, nuevoReporte]);
-
-        // Limpiar campos para poder crear otro reporte
+    const limpiarFormulario = () => {
         setCuartoSeleccionado('');
         setDoctorSeleccionado('');
         setInstrumentoSeleccionado('');
@@ -296,105 +101,71 @@ function ReporteHabitacion() {
         setFechaRegistro('');
         setCosto('');
         setPrioridad('');
-
-        alert('Reporte agregado. Puedes agregar otro.');
     };
 
-    const eliminarReporte = (indice) => {
-        const nuevosReportes = reportes.filter((_, index) => index !== indice);
-        setReportes(nuevosReportes);
+    const agregarReporteLocal = () => {
+        if (!cuartoSeleccionado || !doctorSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
+            alert('Por favor, llena todos los campos antes de agregar el reporte.');
+            return;
+        }
+
+        const doctorObj = listaDoctores.find((d) => String(d.id) === String(doctorSeleccionado));
+        const instrumentoObj = listaInstrumentos.find((i) => String(i.id) === String(instrumentoSeleccionado));
+
+        const nuevoReporte = {
+            cuarto_id: cuartoSeleccionado,
+            doctor_id: doctorSeleccionado,
+            doctor_nombre: doctorObj?.usuario?.nombre || "",
+            instrumento_id: instrumentoSeleccionado,
+            instrumento_nombre: instrumentoObj?.nombre || `Instrumento #${instrumentoSeleccionado}`,
+            descripcion,
+            foto,
+            fecha_registro: fechaRegistro,
+            costo,
+            prioridad
+        };
+
+        setReportesLocales([...reportesLocales, nuevoReporte]);
+        limpiarFormulario();
+        alert('Reporte agregado a la lista temporal.');
     };
 
-    /*
-      // La función ya no necesita el "e.preventDefault()" porque no hay un submit nativo que recargue la página
-      const manejarEnvio = async () => {
-        // Validamos a mano que no dejen campos vacíos (ya que no tenemos el "required" nativo del form)
-            if (!cuartoSeleccionado || !instrumentoSeleccionado || !descripcion || !foto || !fechaRegistro || !costo || !prioridad) {
-          alert('Por favor, llena todos los campos antes de enviar.');
-          return;
-        }
-    
-        const datosFormulario = new FormData();
-        datosFormulario.append('cuarto_id', cuartoSeleccionado);
-        datosFormulario.append('instrumento_id', instrumentoSeleccionado);
-        datosFormulario.append('descripcion', descripcion);
-        datosFormulario.append('foto', foto);
-        datosFormulario.append('fecha_registro', fechaRegistro);
-        datosFormulario.append('costo', costo);
-        datosFormulario.append('prioridad', prioridad);
-    
-        try {
-          const respuesta = await Axios.post(`${API_URL}/reporte-habitacion`, datosFormulario, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-    
-          console.log('Respuesta:', respuesta.data);
-          alert('¡Guardado con éxito con Axios!');
-    
-          // Limpiar campos
-          setCuartoSeleccionado('');
-          setInstrumentoSeleccionado('');
-          setDescripcion('');
-          setFoto(null);
-        setFechaRegistro('');
-        setCosto('');
-        setPrioridad('');
-    
-        } catch (error) {
-          console.error('Error al enviar:', error);
-          alert('Hubo un error al conectar con el servidor.');
-        }
-      };
-    
-        */
+    const eliminarReporteLocal = (indice) => {
+        setReportesLocales(reportesLocales.filter((_, index) => index !== indice));
+    };
 
+    const manejarEnvioGeneral = async () => {
+        const reportesParaEnviar = [...reportesLocales];
 
-    const manejarEnvio = async () => {
-
-        const formularioCompleto = cuartoSeleccionado && doctorSeleccionado && instrumentoSeleccionado && descripcion && foto && fechaRegistro && costo && prioridad;
-        const reportesParaEnviar = [...reportes];
-
-        if (formularioCompleto) {
-
-            const doctorSeleccionadoObj = listaDoctores.find(
-                (doctor) => String(doctor.id) === String(doctorSeleccionado)
-            );
-
+        // Si hay datos sueltos en el formulario actual sin agregar, los incluimos
+        if (cuartoSeleccionado && doctorSeleccionado && instrumentoSeleccionado && descripcion && foto && fechaRegistro && costo && prioridad) {
+            const doctorObj = listaDoctores.find((d) => String(d.id) === String(doctorSeleccionado));
+            const instrumentoObj = listaInstrumentos.find((i) => String(i.id) === String(instrumentoSeleccionado));
 
             reportesParaEnviar.push({
                 cuarto_id: cuartoSeleccionado,
                 doctor_id: doctorSeleccionado,
-                doctor_nombre: doctorSeleccionadoObj?.usuario?.nombre || "",
+                doctor_nombre: doctorObj?.usuario?.nombre || "",
                 instrumento_id: instrumentoSeleccionado,
-                instrumento_nombre: listaInstrumentos.find(
-                    (instrumento) => String(instrumento.id) === String(instrumentoSeleccionado)
-                )?.nombre || `Instrumento #${instrumentoSeleccionado}`,
+                instrumento_nombre: instrumentoObj?.nombre || `Instrumento #${instrumentoSeleccionado}`,
                 descripcion,
                 foto,
                 fecha_registro: fechaRegistro,
                 costo,
                 prioridad
             });
-        } else if (cuartoSeleccionado || instrumentoSeleccionado || descripcion || foto || fechaRegistro || costo || prioridad) {
-            alert('Por favor, llena todos los campos del reporte antes de enviarlo.');
-            return;
         }
 
         if (reportesParaEnviar.length === 0) {
-            alert('Primero agrega al menos un reporte.');
+            alert('Primero completa el formulario o agrega al menos un reporte.');
             return;
         }
 
         try {
-
             const reportesGuardados = [];
 
             for (const reporte of reportesParaEnviar) {
-
                 const datosFormulario = new FormData();
-
                 datosFormulario.append('doctor_id', reporte.doctor_id);
                 datosFormulario.append('cuarto_id', reporte.cuarto_id);
                 datosFormulario.append('instrumento_id', reporte.instrumento_id);
@@ -404,566 +175,178 @@ function ReporteHabitacion() {
                 datosFormulario.append('costo', reporte.costo);
                 datosFormulario.append('prioridad', reporte.prioridad);
 
-                await Axios.post(
-                    `${API_URL}/reporte-habitacion`,
-                    datosFormulario,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    }
-                );
+                await Axios.post(`${API_URL}/reporte-habitacion`, datosFormulario, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
 
                 reportesGuardados.push(reporte);
             }
 
+            alert('¡Reportes guardados con éxito!');
             navigate('/farmacia/documento-reporte', {
-                state: {
-                    reporte: reportesGuardados[0],
-                    reportes: reportesGuardados
-                }
+                state: { reporte: reportesGuardados[0], reportes: reportesGuardados }
             });
 
         } catch (error) {
-
             console.error('Error al enviar:', error);
-
             alert('Hubo un error al guardar los reportes.');
         }
     };
+
     return (
-        <div className="movimientos-layout" style={{ backgroundColor: '#f4f7f6', minHeight: '100vh', display: 'flex' }}>
+        <div style={{ backgroundColor: '#f4f7f6', minHeight: '100vh', display: 'flex' }}>
             <Sidebar />
 
-            <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                padding: '40px 20px',
-                fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
-            }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 20px', fontFamily: "'Segoe UI', Roboto, sans-serif" }}>
+                <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)', width: '100%', maxWidth: '600px', padding: '40px', boxSizing: 'border-box' }}>
+                    
+                    <h2 style={{ textAlign: 'center', color: '#0a1931', fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>
+                        Reportar Habitaciones e Instrumentos
+                    </h2>
+                    <p style={{ textAlign: 'center', color: '#6c757d', fontSize: '13.5px', marginBottom: '30px' }}>
+                        Complete los detalles del estado de la habitación o registre múltiples incidencias.
+                    </p>
 
-                <div style={{
-                    backgroundColor: '#f3f0f0',
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.03)',
-                    width: '100%',
-                    maxWidth: '520px',
-                    padding: '40px',
-                    boxSizing: 'border-box'
-                }}>
+                    {/* Selector de Cuartos */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Selecciona el Cuarto</label>
+                        <select value={cuartoSeleccionado} onChange={(e) => setCuartoSeleccionado(e.target.value)} style={selectStyle}>
+                            <option value="">-- Selecciona un cuarto --</option>
+                            {listaCuartos.map((cuarto) => (
+                                <option key={cuarto.id} value={cuarto.id}>Cuarto: {cuarto.id}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <h2 style={{
-                        textAlign: 'center',
-                        color: '#0a1931',
-                        fontSize: '26px',
-                        fontWeight: '700',
-                        margin: '0 0 8px 0'
-                    }}>Reportar Habitaciones</h2>
+                    {/* Selector de Doctor */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Selecciona el Doctor</label>
+                        <select value={doctorSeleccionado} onChange={(e) => setDoctorSeleccionado(e.target.value)} style={selectStyle}>
+                            <option value="">-- Selecciona un doctor --</option>
+                            {listaDoctores.map((doctor) => (
+                                <option key={doctor.id} value={doctor.id}>{doctor.usuario?.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <p style={{
-                        textAlign: 'center',
-                        color: '#6c757d',
-                        fontSize: '13.5px',
-                        margin: '0 0 30px 0'
-                    }}>Por favor, complete los detalles del estado de la habitación e instrumentos.</p>
+                    {/* Selector de Instrumentos */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Selecciona el Instrumento</label>
+                        <select value={instrumentoSeleccionado} onChange={(e) => setInstrumentoSeleccionado(e.target.value)} style={selectStyle}>
+                            <option value="">-- Selecciona un instrumento --</option>
+                            {listaInstrumentos.map((ins) => (
+                                <option key={ins.id} value={ins.id}>{ins.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                    <div>
-                        {/* Selector de Cuartos */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Selecciona el Cuarto
-                            </label>
-                            <select
-                                value={cuartoSeleccionado}
-                                onChange={(e) => setCuartoSeleccionado(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#4a5568',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            >
-                                <option value="">-- Selecciona un cuarto --</option>
-                                {listaCuartos.map((cuarto) => (
-                                    <option key={cuarto.id} value={cuarto.id}>
-                                        Cuarto: {cuarto.id}
-                                    </option>
-                                ))}
-                            </select>
+                    {/* Descripción */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Descripción</label>
+                        <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} placeholder="Escribe una breve descripción..." style={{ ...selectStyle, minHeight: '90px', resize: 'vertical' }} />
+                    </div>
+
+                    {/* Fecha de Registro */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Fecha de registro</label>
+                        <input type="date" value={fechaRegistro} onChange={(e) => setFechaRegistro(e.target.value)} style={selectStyle} />
+                    </div>
+
+                    {/* Costo */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Costo</label>
+                        <input type="number" min="0" step="0.01" value={costo} onChange={(e) => setCosto(e.target.value)} placeholder="Ingresa el costo" style={selectStyle} />
+                    </div>
+
+                    {/* Prioridad */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Prioridad</label>
+                        <select value={prioridad} onChange={(e) => setPrioridad(e.target.value)} style={selectStyle}>
+                            <option value="">-- Selecciona una prioridad --</option>
+                            <option value="alta">Alta</option>
+                            <option value="media">Media</option>
+                            <option value="baja">Baja</option>
+                        </select>
+                    </div>
+
+                    {/* Subir Foto */}
+                    <div style={{ marginBottom: '25px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#333', fontSize: '13.5px', fontWeight: '500' }}>Subir Foto</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', borderRadius: '8px', border: '1px dashed #cbd5e1', backgroundColor: foto ? '#fff' : '#f8fafc', position: 'relative' }}>
+                            {foto ? (
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <img src={URL.createObjectURL(foto)} alt="Preview" style={{ maxHeight: '180px', maxWidth: '100%', borderRadius: '6px', objectFit: 'contain' }} />
+                                    <button type="button" onClick={() => setFoto(null)} style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#e11d48', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&times;</button>
+                                </div>
+                            ) : (
+                                <label style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+                                    <span style={{ fontSize: '22px', marginBottom: '6px', color: '#94a3b8' }}>📁</span>
+                                    <span style={{ fontSize: '13.5px', color: '#1e3a8a', fontWeight: '600' }}>Seleccionar archivo <span style={{ color: '#64748b', fontWeight: '400' }}>o arrastrar</span></span>
+                                    <input type="file" accept="image/*" onChange={(e) => setFoto(e.target.files[0])} style={{ display: 'none' }} />
+                                </label>
+                            )}
                         </div>
-
-
-
-
-                        <div style={{ marginBottom: '20px' }}>
-                            <label
-                                style={{
-                                    display: 'block',
-                                    marginBottom: '8px',
-                                    color: '#333333',
-                                    fontSize: '13.5px',
-                                    fontWeight: '500'
-                                }}
-                            >
-                                Selecciona el Doctor
-                            </label>
-
-                            <select
-                                value={doctorSeleccionado}
-                                onChange={(e) => setDoctorSeleccionado(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#4a5568',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            >
-                                <option value="">-- Selecciona un doctor --</option>
-
-                                {listaDoctores.map((doctor) => (
-                                    <option key={doctor.id} value={doctor.id}>
-                                        {doctor.usuario?.nombre}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-
-
-
-
-
-
-
-
-
-                        {/* Selector de Instrumentos */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Selecciona el Instrumento
-                            </label>
-                            <select
-                                value={instrumentoSeleccionado}
-                                onChange={(e) => setInstrumentoSeleccionado(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#4a5568',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            >
-                                <option value="">-- Selecciona un instrumento --</option>
-                                {listaInstrumentos.map((ins) => (
-                                    <option key={ins.id} value={ins.id}>
-                                        {ins.nombre}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Campo de Descripción */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Descripción
-                            </label>
-                            <textarea
-                                value={descripcion}
-                                onChange={(e) => setDescripcion(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    minHeight: '100px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#333333',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    resize: 'vertical',
-                                    boxSizing: 'border-box'
-                                }}
-                                placeholder="Escribe una breve descripción del reporte..."
-                            />
-                        </div>
-
-                        {/* Fecha de Registro */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Fecha de registro
-                            </label>
-                            <input
-                                type="date"
-                                value={fechaRegistro}
-                                onChange={(e) => setFechaRegistro(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#4a5568',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            />
-                        </div>
-
-                        {/* Costo */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Costo
-                            </label>
-                            <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={costo}
-                                onChange={(e) => setCosto(e.target.value)}
-                                placeholder="Ingresa el costo"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#4a5568',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            />
-                        </div>
-
-                        {/* Prioridad */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Prioridad
-                            </label>
-                            <select
-                                value={prioridad}
-                                onChange={(e) => setPrioridad(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    backgroundColor: '#f8fafc',
-                                    color: '#4a5568',
-                                    fontSize: '14px',
-                                    outline: 'none',
-                                    boxSizing: 'border-box'
-                                }}
-                            >
-                                <option value="">-- Selecciona una prioridad --</option>
-                                <option value="alta">Alta</option>
-                                <option value="media">Media</option>
-                                <option value="baja">Baja</option>
-                            </select>
-                        </div>
-
-                        {/* Campo de Foto (Estilizado como la zona de arrastrar archivo de la imagen) */}
-                        {/* Campo de Foto */}
-                        <div style={{ marginBottom: '30px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', color: '#333333', fontSize: '13.5px', fontWeight: '500' }}>
-                                Subir Foto
-                            </label>
-
-                            {/* Contenedor principal que reacciona a la selección */}
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '16px',
-                                borderRadius: '8px',
-                                border: '1px dashed #cbd5e1',
-                                backgroundColor: foto ? '#ffffff' : '#f8fafc', // Fondo blanco si hay foto, claro si no
-                                textAlign: 'center',
-                                position: 'relative' // Para el botón de eliminar
-                            }}>
-
-                                {/* Zona de previsualización (cuando HAY una foto) */}
-                                {foto && (
-                                    <div style={{
-                                        position: 'relative',
-                                        display: 'inline-block',
-                                        maxWidth: '100%'
-                                    }}>
-                                        <img
-                                            src={URL.createObjectURL(foto)}
-                                            alt="Preview"
-                                            style={{
-                                                display: 'block',
-                                                maxHeight: '200px',
-                                                maxWidth: '100%',
-                                                borderRadius: '6px',
-                                                objectFit: 'contain'
-                                            }}
-                                        />
-
-                                        {/* Botón de eliminar (pequeña 'X' roja en la esquina) */}
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setFoto(null); // Limpia el estado de la foto
-                                            }}
-                                            style={{
-                                                position: 'absolute',
-                                                top: '-10px',
-                                                right: '-10px',
-                                                background: '#e11d48',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '50%',
-                                                width: '24px',
-                                                height: '24px',
-                                                cursor: 'pointer',
-                                                fontSize: '16px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                                transition: 'transform 0.2s',
-                                                zIndex: 1
-                                            }}
-                                            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                                            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                        >
-                                            &times; {/* Carácter de multiplicación para la 'X' */}
-                                        </button>
-                                    </div>
-                                )}
-
-                                {/* Zona de carga (cuando NO hay foto) */}
-                                {!foto && (
-                                    <label style={{
-                                        width: '100%',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        padding: '8px'
-                                    }}>
-                                        <span style={{ fontSize: '24px', marginBottom: '8px', color: '#94a3b8' }}>📁</span>
-                                        <span style={{ fontSize: '13.5px', color: '#1e3a8a', fontWeight: '600' }}>
-                                            Seleccionar archivo <span style={{ color: '#64748b', fontWeight: '400' }}>o arrastrar y soltar</span>
-                                        </span>
-                                        <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>PNG, JPG hasta 10MB</span>
-
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => setFoto(e.target.files[0])}
-                                            onClick={(e) => (e.target.value = null)}
-                                            style={{ display: 'none' }}
-                                        />
-                                    </label>
-                                )}
-
-                            </div>
-                        </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        {reportes.length > 0 && (
-                            <div style={{ marginBottom: '20px' }}>
-
-                                <h3 style={{
-                                    fontSize: '16px',
-                                    color: '#0a1931',
-                                    marginBottom: '10px'
-                                }}>
-                                    Reportes agregados ({reportes.length})
-                                </h3>
-
-                                {reportes.map((reporte, index) => (
-                                    <div
-                                        key={index}
-                                        style={{
-                                            padding: '12px',
-                                            marginBottom: '10px',
-                                            border: '1px solid #e2e8f0',
-                                            borderRadius: '8px',
-                                            backgroundColor: '#ffffff'
-                                        }}
-                                    >
-
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center'
-                                        }}>
-
-                                            <strong>
-                                                Reporte #{index + 1}
-                                            </strong>
-
-                                            <button
-                                                type="button"
-                                                onClick={() => eliminarReporte(index)}
-                                                style={{
-                                                    backgroundColor: '#e11d48',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '6px',
-                                                    padding: '5px 10px',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                Eliminar
-                                            </button>
-
-                                        </div>
-
-                                        <p style={{ margin: '6px 0', fontSize: '13px' }}>
-                                            Cuarto: {reporte.cuarto_id}
-                                        </p>
-
-                                        <p style={{ margin: '6px 0', fontSize: '13px' }}>
-                                            Instrumento: {reporte.instrumento_nombre || `Instrumento #${reporte.instrumento_id}`}
-                                        </p>
-
-                                        <p style={{ margin: '6px 0', fontSize: '13px' }}>
-                                            Descripción: {reporte.descripcion}
-                                        </p>
-
-                                        <p style={{ margin: '6px 0', fontSize: '13px' }}>
-                                            Costo: ${reporte.costo}
-                                        </p>
-
-                                        <p style={{ margin: '6px 0', fontSize: '13px' }}>
-                                            Prioridad: {reporte.prioridad}
-                                        </p>
-
-                                        <p style={{ margin: '6px 0', fontSize: '13px' }}>
-                                            Fecha de Registro: {reporte.fecha_registro}
-                                        </p>
-
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        <button
-                            type="button"
-                            onClick={agregarReporte}
-                            style={{
-                                width: '100%',
-                                padding: '14px',
-                                backgroundColor: '#64748b',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontSize: '15px',
-                                fontWeight: '600',
-                                marginBottom: '10px',
-                                boxSizing: 'border-box'
-                            }}
-                        >
-                            + Agregar otro reporte
+                    </div>
+
+                    {/* Botones de acción del formulario */}
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
+                        <button type="button" onClick={agregarReporteLocal} style={{ flex: 1, backgroundColor: '#475569', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', cursor: 'pointer', fontWeight: '600' }}>
+                            + Agregar a lista
                         </button>
-
-                        {/* Botón de Enviar */}
-                        <button
-                            type="button"
-                            onClick={manejarEnvio}
-                            style={{
-                                width: '100%',
-                                padding: '14px',
-                                backgroundColor: '#1d4ed8',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontSize: '15px',
-                                fontWeight: '600',
-                                transition: 'background-color 0.2s ease',
-                                boxSizing: 'border-box'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1e40af'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
-                        >
-                            Enviar informe
+                        <button type="button" onClick={manejarEnvioGeneral} style={{ flex: 1, backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', cursor: 'pointer', fontWeight: '600' }}>
+                            Enviar Reportes
                         </button>
                     </div>
-                </div>
-                <div style={{ width: '100%', maxWidth: '700px', marginTop: '30px' }}>
-                    <h2 style={{ color: '#0a1931', marginBottom: '20px' }}>
-                        Reportes registrados
-                    </h2>
 
-                    <ul style={{ padding: 0, margin: 0 }}>
-                        {reportesBack}
-                    </ul>
+                    {/* Lista temporal de reportes agregados */}
+                    {reportesLocales.length > 0 && (
+                        <div style={{ marginBottom: '30px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
+                            <h3 style={{ fontSize: '15px', color: '#0a1931', marginBottom: '12px' }}>Reportes en espera de envío ({reportesLocales.length}):</h3>
+                            {reportesLocales.map((rep, idx) => (
+                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '6px', marginBottom: '8px', border: '1px solid #e2e8f0' }}>
+                                    <span style={{ fontSize: '13px', color: '#333' }}>Cuarto #{rep.cuarto_id} - {rep.instrumento_nombre}</span>
+                                    <button type="button" onClick={() => eliminarReporteLocal(idx)} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '12px' }}>Quitar</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Historial de reportes existentes en base de datos */}
+                    <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
+                        <h3 style={{ fontSize: '16px', color: '#0a1931', marginBottom: '15px' }}>Reportes Registrados en el Sistema</h3>
+                        <ul style={{ padding: 0, margin: 0 }}>
+                            {listaReportes.map((reporte) => (
+                                <li key={reporte.id} style={{ listStyle: 'none', backgroundColor: '#fdfdfd', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '15px', marginBottom: '12px' }}>
+                                    <p style={{ margin: '0 0 6px 0', fontSize: '13.5px' }}><strong>Descripción:</strong> {reporte.descripcion}</p>
+                                    <p style={{ margin: '0 0 6px 0', fontSize: '13.5px' }}><strong>Estado:</strong> {reporte.status || "Sin estado"}</p>
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                                        {reporte.status === "pendiente" && (
+                                            <button type="button" onClick={() => cambiarStatus(reporte.id)} style={{ backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontSize: '13px' }}>Aprobar</button>
+                                        )}
+                                        <button type="button" onClick={() => verReporte(reporte)} style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontSize: '13px' }}>Ver reporte</button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
                 </div>
             </div>
-
         </div>
     );
 }
+
+// Estilo común reutilizable para inputs y selects
+const selectStyle = {
+    width: '100%',
+    padding: '12px 14px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#f8fafc',
+    color: '#4a5568',
+    fontSize: '14px',
+    outline: 'none',
+    boxSizing: 'border-box'
+};
 
 export default ReporteHabitacion;

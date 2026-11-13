@@ -29,6 +29,7 @@ import DocumentoReporte  from "../pages/farmacia/DocumentoReporte";
 import ControlAlimientos from "../pages/farmacia/ControlAlimientos";
 import InsumosEstancia from "../pages/farmacia/InsumosEstancia";
 import GetionPersonal from "../pages/farmacia/GestionPersonal";
+import HistorialSesionesDoctores from "../pages/farmacia/HistorialSesionesDoctores";
 
 export default function FarmaciaRoutes(){
     return(
@@ -59,6 +60,7 @@ export default function FarmaciaRoutes(){
             <Route path="documento-reporte" element={<DocumentoReporte />} />
             <Route path="control-alimentos" element={<ControlAlimientos />} />
             <Route path="gestion-personal" element={<GetionPersonal />} />
+            <Route path="sesiones-doctores" element={<HistorialSesionesDoctores />} />
         </Routes>
     );
 }
