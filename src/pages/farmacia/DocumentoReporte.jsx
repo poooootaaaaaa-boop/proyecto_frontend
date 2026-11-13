@@ -78,6 +78,9 @@ table.rh-tbl td:last-child { border-right: none; }
 }
 `;
 
+const API_URL = import.meta.env.VITE_API_URL;
+const STORAGE_URL = API_URL.replace(/\/api\/?$/, "");
+
 function fmt(n) {
   return "$" + Number(n || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -86,15 +89,15 @@ function fmtFecha(f) {
   if (!f) return "-";
   const [y, m, d] = f.split("-");
   if (!y || !m || !d) return f;
-  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   return `${parseInt(d)} de ${meses[parseInt(m) - 1]} de ${y}`;
 }
 
 // Mapeo de prioridad a estilos
 const PRIO = {
-  alta:  { cls: "prio-alta",  label: "Alta",  selloColor: "#721c24", icon: "!" },
+  alta: { cls: "prio-alta", label: "Alta", selloColor: "#721c24", icon: "!" },
   media: { cls: "prio-media", label: "Media", selloColor: "#856404", icon: "~" },
-  baja:  { cls: "prio-baja",  label: "Baja",  selloColor: "#155724", icon: "✔" },
+  baja: { cls: "prio-baja", label: "Baja", selloColor: "#155724", icon: "✔" },
 };
 
 export default function DocumentoReporte() {
@@ -118,10 +121,10 @@ export default function DocumentoReporte() {
     );
   }
 
-  const prio      = PRIO[reporte.prioridad] ?? PRIO.media;
-  const costo     = reportes.reduce((total, item) => total + Number(item.costo || 0), 0);
-  const iva       = costo * 0.16;
-  const total     = costo + iva;
+  const prio = PRIO[reporte.prioridad] ?? PRIO.media;
+  const costo = reportes.reduce((total, item) => total + Number(item.costo || 0), 0);
+  const iva = costo * 0.16;
+  const total = costo + iva;
 
   return (
     <>
@@ -190,13 +193,13 @@ export default function DocumentoReporte() {
                   <td className="left">{item.instrumento_nombre || `Instrumento #${item.instrumento_id}`}</td>
                   <td>
                     <span className={
-                      item.prioridad === "alta"  ? "est-falla" :
-                      item.prioridad === "media" ? "est-revision" :
-                                                      "est-ok"
+                      item.prioridad === "alta" ? "est-falla" :
+                        item.prioridad === "media" ? "est-revision" :
+                          "est-ok"
                     }>
-                      {item.prioridad === "alta"  ? "Con falla" :
-                       item.prioridad === "media" ? "En revisión" :
-                                                       "En orden"}
+                      {item.prioridad === "alta" ? "Con falla" :
+                        item.prioridad === "media" ? "En revisión" :
+                          "En orden"}
                     </span>
                   </td>
                   <td>{fmt(item.costo)}</td>
@@ -228,20 +231,41 @@ export default function DocumentoReporte() {
 
           {/* ── FOTO ── */}
           <div className="rh-sec">Evidencia fotográfica</div>
-          <div className="rh-foto-block">
-            {reportes.some((item) => item.foto) ? reportes.map((item, index) => {
-              if (!item.foto) return null;
-              const fotoSrc = typeof item.foto === "string"
-                ? item.foto
-                : URL.createObjectURL(item.foto);
 
-              return (
-                <div key={`foto-${index}`}>
-                  <p style={{ marginTop: 6 }}>Reporte {index + 1}</p>
-                  <img src={fotoSrc} alt={`Evidencia del reporte ${index + 1}`} className="rh-foto-img" />
-                </div>
-              );
-            }) : <div className="rh-foto-placeholder">Sin fotografía adjunta</div>}
+          <div className="rh-foto-block">
+            {reportes.some((item) => item.foto) ? (
+              reportes.map((item, index) => {
+                if (!item.foto) return null;
+
+                const fotoSrc =
+                  typeof item.foto === "string"
+                    ? item.foto.startsWith("http")
+                      ? item.foto
+                      : `${STORAGE_URL}/imagenes_registros/${item.foto}`
+                    : URL.createObjectURL(item.foto);
+
+                return (
+                  <div key={`foto-${index}`}>
+                    <p style={{ marginTop: 6 }}>
+                      Reporte {index + 1}
+                    </p>
+
+                    <img
+                      src={fotoSrc}
+                      alt={`Evidencia del reporte ${index + 1}`}
+                      className="rh-foto-img"
+                      onError={(e) => {
+                        console.error("Error al cargar la foto:", fotoSrc);
+                      }}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="rh-foto-placeholder">
+                Sin fotografía adjunta
+              </div>
+            )}
           </div>
 
           {/* ── FOOTER ── */}
@@ -255,8 +279,8 @@ export default function DocumentoReporte() {
               <label>Revisado por:</label>
               <div className="rh-firma-line" />
               <div className="rh-firma-sub">
-              {reporte.doctor_nombre || "___________________________"}
-            </div>
+                {reporte.doctor_nombre || "___________________________"}
+              </div>
             </div>
             <div
               className="rh-sello"
