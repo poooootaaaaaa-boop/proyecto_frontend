@@ -115,6 +115,11 @@ export default function Sidebar() {
   Asistencias
 </Nav.Link>
 
+        <Nav.Link as={NavLink} to="/farmacia/sesiones-doctores" style={linkStyle}>
+          <i className="bi bi-clock-history"></i>
+          Entradas y salidas
+        </Nav.Link>
+
         <Nav.Link as={NavLink} to="/farmacia/agregar-consultorios" style={linkStyle}>
           <i className="bi bi-person-badge"></i>
           Consultorios

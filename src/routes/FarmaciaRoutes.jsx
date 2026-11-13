@@ -27,6 +27,7 @@ import GestionIngresosEgresos from "../pages/farmacia/GestionIngresosEgresos"; /
 
 import DocumentoReporte  from "../pages/farmacia/DocumentoReporte";
 import ControlAlimientos from "../pages/farmacia/ControlAlimientos";
+import HistorialSesionesDoctores from "../pages/farmacia/HistorialSesionesDoctores";
 
 export default function FarmaciaRoutes(){
     return(
@@ -55,6 +56,7 @@ export default function FarmaciaRoutes(){
             <Route path="prueba-consentimiento-firma" element={<PruebaConsentimientoFirma />} />
             <Route path="documento-reporte" element={<DocumentoReporte />} />
             <Route path="control-alimentos" element={<ControlAlimientos />} />
+            <Route path="sesiones-doctores" element={<HistorialSesionesDoctores />} />
         </Routes>
     );
 }

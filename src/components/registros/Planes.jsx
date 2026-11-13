@@ -22,7 +22,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import Axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const CLAVE_PLANES = "planes_activos_por_usuario";
 
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -44,44 +43,16 @@ const cardElementOptions = {
 };
 
 function obtenerUsuarioId() {
-  const directo = localStorage.getItem("usuario_id");
-  if (directo) return String(directo);
-
   try {
     const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
-    const id = usuario?.id || usuario?.user_id;
-    return id != null && id !== "" ? String(id) : null;
+    const id = usuario?.id ?? usuario?.user_id;
+    if (id != null && id !== "") return String(id);
   } catch {
-    return null;
-  }
-}
-
-function leerPlanGuardado() {
-  const usuarioId = obtenerUsuarioId();
-  if (!usuarioId) return null;
-
-  try {
-    const mapa = JSON.parse(localStorage.getItem(CLAVE_PLANES) || "{}");
-    const planId = mapa[usuarioId];
-    return planId != null && planId !== "" ? String(planId) : null;
-  } catch {
-    return null;
-  }
-}
-
-function guardarPlanActivo(planId) {
-  const usuarioId = obtenerUsuarioId();
-  if (!usuarioId || planId == null || planId === "") return;
-
-  let mapa = {};
-  try {
-    mapa = JSON.parse(localStorage.getItem(CLAVE_PLANES) || "{}");
-  } catch {
-    mapa = {};
+    /* la sesión no trae un objeto de usuario válido */
   }
 
-  mapa[usuarioId] = String(planId);
-  localStorage.setItem(CLAVE_PLANES, JSON.stringify(mapa));
+  const directo = localStorage.getItem("usuario_id");
+  return directo ? String(directo) : null;
 }
 
 function esPlanGratuito(plan) {
@@ -125,16 +96,7 @@ function CheckoutForm({ planId, planNombre, planPrecio, onSuccess, onAlreadyOwne
     setLoading(true);
     setErrorMessage("");
 
-    let usuario_id = localStorage.getItem("usuario_id");
-
-    if (!usuario_id) {
-      try {
-        const usuarioGuardado = JSON.parse(localStorage.getItem("usuario") || "null");
-        usuario_id = usuarioGuardado?.id || usuarioGuardado?.user_id;
-      } catch (err) {
-        console.error("Error al parsear el usuario del localStorage", err);
-      }
-    }
+    const usuario_id = obtenerUsuarioId();
 
     if (!usuario_id) {
       setErrorMessage("No se encontró el ID del usuario en la sesión. Vuelve a iniciar sesión.");
@@ -307,6 +269,7 @@ function Planes() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [planActivoId, setPlanActivoId] = useState(null);
+  const [tienePlanDePago, setTienePlanDePago] = useState(false);
   const [procesandoPago, setProcesandoPago] = useState(false);
 
   useEffect(() => {
@@ -319,32 +282,65 @@ function Planes() {
       });
   }, []);
 
+  const marcarComoGratuito = () => {
+    const gratuito = planes.find(esPlanGratuito);
+    setPlanActivoId(gratuito ? String(gratuito.id) : null);
+    setTienePlanDePago(false);
+  };
+
   useEffect(() => {
     if (!planes.length) return;
 
-    const guardado = leerPlanGuardado();
-    const planGuardado = planes.find((plan) => String(plan.id) === String(guardado));
+    localStorage.removeItem("planes_activos_por_usuario");
 
-    if (planGuardado && !esPlanGratuito(planGuardado)) {
-      setPlanActivoId(String(planGuardado.id));
+    const usuarioId = obtenerUsuarioId();
+    if (!usuarioId) {
+      marcarComoGratuito();
       return;
     }
 
-    setPlanActivoId(null);
+    let vigente = true;
+
+    Axios.get(`${API_URL}/suscripcion-activa`, { params: { usuario_id: usuarioId } })
+      .then(({ data }) => {
+        if (!vigente) return;
+
+        const plan = planes.find((item) => String(item.id) === String(data?.plan_id));
+        const esPago = Boolean(data?.es_pago) && plan && !esPlanGratuito(plan);
+
+        if (esPago) {
+          setPlanActivoId(String(plan.id));
+          setTienePlanDePago(true);
+          return;
+        }
+
+        marcarComoGratuito();
+      })
+      .catch((error) => {
+        console.error("Error consultando la suscripción activa:", error);
+        if (vigente) marcarComoGratuito();
+      });
+
+    return () => {
+      vigente = false;
+    };
   }, [planes]);
 
   const marcarPlanActivo = (planId) => {
-    if (planId == null) return;
-    guardarPlanActivo(planId);
-    setPlanActivoId(String(planId));
+    const plan = planes.find((item) => String(item.id) === String(planId));
+    if (plan && !esPlanGratuito(plan)) {
+      setPlanActivoId(String(plan.id));
+      setTienePlanDePago(true);
+      return;
+    }
+
+    marcarComoGratuito();
   };
 
-  const planActivo = planes.find((plan) => String(plan.id) === String(planActivoId)) || null;
-  const tienePlanDePago = Boolean(planActivo && !esPlanGratuito(planActivo));
-
   const estaBloqueado = (plan) => {
-    if (tienePlanDePago && esPlanGratuito(plan)) return true;
-    return tienePlanDePago && String(plan.id) === String(planActivoId);
+    const esActual = String(plan.id) === String(planActivoId);
+    if (tienePlanDePago) return esPlanGratuito(plan) || esActual;
+    return esActual;
   };
 
   const cerrarModal = () => {
@@ -428,7 +424,8 @@ function Planes() {
           {planes.map((plan, index) => {
             const bloqueado = estaBloqueado(plan);
             const esGratuito = esPlanGratuito(plan);
-            const esPlanComprado = bloqueado && !esGratuito;
+            const esActual = String(plan.id) === String(planActivoId);
+            const noDisponible = tienePlanDePago && esGratuito;
             const destacado = index === 1 && !bloqueado;
 
             return (
@@ -437,9 +434,9 @@ function Planes() {
                 className={`plan-card ${destacado ? "featured" : ""} ${bloqueado ? "is-owned" : ""}`}
               >
                 {bloqueado && (
-                  <div className={`owned-badge ${esGratuito ? "unavailable" : ""}`}>
+                  <div className={`owned-badge ${noDisponible ? "unavailable" : ""}`}>
                     <LockOutlinedIcon sx={{ fontSize: 14 }} />
-                    {esPlanComprado ? "Ya adquirido" : "No disponible"}
+                    {noDisponible ? "No disponible" : esActual && !esGratuito ? "Adquirido" : "Plan actual"}
                   </div>
                 )}
                 {destacado && <div className="popular-badge">MÁS POPULAR</div>}
@@ -462,7 +459,7 @@ function Planes() {
                   startIcon={bloqueado ? <LockOutlinedIcon /> : null}
                   onClick={() => abrirPasarela(plan)}
                 >
-                  {esPlanComprado ? "Plan activo" : bloqueado ? "No disponible" : "Contratar Plan"}
+                  {noDisponible ? "No disponible" : esActual ? "Plan activo" : "Contratar Plan"}
                 </Button>
               </div>
             );
