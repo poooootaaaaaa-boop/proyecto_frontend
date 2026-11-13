@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import FarmaciaRoutes from "./routes/FarmaciaRoutes";
 import MedicosRoute from "./routes/MedicosRoutes"; // Esto es lo que trajo el equipo
 import Dashboard from "./pages/Dashboard";
@@ -31,11 +32,42 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 
 export default function App() {
+  // Captura sesión síncrona antes de montar hijos
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const usuario = params.get("usuario");
+    if (token) localStorage.setItem("token", token);
+    if (usuario) localStorage.setItem("usuario", usuario);
+  } catch (e) {
+    console.warn("Error leyendo sesión de URL:", e);
+  }
+
+  // Limpia token y usuario de la URL sin recargar
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("token") || params.get("usuario")) {
+        params.delete("token");
+        params.delete("usuario");
+        const newSearch = params.toString();
+        const newUrl =
+          window.location.pathname +
+          (newSearch ? `?${newSearch}` : "") +
+          window.location.hash;
+        window.history.replaceState({}, document.title, newUrl);
+      }
+    } catch (e) {
+      // Ignorar
+    }
+  }, []);
+
   return (
 
     <AppointmentProvider>
       <Routes>
         <Route path="/Dashboard_paciente" element={<Dashboard />} />
+        <Route path="/dashboard_paciente" element={<Dashboard />} />
         <Route path="/recuperar" element={<ForgotPassword />} />
         <Route path="/seleccionar_perfil" element={<SelectProfile />} />
         <Route path="/registro/doctor" element={<DoctorInfo />} />
@@ -73,6 +105,8 @@ export default function App() {
         <Route path="/confirmar-cita" element={<ConfirmAppointment />} />
         <Route path="/tratamientos" element={<Treatments />} />
         <Route path="/farmacia/*" element={<FarmaciaRoutes />} />
+        <Route path="/Farmacia/*" element={<FarmaciaRoutes />} />
+        <Route path="/medicos/*" element={<MedicosRoute />} />
         <Route path="/Medicos/*" element={<MedicosRoute />} />
             {/* Módulo de Doctores (Gestión, edición y marcaje rápido) */}
 
