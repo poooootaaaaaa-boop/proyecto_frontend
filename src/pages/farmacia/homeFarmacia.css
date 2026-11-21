@@ -535,3 +535,77 @@
   margin-bottom: 20px;
   line-height: 1.5;
 }
+
+.status-chip.neutral {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.metric-icon-box.blue { background-color: #eff6ff; color: #2563eb; }
+.metric-icon-box.green { background-color: #f0fdf4; color: #16a34a; }
+
+.session-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.session-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.session-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.session-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+}
+
+.session-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.session-avatar-fallback {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.doctor-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doctor-meta small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .session-filters {
+    grid-template-columns: 1fr;
+  }
+}
