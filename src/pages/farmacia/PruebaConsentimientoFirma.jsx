@@ -23,6 +23,8 @@ import {
   Trash2,
   Building2,
   UserRound,
+  FileCheck2,
+  AlertTriangle,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FirmaElectronica from "../../components/multiusos/FirmaElectronica.jsx";
@@ -148,6 +150,7 @@ export default function PruebaConsentimientoFirma() {
   const [subiendoAdjunto, setSubiendoAdjunto] = useState(false);
   const [finalizando, setFinalizando] = useState(false);
   const [finalizado, setFinalizado] = useState(false);
+  const [modalFinalizar, setModalFinalizar] = useState(null); // null | "confirmar" | "exito"
 
   const [mensaje, setMensaje] = useState(null); // { tipo: 'ok' | 'error', texto }
   const mostrarMensaje = useCallback((tipo, texto) => setMensaje({ tipo, texto }), []);
@@ -213,6 +216,16 @@ export default function PruebaConsentimientoFirma() {
       activo = false;
     };
   }, [mostrarMensaje]);
+
+  // Cerrar el modal de confirmación con la tecla Escape
+  useEffect(() => {
+    if (modalFinalizar !== "confirmar") return;
+    const onKey = (e) => {
+      if (e.key === "Escape" && !finalizando) setModalFinalizar(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalFinalizar, finalizando]);
 
   const actualizarCampo = (campo) => (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value }));
 
@@ -437,26 +450,27 @@ export default function PruebaConsentimientoFirma() {
     setForm({ ...formInicial, fecha_ingreso: hoyISO() });
     setMensaje(null);
     setFinalizado(false);
+    setModalFinalizar(null);
   };
 
   const urlPdf = (descargar = false) =>
     `${API_URL}/consentimientos/${consentimiento.id}/pdf${descargar ? "?download=1" : ""}`;
 
-  // ---- 4) Finalizar el proceso: marca el documento como Finalizado en el
-  // backend, descarga el PDF final y cierra este consentimiento ----
+  // ---- 4) Finalizar el proceso ----
+  // Abre el modal de confirmación (reemplaza window.confirm)
+  const pedirConfirmacionFinalizar = () => {
+    if (!consentimiento?.id || finalizando) return;
+    setModalFinalizar("confirmar");
+  };
+
+  // Marca el documento como Finalizado en el backend, descarga el PDF final
+  // y muestra el modal de éxito
   const finalizarProceso = async () => {
     if (!consentimiento?.id || finalizando) return;
-
-    const confirmar = window.confirm(
-      "¿Finalizar el proceso? Se descargará el documento final y este consentimiento quedará cerrado."
-    );
-    if (!confirmar) return;
 
     setMensaje(null);
     setFinalizando(true);
     try {
-      // Esto es lo que realmente cierra el documento en la base de datos
-      // (antes solo se descargaba el PDF y nunca se avisaba al backend).
       const res = await api.post(`/consentimientos/${consentimiento.id}/finalizar`);
       setConsentimiento((prev) => ({ ...prev, ...(res.data?.data ?? { estado: "Finalizado" }) }));
 
@@ -469,17 +483,18 @@ export default function PruebaConsentimientoFirma() {
       enlace.remove();
 
       setFinalizado(true);
-      mostrarMensaje("ok", "Proceso finalizado. El documento se descargó y el consentimiento quedó cerrado.");
-
-      // Da tiempo a que se vea el mensaje y se dispare la descarga antes de salir de la página
-      setTimeout(() => {
-        navigate("/Farmacia/dashboard");
-      }, 800);
+      setModalFinalizar("exito");
     } catch (err) {
+      setModalFinalizar(null);
       mostrarMensaje("error", errorTexto(err, "No se pudo finalizar el proceso."));
     } finally {
       setFinalizando(false);
     }
+  };
+
+  const cerrarModalExito = () => {
+    setModalFinalizar(null);
+    navigate("/Farmacia/dashboard");
   };
 
   // Paso actual para el riel
@@ -534,111 +549,111 @@ export default function PruebaConsentimientoFirma() {
               </div>
             )}
 
-{/* ============ Nuevo formato de consentimiento ============ */}
-{mostrarNuevoFormato && !consentimiento && (
-  <section className="consent-card consent-card-accent">
-    <div className="consent-card-header consent-card-header-split">
-      <div className="consent-title-group">
-        <span className="consent-title-icon">
-          <FilePlus size={18} />
-        </span>
-        <div>
-          <h3>Nuevo formato de consentimiento</h3>
-          <p>Redacta el texto una vez y reutilízalo en cada ingreso.</p>
-        </div>
-      </div>
-      <button type="button" className="consent-btn-ghost" onClick={() => setMostrarNuevoFormato(false)}>
-        <X size={13} />
-        Cerrar
-      </button>
-    </div>
+            {/* ============ Nuevo formato de consentimiento ============ */}
+            {mostrarNuevoFormato && !consentimiento && (
+              <section className="consent-card consent-card-accent">
+                <div className="consent-card-header consent-card-header-split">
+                  <div className="consent-title-group">
+                    <span className="consent-title-icon">
+                      <FilePlus size={18} />
+                    </span>
+                    <div>
+                      <h3>Nuevo formato de consentimiento</h3>
+                      <p>Redacta el texto una vez y reutilízalo en cada ingreso.</p>
+                    </div>
+                  </div>
+                  <button type="button" className="consent-btn-ghost" onClick={() => setMostrarNuevoFormato(false)}>
+                    <X size={13} />
+                    Cerrar
+                  </button>
+                </div>
 
-    <form onSubmit={guardarNuevoFormato} className="consent-grid consent-format-form">
-      <Campo label="Nombre del formato" full>
-        <input
-          required
-          maxLength={200}
-          value={nuevoFormato.nombre}
-          onChange={(e) => setNuevoFormato((p) => ({ ...p, nombre: e.target.value }))}
-          className="consent-input"
-          placeholder="Ej. Consentimiento de hospitalización"
-        />
-      </Campo>
+                <form onSubmit={guardarNuevoFormato} className="consent-grid consent-format-form">
+                  <Campo label="Nombre del formato" full>
+                    <input
+                      required
+                      maxLength={200}
+                      value={nuevoFormato.nombre}
+                      onChange={(e) => setNuevoFormato((p) => ({ ...p, nombre: e.target.value }))}
+                      className="consent-input"
+                      placeholder="Ej. Consentimiento de hospitalización"
+                    />
+                  </Campo>
 
-      <Campo label="Descripción" full>
-        <input
-          value={nuevoFormato.descripcion}
-          onChange={(e) => setNuevoFormato((p) => ({ ...p, descripcion: e.target.value }))}
-          className="consent-input"
-          placeholder="Para qué se usa este formato (opcional)"
-        />
-      </Campo>
+                  <Campo label="Descripción" full>
+                    <input
+                      value={nuevoFormato.descripcion}
+                      onChange={(e) => setNuevoFormato((p) => ({ ...p, descripcion: e.target.value }))}
+                      className="consent-input"
+                      placeholder="Para qué se usa este formato (opcional)"
+                    />
+                  </Campo>
 
-      <Campo label="Texto del consentimiento" full>
-        <textarea
-          required
-          rows={8}
-          value={nuevoFormato.contenido}
-          onChange={(e) => setNuevoFormato((p) => ({ ...p, contenido: e.target.value }))}
-          className="consent-input consent-textarea-lg"
-          placeholder="Yo, el paciente, autorizo al doctor de la clínica a..."
-        />
-        <span className="consent-counter">{nuevoFormato.contenido.length} caracteres</span>
-      </Campo>
+                  <Campo label="Texto del consentimiento" full>
+                    <textarea
+                      required
+                      rows={8}
+                      value={nuevoFormato.contenido}
+                      onChange={(e) => setNuevoFormato((p) => ({ ...p, contenido: e.target.value }))}
+                      className="consent-input consent-textarea-lg"
+                      placeholder="Yo, el paciente, autorizo al doctor de la clínica a..."
+                    />
+                    <span className="consent-counter">{nuevoFormato.contenido.length} caracteres</span>
+                  </Campo>
 
-      <div className="consent-full consent-tokens-panel">
-        <div className="consent-tokens-head">
-          <strong>Insertar dato automático</strong>
-          <span>Toca un dato para agregarlo al texto. Al crear el consentimiento se reemplaza por la información real.</span>
-        </div>
-        <div className="consent-tokens">
-          {MARCADORES.map((m) => (
-  <button type="button" key={m.id} onClick={() => insertarMarcador(m.id)}>
-    <Plus size={12} />
-    {m.label}
-  </button>
-))}
-        </div>
-      </div>
+                  <div className="consent-full consent-tokens-panel">
+                    <div className="consent-tokens-head">
+                      <strong>Insertar dato automático</strong>
+                      <span>Toca un dato para agregarlo al texto. Al crear el consentimiento se reemplaza por la información real.</span>
+                    </div>
+                    <div className="consent-tokens">
+                      {MARCADORES.map((m) => (
+                        <button type="button" key={m.id} onClick={() => insertarMarcador(m.id)}>
+                          <Plus size={12} />
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-      <div className="consent-full consent-toggles">
-        <label className="consent-toggle">
-          <input
-            type="checkbox"
-            checked={nuevoFormato.requiere_firma}
-            onChange={(e) => setNuevoFormato((p) => ({ ...p, requiere_firma: e.target.checked }))}
-          />
-          <span>
-            <strong>Requiere firma del paciente</strong>
-            <small>El documento no se cierra sin su firma.</small>
-          </span>
-        </label>
+                  <div className="consent-full consent-toggles">
+                    <label className="consent-toggle">
+                      <input
+                        type="checkbox"
+                        checked={nuevoFormato.requiere_firma}
+                        onChange={(e) => setNuevoFormato((p) => ({ ...p, requiere_firma: e.target.checked }))}
+                      />
+                      <span>
+                        <strong>Requiere firma del paciente</strong>
+                        <small>El documento no se cierra sin su firma.</small>
+                      </span>
+                    </label>
 
-        <label className="consent-toggle">
-          <input
-            type="checkbox"
-            checked={nuevoFormato.activo}
-            onChange={(e) => setNuevoFormato((p) => ({ ...p, activo: e.target.checked }))}
-          />
-          <span>
-            <strong>Formato activo</strong>
-            <small>Aparece en la lista de formatos.</small>
-          </span>
-        </label>
-      </div>
+                    <label className="consent-toggle">
+                      <input
+                        type="checkbox"
+                        checked={nuevoFormato.activo}
+                        onChange={(e) => setNuevoFormato((p) => ({ ...p, activo: e.target.checked }))}
+                      />
+                      <span>
+                        <strong>Formato activo</strong>
+                        <small>Aparece en la lista de formatos.</small>
+                      </span>
+                    </label>
+                  </div>
 
-      <div className="consent-full consent-form-actions">
-        <button type="button" className="consent-btn-ghost" onClick={() => setMostrarNuevoFormato(false)}>
-          Cancelar
-        </button>
-        <button type="submit" disabled={guardandoFormato} className="consent-btn-primary">
-          {guardandoFormato && <Loader2 size={14} className="spin" />}
-          Guardar formato
-        </button>
-      </div>
-    </form>
-  </section>
-)}
+                  <div className="consent-full consent-form-actions">
+                    <button type="button" className="consent-btn-ghost" onClick={() => setMostrarNuevoFormato(false)}>
+                      Cancelar
+                    </button>
+                    <button type="submit" disabled={guardandoFormato} className="consent-btn-primary">
+                      {guardandoFormato && <Loader2 size={14} className="spin" />}
+                      Guardar formato
+                    </button>
+                  </div>
+                </form>
+              </section>
+            )}
 
             {/* ============ Paso 1 ============ */}
             <section className="consent-card">
@@ -1015,7 +1030,7 @@ export default function PruebaConsentimientoFirma() {
                   </a>
                   <button
                     type="button"
-                    onClick={finalizarProceso}
+                    onClick={pedirConfirmacionFinalizar}
                     disabled={finalizando || finalizado}
                     className="consent-btn-primary"
                   >
@@ -1084,6 +1099,81 @@ export default function PruebaConsentimientoFirma() {
           </main>
         </div>
       </div>
+
+      {/* ============ Modal: confirmar / éxito ============ */}
+      {modalFinalizar && (
+        <div
+          className="consent-modal-overlay"
+          role="presentation"
+          onClick={() => modalFinalizar === "confirmar" && !finalizando && setModalFinalizar(null)}
+        >
+          <div
+            className="consent-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="consent-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {modalFinalizar === "confirmar" ? (
+              <>
+                <span className="consent-modal-icon is-warning">
+                  <AlertTriangle size={26} />
+                </span>
+                <h3 id="consent-modal-title">¿Finalizar el proceso?</h3>
+                <p>
+                  Se descargará el documento final y este consentimiento quedará cerrado. Ya no podrás modificar las
+                  firmas.
+                </p>
+                <div className="consent-modal-actions">
+                  <button
+                    type="button"
+                    className="consent-btn-ghost consent-modal-btn"
+                    onClick={() => setModalFinalizar(null)}
+                    disabled={finalizando}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="consent-btn-primary consent-modal-btn"
+                    onClick={finalizarProceso}
+                    disabled={finalizando}
+                    autoFocus
+                  >
+                    {finalizando ? <Loader2 size={14} className="spin" /> : <CheckCircle2 size={14} />}
+                    Sí, finalizar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="consent-modal-icon is-success">
+                  <FileCheck2 size={28} />
+                </span>
+                <h3 id="consent-modal-title">¡Documento descargado!</h3>
+                <p>
+                  El proceso finalizó correctamente. El PDF quedó guardado en tu equipo y el consentimiento #
+                  {consentimiento?.id} fue cerrado.
+                </p>
+                <div className="consent-modal-actions">
+                  <a href={urlPdf()} target="_blank" rel="noreferrer" className="consent-btn-secondary consent-modal-btn">
+                    <Printer size={14} />
+                    Ver PDF
+                  </a>
+                  <button
+                    type="button"
+                    className="consent-btn-primary consent-modal-btn"
+                    onClick={cerrarModalExito}
+                    autoFocus
+                  >
+                    Continuar
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

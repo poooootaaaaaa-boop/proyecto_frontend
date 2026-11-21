@@ -1194,12 +1194,118 @@ textarea.consent-input {
   }
 }
 
+/* =====================================================
+   MODAL (confirmar / éxito)
+   ===================================================== */
+.consent-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 37, 71, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: consent-fade 0.18s ease-out;
+}
+
+.consent-modal {
+  width: 100%;
+  max-width: 400px;
+  background: var(--sheet);
+  border-radius: 20px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(15, 37, 71, 0.35);
+  animation: consent-pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.consent-modal-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consent-modal-icon.is-warning {
+  background: var(--amber-wash);
+  color: var(--amber);
+  box-shadow: 0 0 0 8px rgba(254, 243, 226, 0.6);
+}
+
+.consent-modal-icon.is-success {
+  background: var(--blue-wash);
+  color: var(--blue);
+  box-shadow: 0 0 0 8px var(--blue-ring);
+}
+
+.consent-modal h3 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.consent-modal p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.consent-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.consent-modal-btn {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  justify-content: center;
+}
+
+.consent-modal-actions .consent-btn-ghost {
+  border-radius: 10px;
+}
+
+@keyframes consent-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes consent-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spin {
     animation-duration: 2s;
   }
   .consent-page * {
     transition: none !important;
+  }
+  .consent-modal,
+  .consent-modal-overlay {
+    animation: none;
   }
 }
 
@@ -1275,6 +1381,10 @@ textarea.consent-input {
   }
 
   .consent-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .consent-modal-actions {
     flex-direction: column-reverse;
   }
 }
