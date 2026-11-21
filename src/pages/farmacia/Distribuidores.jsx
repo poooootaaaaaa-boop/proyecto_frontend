@@ -26,6 +26,8 @@ import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import "./distribuidores.css"; // Estilos dedicados
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Distribuidores() {
   const [distribuidores, setDistribuidores] = useState([]);
   const [busqueda, setBusqueda] = useState("");
@@ -56,7 +58,7 @@ export default function Distribuidores() {
 
   // ===== CARGAR DATOS =====
   useEffect(() => {
-    Axios.get("http://127.0.0.1:8000/api/MostrarDistribuidor")
+    Axios.get(`${API_URL}/MostrarDistribuidor`)
       .then((response) => {
         setDistribuidores(response.data.distribuidor || []);
       })
@@ -75,7 +77,7 @@ export default function Distribuidores() {
   // ===== GUARDAR EDICIÓN =====
   const guardarEdicion = () => {
     Axios.put(
-      `http://127.0.0.1:8000/api/UpdateDistribuidor/${distribuidorEdit.id}`,
+      `${API_URL}/UpdateDistribuidor/${distribuidorEdit.id}`,
       formData
     )
       .then((response) => {
@@ -102,12 +104,14 @@ export default function Distribuidores() {
   // ===== CONFIRMAR ELIMINAR =====
   const eliminarDistribuidor = () => {
     Axios.delete(
-      `http://127.0.0.1:8000/api/DeleteDistribuidor/${distribuidorDelete.id}`
+      `${API_URL}/DeleteDistribuidor/${distribuidorDelete.id}`
     )
       .then(() => {
+        // quitar del estado (UI inmediata)
         const filtrados = distribuidores.filter(
           (d) => d.id !== distribuidorDelete.id
         );
+
         setDistribuidores(filtrados);
         setShowDelete(false);
       })
@@ -118,9 +122,10 @@ export default function Distribuidores() {
   };
 
   // Filtro de búsqueda dinámica
-  const distribuidoresFiltrados = distribuidores.filter((d) =>
-    d.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-    d.rfc?.toLowerCase().includes(busqueda.toLowerCase())
+  const distribuidoresFiltrados = distribuidores.filter(
+    (d) =>
+      d.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      d.rfc?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   return (
