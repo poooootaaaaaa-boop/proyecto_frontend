@@ -10,8 +10,8 @@ import TabHorarios from "../farmacia/personal/Tabhorarios";
 import TabPermisos from "../farmacia/personal/Tabpermisos";
 import TabVacaciones from "../farmacia/personal/Tabvacaciones";
 import TabHistorial from "../farmacia/personal/Tabhistorial";
-import "./dashboardFarmacia.css";
-import "./gestionPersonal.css";
+import "./DashboardFarmacia.css";
+import "./GestionPersonal.css";
 
 /** CLIC-384 · Gestión de Personal — administra la información del personal de la clínica. */
 const TABS = [
