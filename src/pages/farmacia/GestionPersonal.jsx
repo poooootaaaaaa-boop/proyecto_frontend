@@ -5,11 +5,11 @@ import Sidebar from "../../components/farmacia/Sidebar";
 import Topbar from "../../components/farmacia/Topbar";
 import { PERSONAL_URL, getClinicaId } from "../farmacia/personal/Personalutils.js";
 import TabEmpleados from "../farmacia/personal/Tabempleados.jsx";
-import TabPuestos from "../farmacia/personal/TabPuestos";
-import TabHorarios from "../farmacia/personal/TabHorarios";
-import TabPermisos from "../farmacia/personal/TabPermisos";
-import TabVacaciones from "../farmacia/personal/TabVacaciones";
-import TabHistorial from "../farmacia/personal/TabHistorial";
+import TabPuestos from "../farmacia/personal/Tabpuestos";
+import TabHorarios from "../farmacia/personal/Tabhorarios";
+import TabPermisos from "../farmacia/personal/Tabpermisos";
+import TabVacaciones from "../farmacia/personal/Tabvacaciones";
+import TabHistorial from "../farmacia/personal/Tabhistorial";
 import "./dashboardFarmacia.css";
 import "./gestionPersonal.css";
 
